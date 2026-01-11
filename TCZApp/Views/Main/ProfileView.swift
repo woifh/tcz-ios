@@ -39,7 +39,7 @@ struct ProfileView: View {
                     HStack {
                         Text("Server")
                         Spacer()
-                        Text("tcz.pythonanywhere.com")
+                        Text("woifh.pythonanywhere.com")
                             .foregroundColor(.secondary)
                     }
                 }
