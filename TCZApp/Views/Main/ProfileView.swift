@@ -4,6 +4,12 @@ struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var showingLogoutAlert = false
 
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
+        return "\(version) (\(build))"
+    }
+
     var body: some View {
         NavigationView {
             List {
@@ -33,13 +39,13 @@ struct ProfileView: View {
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text("1.0.0")
+                        Text(appVersion)
                             .foregroundColor(.secondary)
                     }
                     HStack {
                         Text("Server")
                         Spacer()
-                        Text("woifh.pythonanywhere.com")
+                        Text(APIClient.shared.serverHost)
                             .foregroundColor(.secondary)
                     }
                 }

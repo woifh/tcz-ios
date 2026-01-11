@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - 2025-01-11
 ### Fixed
-- Corrected server URL displayed in Profile view (woifh.pythonanywhere.com)
+- Profile view now dynamically reads version from app bundle and server URL from APIClient
 
 ## [1.0.0] - 2025-01-11
 ### Added

@@ -169,6 +169,10 @@ final class APIClient: APIClientProtocol {
         }
     }
 
+    var serverHost: String {
+        baseURL.host ?? baseURL.absoluteString
+    }
+
     func clearCookies() {
         if let cookies = HTTPCookieStorage.shared.cookies {
             cookies.forEach { HTTPCookieStorage.shared.deleteCookie($0) }
