@@ -21,7 +21,7 @@ final class APIClient: APIClientProtocol {
         #if DEBUG
         self.baseURL = URL(string: "http://10.0.0.147:5001")!  // Mac's local IP for device testing
         #else
-        self.baseURL = URL(string: "https://tcz.pythonanywhere.com")!
+        self.baseURL = URL(string: "https://woifh.pythonanywhere.com")!
         #endif
 
         // Configure session with cookie storage for Flask session management
