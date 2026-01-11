@@ -5,8 +5,15 @@ struct CourtGridView: View {
     /// Callback when a slot is tapped: (courtId, courtNumber, time, slot)
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
 
-    // Calculate grid height: page label (30) + header (32) + 14 rows * ~36 each + padding
-    private let gridHeight: CGFloat = 30 + 32 + (14 * 36) + 40
+    // Height constants - show 8 slots at once for better readability
+    private let visibleSlots: Int = 8
+    private let rowHeight: CGFloat = 50
+    private let headerHeight: CGFloat = 36
+    private let pageLabelHeight: CGFloat = 30
+
+    private var gridHeight: CGFloat {
+        pageLabelHeight + headerHeight + (CGFloat(visibleSlots) * rowHeight) + 20
+    }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -23,7 +30,10 @@ struct CourtGridView: View {
                     SinglePageGrid(
                         viewModel: viewModel,
                         pageIndex: pageIndex,
-                        onSlotTap: onSlotTap
+                        onSlotTap: onSlotTap,
+                        visibleSlots: visibleSlots,
+                        rowHeight: rowHeight,
+                        headerHeight: headerHeight
                     )
                     .tag(pageIndex)
                 }
@@ -87,9 +97,16 @@ struct SinglePageGrid: View {
     @ObservedObject var viewModel: DashboardViewModel
     let pageIndex: Int
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
+    let visibleSlots: Int
+    let rowHeight: CGFloat
+    let headerHeight: CGFloat
 
     private var courtIndices: Range<Int> {
         viewModel.courtIndicesForPage(pageIndex)
+    }
+
+    private var scrollAreaHeight: CGFloat {
+        CGFloat(visibleSlots) * rowHeight
     }
 
     var body: some View {
@@ -101,53 +118,60 @@ struct SinglePageGrid: View {
                 .foregroundColor(.secondary)
                 .padding(.bottom, 8)
 
-            // Header row with court numbers
+            // Header row with court numbers (fixed)
             HStack(spacing: 0) {
                 Text("Zeit")
-                    .font(.caption)
+                    .font(.body)
                     .fontWeight(.semibold)
-                    .frame(width: 50)
-                    .padding(.vertical, 8)
+                    .frame(width: 60)
+                    .frame(height: headerHeight)
                     .background(Color(.systemGray5))
 
                 ForEach(courtIndices, id: \.self) { courtIndex in
                     let courtNumber = viewModel.courtNumbers[courtIndex]
                     Text("P\(courtNumber)")
-                        .font(.caption)
+                        .font(.body)
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .frame(height: headerHeight)
                         .background(Color(.systemGray5))
                 }
             }
 
-            // Time slot rows
-            ForEach(viewModel.timeSlots, id: \.self) { time in
-                HStack(spacing: 0) {
-                    // Time label
-                    Text(time)
-                        .font(.caption2)
-                        .frame(width: 50)
-                        .padding(.vertical, 10)
-                        .background(Color(.systemGray6))
+            // Scrollable time slot rows - shows 8 slots, scroll for more
+            ScrollView(.vertical, showsIndicators: true) {
+                VStack(spacing: 0) {
+                    ForEach(viewModel.timeSlots, id: \.self) { time in
+                        HStack(spacing: 0) {
+                            // Time label
+                            Text(time)
+                                .font(.body)
+                                .fontWeight(.medium)
+                                .frame(width: 60)
+                                .frame(height: rowHeight)
+                                .background(Color(.systemGray6))
 
-                    // Court cells (only for this page's courts)
-                    ForEach(courtIndices, id: \.self) { courtIndex in
-                        let slot = viewModel.getSlot(courtIndex: courtIndex, time: time)
-                        let courtInfo = viewModel.getCourtInfo(courtIndex: courtIndex)
+                            // Court cells (only for this page's courts)
+                            ForEach(courtIndices, id: \.self) { courtIndex in
+                                let slot = viewModel.getSlot(courtIndex: courtIndex, time: time)
+                                let courtInfo = viewModel.getCourtInfo(courtIndex: courtIndex)
 
-                        TimeSlotCell(
-                            slot: slot,
-                            isPast: viewModel.isSlotInPast(time: time),
-                            canBook: viewModel.canBookSlot(slot, time: time),
-                            isUserBooking: viewModel.isUserBooking(slot)
-                        )
-                        .onTapGesture {
-                            onSlotTap(courtInfo.id, courtInfo.number, time, slot)
+                                TimeSlotCell(
+                                    slot: slot,
+                                    isPast: viewModel.isSlotInPast(time: time),
+                                    canBook: viewModel.canBookSlot(slot, time: time),
+                                    isUserBooking: viewModel.isUserBooking(slot),
+                                    rowHeight: rowHeight
+                                )
+                                .onTapGesture {
+                                    onSlotTap(courtInfo.id, courtInfo.number, time, slot)
+                                }
+                            }
                         }
                     }
                 }
             }
+            .frame(height: scrollAreaHeight)
         }
         .background(Color(.systemBackground))
         .cornerRadius(8)
@@ -161,6 +185,7 @@ struct TimeSlotCell: View {
     let isPast: Bool
     let canBook: Bool
     let isUserBooking: Bool
+    let rowHeight: CGFloat
 
     var body: some View {
         VStack(spacing: 2) {
@@ -169,33 +194,33 @@ struct TimeSlotCell: View {
                 case .available:
                     if isPast {
                         Text("-")
-                            .font(.system(size: 10))
+                            .font(.system(size: 14))
                     } else {
                         Text("Frei")
-                            .font(.system(size: 9))
+                            .font(.system(size: 13))
                             .fontWeight(.medium)
                     }
 
                 case .reserved, .shortNotice:
                     if let details = slot.details {
                         Text(details.bookedFor ?? "Gebucht")
-                            .font(.system(size: 8))
+                            .font(.system(size: 11))
                             .lineLimit(2)
                             .multilineTextAlignment(.center)
                     } else {
                         Text("Gebucht")
-                            .font(.system(size: 9))
+                            .font(.system(size: 13))
                     }
 
                 case .blocked:
                     VStack(spacing: 1) {
                         Text(slot.details?.reason ?? "Gesperrt")
-                            .font(.system(size: 7))
+                            .font(.system(size: 10))
                             .fontWeight(.medium)
 
                         if let details = slot.details?.details, !details.isEmpty {
                             Text(details)
-                                .font(.system(size: 6))
+                                .font(.system(size: 9))
                                 .opacity(0.8)
                         }
                     }
@@ -204,12 +229,12 @@ struct TimeSlotCell: View {
                 }
             } else {
                 Text("Frei")
-                    .font(.system(size: 9))
+                    .font(.system(size: 13))
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .padding(.horizontal, 2)
+        .frame(height: rowHeight)
+        .padding(.horizontal, 4)
         .background(backgroundColor)
         .foregroundColor(foregroundColor)
         .opacity(isPast ? 0.5 : 1.0)
