@@ -1,7 +1,7 @@
 import Foundation
 
 struct Member: Codable, Identifiable, Equatable {
-    let id: Int
+    let id: String
     let firstname: String
     let lastname: String
     let email: String
@@ -13,7 +13,7 @@ struct Member: Codable, Identifiable, Equatable {
 }
 
 struct MemberSummary: Codable, Identifiable, Equatable, Hashable {
-    let id: Int
+    let id: String
     let name: String
     let email: String
 
@@ -29,6 +29,12 @@ struct MemberSummary: Codable, Identifiable, Equatable, Hashable {
 // Login response
 struct LoginResponse: Decodable {
     let user: Member
+    let accessToken: String
+
+    enum CodingKeys: String, CodingKey {
+        case user
+        case accessToken = "access_token"
+    }
 }
 
 // Favorites response

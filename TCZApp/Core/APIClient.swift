@@ -3,6 +3,7 @@ import Foundation
 protocol APIClientProtocol {
     func request<T: Decodable>(_ endpoint: APIEndpoint, body: Encodable?) async throws -> T
     func requestVoid(_ endpoint: APIEndpoint, body: Encodable?) async throws
+    func setAccessToken(_ token: String?)
 }
 
 final class APIClient: APIClientProtocol {
@@ -13,6 +14,8 @@ final class APIClient: APIClientProtocol {
     private let decoder: JSONDecoder
     // Keep a strong reference to the delegate to prevent deallocation
     private let redirectBlocker: RedirectBlocker
+    // Bearer token for API authentication
+    private var accessToken: String?
 
     private init() {
         // Development URL - use your Mac's IP for device testing, 127.0.0.1 for simulator
@@ -69,6 +72,10 @@ final class APIClient: APIClientProtocol {
         }
     }
 
+    func setAccessToken(_ token: String?) {
+        self.accessToken = token
+    }
+
     func request<T: Decodable>(_ endpoint: APIEndpoint, body: Encodable? = nil) async throws -> T {
         // Use string concatenation to preserve query parameters (appendingPathComponent encodes ? and &)
         guard let url = URL(string: baseURL.absoluteString + endpoint.path) else {
@@ -78,6 +85,11 @@ final class APIClient: APIClientProtocol {
         request.httpMethod = endpoint.method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        // Add Bearer token if available
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
 
         if let body = body {
             let encoder = JSONEncoder()
@@ -131,6 +143,11 @@ final class APIClient: APIClientProtocol {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
+        // Add Bearer token if available
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
         if let body = body {
             let encoder = JSONEncoder()
             request.httpBody = try encoder.encode(body)
@@ -177,6 +194,11 @@ final class APIClient: APIClientProtocol {
         if let cookies = HTTPCookieStorage.shared.cookies {
             cookies.forEach { HTTPCookieStorage.shared.deleteCookie($0) }
         }
+    }
+
+    func clearAuth() {
+        accessToken = nil
+        clearCookies()
     }
 }
 

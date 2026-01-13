@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class BookingViewModel: ObservableObject {
-    @Published var selectedMemberId: Int?
+    @Published var selectedMemberId: String?
     @Published var favorites: [MemberSummary] = []
     @Published var isLoading = false
     @Published var isLoadingFavorites = false
@@ -15,7 +15,7 @@ final class BookingViewModel: ObservableObject {
     var courtNumber: Int = 0
     var time: String = ""
     var date: Date = Date()
-    var currentUserId: Int?
+    var currentUserId: String?
 
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -28,7 +28,7 @@ final class BookingViewModel: ObservableObject {
         self.apiClient = apiClient
     }
 
-    func setup(courtId: Int, courtNumber: Int, time: String, date: Date, currentUserId: Int) {
+    func setup(courtId: Int, courtNumber: Int, time: String, date: Date, currentUserId: String) {
         self.courtId = courtId
         self.courtNumber = courtNumber
         self.time = time

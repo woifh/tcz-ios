@@ -47,6 +47,12 @@ final class AuthViewModel: ObservableObject {
                 try? keychainService.save(key: "currentUser", data: userData)
             }
 
+            // Store and set access token for Bearer authentication
+            if let tokenData = response.accessToken.data(using: .utf8) {
+                try? keychainService.save(key: "accessToken", data: tokenData)
+            }
+            apiClient.setAccessToken(response.accessToken)
+
         } catch let error as APIError {
             errorMessage = error.localizedDescription
         } catch {
@@ -70,8 +76,10 @@ final class AuthViewModel: ObservableObject {
         currentUser = nil
         isAuthenticated = false
         keychainService.delete(key: "currentUser")
+        keychainService.delete(key: "accessToken")
 
-        // Clear cookies
+        // Clear auth (token and cookies)
+        apiClient.setAccessToken(nil)
         if let client = apiClient as? APIClient {
             client.clearCookies()
         }
@@ -80,10 +88,17 @@ final class AuthViewModel: ObservableObject {
     }
 
     private func checkStoredSession() {
+        // Restore user data
         if let userData = keychainService.load(key: "currentUser"),
            let user = try? JSONDecoder().decode(Member.self, from: userData) {
             currentUser = user
             isAuthenticated = true
+
+            // Restore access token for Bearer authentication
+            if let tokenData = keychainService.load(key: "accessToken"),
+               let token = String(data: tokenData, encoding: .utf8) {
+                apiClient.setAccessToken(token)
+            }
         }
     }
 }

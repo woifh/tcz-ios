@@ -9,7 +9,7 @@ struct BookingSheet: View {
     let courtNumber: Int
     let time: String
     let date: Date
-    let currentUserId: Int
+    let currentUserId: String
     let onComplete: () -> Void
 
     @State private var currentUserName: String = "Ich"
@@ -49,11 +49,11 @@ struct BookingSheet: View {
                     } else {
                         Picker("Mitglied", selection: $viewModel.selectedMemberId) {
                             Text("\(currentUserName) (Ich)")
-                                .tag(currentUserId as Int?)
+                                .tag(currentUserId as String?)
 
                             ForEach(viewModel.favorites) { favorite in
                                 Text(favorite.name)
-                                    .tag(favorite.id as Int?)
+                                    .tag(favorite.id as String?)
                             }
                         }
                     }

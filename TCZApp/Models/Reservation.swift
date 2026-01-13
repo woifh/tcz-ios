@@ -8,9 +8,9 @@ struct Reservation: Codable, Identifiable, Equatable {
     let startTime: String
     let endTime: String
     let bookedFor: String
-    let bookedForId: Int
+    let bookedForId: String
     let bookedBy: String
-    let bookedById: Int
+    let bookedById: String
     let status: String
     let isShortNotice: Bool
     let isActive: Bool?
@@ -89,7 +89,7 @@ struct CreateBookingRequest: Encodable {
     let courtId: Int
     let date: String
     let startTime: String
-    let bookedForId: Int
+    let bookedForId: String
 
     enum CodingKeys: String, CodingKey {
         case courtId = "court_id"

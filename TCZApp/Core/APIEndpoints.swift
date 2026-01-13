@@ -9,9 +9,9 @@ enum APIEndpoint {
     case createReservation
     case cancelReservation(id: Int)
     case searchMembers(query: String)
-    case favorites(memberId: Int)
-    case addFavorite(memberId: Int)
-    case removeFavorite(memberId: Int, favoriteId: Int)
+    case favorites(memberId: String)
+    case addFavorite(memberId: String)
+    case removeFavorite(memberId: String, favoriteId: String)
 
     var path: String {
         switch self {

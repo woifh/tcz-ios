@@ -1,7 +1,7 @@
 import Foundation
 
 struct AddFavoriteRequest: Encodable {
-    let favouriteId: Int
+    let favouriteId: String
 
     enum CodingKeys: String, CodingKey {
         case favouriteId = "favourite_id"
@@ -28,13 +28,13 @@ final class FavoritesViewModel: ObservableObject {
     @Published var searchQuery = ""
 
     private let apiClient: APIClientProtocol
-    private(set) var currentUserId: Int?
+    private(set) var currentUserId: String?
 
     init(apiClient: APIClientProtocol = APIClient.shared) {
         self.apiClient = apiClient
     }
 
-    func setCurrentUserId(_ id: Int) {
+    func setCurrentUserId(_ id: String) {
         self.currentUserId = id
     }
 
@@ -82,7 +82,7 @@ final class FavoritesViewModel: ObservableObject {
         isSearching = false
     }
 
-    func addFavorite(_ memberId: Int) async -> Bool {
+    func addFavorite(_ memberId: String) async -> Bool {
         guard let userId = currentUserId else { return false }
 
         isAdding = true
@@ -109,7 +109,7 @@ final class FavoritesViewModel: ObservableObject {
         }
     }
 
-    func removeFavorite(_ favoriteId: Int) async -> Bool {
+    func removeFavorite(_ favoriteId: String) async -> Bool {
         guard let userId = currentUserId else { return false }
 
         do {

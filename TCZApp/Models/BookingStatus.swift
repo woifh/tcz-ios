@@ -2,7 +2,7 @@ import Foundation
 
 struct BookingStatusResponse: Codable {
     let currentTime: String
-    let userId: Int
+    let userId: String
     let limits: BookingLimits
     let activeReservations: ActiveReservationCounts
     let nextReservations: [ReservationSummary]

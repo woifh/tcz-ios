@@ -38,9 +38,9 @@ enum SlotStatus: String, Codable {
 struct SlotDetails: Codable {
     // For reservations
     let bookedFor: String?
-    let bookedForId: Int?
+    let bookedForId: String?
     let bookedBy: String?
-    let bookedById: Int?
+    let bookedById: String?
     let reservationId: Int?
     let isShortNotice: Bool?
 

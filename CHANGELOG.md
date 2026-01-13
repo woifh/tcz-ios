@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2025-01-14
+### Changed
+- Compact header layout for more screen space
+- Secure token-based authentication
+
 ## [1.0.1] - 2025-01-11
 ### Fixed
 - Profile view now dynamically reads version from app bundle and server URL from APIClient

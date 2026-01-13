@@ -11,7 +11,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var currentPage: Int = 0
 
     private let apiClient: APIClientProtocol
-    private(set) var currentUserId: Int?
+    private(set) var currentUserId: String?
 
     // Time slots: 08:00 to 21:00 (14 slots)
     let timeSlots = (8..<22).map { String(format: "%02d:00", $0) }
@@ -44,7 +44,7 @@ final class DashboardViewModel: ObservableObject {
         self.apiClient = apiClient
     }
 
-    func setCurrentUserId(_ id: Int) {
+    func setCurrentUserId(_ id: String) {
         self.currentUserId = id
     }
 

@@ -8,13 +8,13 @@ final class ReservationsViewModel: ObservableObject {
     @Published var cancellingId: Int?
 
     private let apiClient: APIClientProtocol
-    private(set) var currentUserId: Int?
+    private(set) var currentUserId: String?
 
     init(apiClient: APIClientProtocol = APIClient.shared) {
         self.apiClient = apiClient
     }
 
-    func setCurrentUserId(_ id: Int) {
+    func setCurrentUserId(_ id: String) {
         self.currentUserId = id
     }
 
