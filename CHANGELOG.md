@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-01-15
+### Changed
+- Updated to work with server version 3.7.0
+- Improved booking dialog reliability
+- Optimized data loading for better performance
+
+### Fixed
+- Court availability display now loads correctly
+- Booking a court now works properly
+- "My Bookings" list displays correctly
+
 ## [2.0.0] - 2025-01-14
 ### Changed
 - Compact header layout for more screen space

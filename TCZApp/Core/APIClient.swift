@@ -107,6 +107,13 @@ final class APIClient: APIClientProtocol {
             do {
                 return try decoder.decode(T.self, from: data)
             } catch {
+                #if DEBUG
+                print("🔴 Decoding error for \(endpoint.path):")
+                print("   Error: \(error)")
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("   Response JSON: \(jsonString.prefix(1000))")
+                }
+                #endif
                 throw APIError.decodingError(error)
             }
         case 301, 302, 303, 307, 308:

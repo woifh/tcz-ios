@@ -5,7 +5,7 @@ struct BookingStatusResponse: Codable {
     let userId: String
     let limits: BookingLimits
     let activeReservations: ActiveReservationCounts
-    let nextReservations: [ReservationSummary]
+    let nextReservations: [ReservationSummary]?
 
     enum CodingKeys: String, CodingKey {
         case currentTime = "current_time"

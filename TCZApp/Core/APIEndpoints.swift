@@ -20,24 +20,24 @@ enum APIEndpoint {
         case .logout:
             return "/auth/logout"
         case .availability(let date):
-            return "/courts/availability?date=\(date)"
+            return "/api/courts/availability?date=\(date)"
         case .reservations:
-            return "/reservations/?format=json"
+            return "/api/reservations/"
         case .reservationStatus:
-            return "/reservations/status"
+            return "/api/reservations/status"
         case .createReservation:
-            return "/reservations/"
+            return "/api/reservations/"
         case .cancelReservation(let id):
-            return "/reservations/\(id)"
+            return "/api/reservations/\(id)"
         case .searchMembers(let query):
             let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-            return "/members/search?q=\(encoded)"
+            return "/api/members/search?q=\(encoded)"
         case .favorites(let memberId):
-            return "/members/\(memberId)/favourites"
+            return "/api/members/\(memberId)/favourites"
         case .addFavorite(let memberId):
-            return "/members/\(memberId)/favourites"
+            return "/api/members/\(memberId)/favourites"
         case .removeFavorite(let memberId, let favoriteId):
-            return "/members/\(memberId)/favourites/\(favoriteId)"
+            return "/api/members/\(memberId)/favourites/\(favoriteId)"
         }
     }
 

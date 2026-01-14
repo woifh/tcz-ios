@@ -3,13 +3,13 @@ import Foundation
 struct Reservation: Codable, Identifiable, Equatable {
     let id: Int
     let courtId: Int
-    let courtNumber: Int
+    let courtNumber: Int?
     let date: String
     let startTime: String
     let endTime: String
-    let bookedFor: String
+    let bookedFor: String?
     let bookedForId: String
-    let bookedBy: String
+    let bookedBy: String?
     let bookedById: String
     let status: String
     let isShortNotice: Bool
@@ -101,7 +101,6 @@ struct CreateBookingRequest: Encodable {
 
 // Create booking response
 struct BookingCreatedResponse: Decodable {
-    let id: Int
     let message: String
     let reservation: CreatedReservationInfo?
 }
@@ -109,18 +108,28 @@ struct BookingCreatedResponse: Decodable {
 struct CreatedReservationInfo: Decodable {
     let id: Int
     let courtId: Int
+    let courtNumber: Int?
     let date: String
     let startTime: String
     let endTime: String
     let isShortNotice: Bool
+    let bookedFor: String?
+    let bookedForId: String?
+    let bookedById: String?
+    let status: String?
 
     enum CodingKeys: String, CodingKey {
         case id
         case courtId = "court_id"
+        case courtNumber = "court_number"
         case date
         case startTime = "start_time"
         case endTime = "end_time"
         case isShortNotice = "is_short_notice"
+        case bookedFor = "booked_for"
+        case bookedForId = "booked_for_id"
+        case bookedById = "booked_by_id"
+        case status
     }
 }
 

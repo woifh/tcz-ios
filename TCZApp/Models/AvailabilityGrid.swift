@@ -2,22 +2,36 @@ import Foundation
 
 struct AvailabilityResponse: Codable {
     let date: String
-    let grid: [CourtAvailability]
+    let currentHour: Int?
+    let courts: [CourtAvailability]
     let metadata: AvailabilityMetadata?
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case currentHour = "current_hour"
+        case courts
+        case metadata
+    }
 }
 
 struct CourtAvailability: Codable, Identifiable {
     let courtId: Int
     let courtNumber: Int
-    let slots: [TimeSlot]
+    let occupied: [OccupiedSlot]
 
     var id: Int { courtId }
 
     enum CodingKeys: String, CodingKey {
         case courtId = "court_id"
         case courtNumber = "court_number"
-        case slots
+        case occupied
     }
+}
+
+struct OccupiedSlot: Codable {
+    let time: String
+    let status: SlotStatus
+    let details: SlotDetails?
 }
 
 struct TimeSlot: Codable, Identifiable {

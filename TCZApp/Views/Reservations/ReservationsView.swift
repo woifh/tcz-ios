@@ -89,7 +89,8 @@ struct ReservationsView: View {
 
     private var cancelAlertMessage: String {
         if let reservation = reservationToCancel {
-            return "Moechten Sie die Buchung fuer Platz \(reservation.courtNumber) am \(reservation.formattedDate) um \(reservation.startTime) wirklich stornieren?"
+            let courtText = reservation.courtNumber.map { "Platz \($0)" } ?? "den Platz"
+            return "Moechten Sie die Buchung fuer \(courtText) am \(reservation.formattedDate) um \(reservation.startTime) wirklich stornieren?"
         }
         return ""
     }
@@ -104,7 +105,7 @@ struct ReservationRow: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text("Platz \(reservation.courtNumber)")
+                    Text("Platz \(reservation.courtNumber ?? 0)")
                         .font(.headline)
 
                     if reservation.isShortNotice {
@@ -122,8 +123,10 @@ struct ReservationRow: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
-                if reservation.bookedFor != reservation.bookedBy {
-                    Text("Fuer: \(reservation.bookedFor)")
+                if let bookedFor = reservation.bookedFor,
+                   let bookedBy = reservation.bookedBy,
+                   bookedFor != bookedBy {
+                    Text("Fuer: \(bookedFor)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

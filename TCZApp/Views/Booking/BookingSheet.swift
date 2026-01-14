@@ -100,6 +100,9 @@ struct BookingSheet: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
+            #if DEBUG
+            print("📋 BookingSheet appeared - courtId: \(courtId), courtNumber: \(courtNumber), time: \(time), userId: \(currentUserId)")
+            #endif
             if !isInitialized {
                 // Setup viewModel with booking data
                 viewModel.courtId = courtId

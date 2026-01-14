@@ -105,16 +105,23 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func getSlot(courtIndex: Int, time: String) -> TimeSlot? {
-        guard let courts = availability?.grid,
+        guard let courts = availability?.courts,
               courtIndex < courts.count else {
             return nil
         }
-        return courts[courtIndex].slots.first { $0.time == time }
+
+        // Check if this time slot is in the occupied array (sparse format)
+        if let occupied = courts[courtIndex].occupied.first(where: { $0.time == time }) {
+            return TimeSlot(time: occupied.time, status: occupied.status, details: occupied.details)
+        }
+
+        // Slot not in occupied array = available
+        return TimeSlot(time: time, status: .available, details: nil)
     }
 
     /// Returns the court ID and number for a given index
     func getCourtInfo(courtIndex: Int) -> (id: Int, number: Int) {
-        guard let courts = availability?.grid,
+        guard let courts = availability?.courts,
               courtIndex < courts.count else {
             // Fallback: assume court ID equals court number (1-6)
             return (id: courtIndex + 1, number: courtIndex + 1)

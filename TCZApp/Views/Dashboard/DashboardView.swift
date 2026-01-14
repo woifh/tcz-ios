@@ -1,10 +1,18 @@
 import SwiftUI
 
+/// Data needed to show the booking sheet
+struct BookingSheetData: Identifiable {
+    let id = UUID()
+    let courtId: Int
+    let courtNumber: Int
+    let time: String
+    let userId: String
+}
+
 struct DashboardView: View {
     @ObservedObject var viewModel: DashboardViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
-    @State private var showingBookingSheet = false
-    @State private var selectedSlotInfo: (courtId: Int, courtNumber: Int, time: String)?
+    @State private var bookingSheetData: BookingSheetData?
 
     var body: some View {
         NavigationView {
@@ -43,21 +51,18 @@ struct DashboardView: View {
             .refreshable {
                 await viewModel.refresh()
             }
-            .sheet(isPresented: $showingBookingSheet) {
-                if let info = selectedSlotInfo,
-                   let userId = authViewModel.currentUser?.id {
-                    BookingSheet(
-                        courtId: info.courtId,
-                        courtNumber: info.courtNumber,
-                        time: info.time,
-                        date: viewModel.selectedDate,
-                        currentUserId: userId,
-                        onComplete: {
-                            showingBookingSheet = false
-                            Task { await viewModel.loadData() }
-                        }
-                    )
-                }
+            .sheet(item: $bookingSheetData) { data in
+                BookingSheet(
+                    courtId: data.courtId,
+                    courtNumber: data.courtNumber,
+                    time: data.time,
+                    date: viewModel.selectedDate,
+                    currentUserId: data.userId,
+                    onComplete: {
+                        bookingSheetData = nil
+                        Task { await viewModel.loadData() }
+                    }
+                )
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
@@ -70,10 +75,16 @@ struct DashboardView: View {
     }
 
     private func handleSlotTap(courtId: Int, courtNumber: Int, time: String, slot: TimeSlot?) {
-        if viewModel.canBookSlot(slot, time: time) {
-            selectedSlotInfo = (courtId, courtNumber, time)
-            showingBookingSheet = true
+        guard viewModel.canBookSlot(slot, time: time),
+              let userId = authViewModel.currentUser?.id else {
+            return
         }
+        bookingSheetData = BookingSheetData(
+            courtId: courtId,
+            courtNumber: courtNumber,
+            time: time,
+            userId: userId
+        )
     }
 }
 
