@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.2] - 2026-01-15
 ### Changed
 - Improved court page indicator with text labels instead of dots
+- Court grid now shows all time slots instead of limiting to 8
 
 ## [3.1] - 2026-01-15
 ### Changed
