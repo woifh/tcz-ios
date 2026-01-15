@@ -20,7 +20,7 @@ struct DashboardView: View {
                 VStack(spacing: 12) {
                     // Compact Header (date selector + legend + booking badge)
                     CompactHeaderView(
-                        selectedDate: viewModel.selectedDate,
+                        selectedDate: $viewModel.selectedDate,
                         isToday: viewModel.isToday,
                         bookingStatus: viewModel.bookingStatus,
                         onPrevious: { viewModel.changeDate(by: -1) },
@@ -89,12 +89,15 @@ struct DashboardView: View {
 }
 
 struct CompactHeaderView: View {
-    let selectedDate: Date
+    @Binding var selectedDate: Date
     let isToday: Bool
     let bookingStatus: BookingStatusResponse?
     let onPrevious: () -> Void
     let onNext: () -> Void
     let onToday: () -> Void
+
+    @State private var showLegend = false
+    @State private var showDatePicker = false
 
     private var compactDateString: String {
         DateFormatterService.compactDate.string(from: selectedDate)
@@ -113,86 +116,152 @@ struct CompactHeaderView: View {
     }
 
     var body: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 12) {
-                // Date navigation
-                HStack(spacing: 8) {
-                    Button(action: onPrevious) {
-                        Image(systemName: "chevron.left")
-                            .font(.body.weight(.semibold))
-                            .foregroundColor(.green)
-                    }
+        HStack(spacing: 8) {
+            // Date navigation
+            Button(action: onPrevious) {
+                Image(systemName: "chevron.left")
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(.green)
+                    .frame(width: 40, height: 40)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+            }
 
-                    Text(compactDateString)
-                        .font(.subheadline.weight(.medium))
-                        .frame(minWidth: 100)
+            Button(action: { showDatePicker = true }) {
+                Text(compactDateString)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .foregroundColor(.primary)
+            }
 
-                    Button(action: onNext) {
-                        Image(systemName: "chevron.right")
-                            .font(.body.weight(.semibold))
-                            .foregroundColor(.green)
-                    }
-                }
+            Button(action: onNext) {
+                Image(systemName: "chevron.right")
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(.green)
+                    .frame(width: 40, height: 40)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+            }
 
-                Spacer()
+            // Today button (calendar icon)
+            Button(action: onToday) {
+                Image(systemName: "calendar.badge.clock")
+                    .font(.title3)
+                    .foregroundColor(.white)
+                    .frame(width: 40, height: 40)
+                    .background(isToday ? Color(.systemGray4) : Color.green)
+                    .cornerRadius(8)
+            }
+            .disabled(isToday)
 
-                // Legend
-                HStack(spacing: 8) {
-                    CompactLegendDot(color: .green, label: "F")
-                    CompactLegendDot(color: .red, label: "B")
-                    CompactLegendDot(color: .orange, label: "K")
-                    CompactLegendDot(color: .gray, label: "G")
-                }
+            Spacer()
 
-                // Booking badges (only show when near limit)
-                if let status = bookingStatus {
-                    if showRegularBadge || showShortNoticeBadge {
-                        HStack(spacing: 4) {
-                            if showRegularBadge {
-                                BookingBadge(
-                                    current: status.limits.regularReservations.current,
-                                    limit: status.limits.regularReservations.limit,
-                                    color: status.limits.regularReservations.canBook ? .secondary : .red
-                                )
-                            }
-                            if showShortNoticeBadge {
-                                BookingBadge(
-                                    current: status.limits.shortNoticeBookings.current,
-                                    limit: status.limits.shortNoticeBookings.limit,
-                                    color: status.limits.shortNoticeBookings.canBook ? .orange : .red
-                                )
-                            }
+            // Legend info button
+            Button(action: { showLegend = true }) {
+                Image(systemName: "info.circle")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+            }
+
+            // Booking badges (only show when near limit)
+            if let status = bookingStatus {
+                if showRegularBadge || showShortNoticeBadge {
+                    HStack(spacing: 4) {
+                        if showRegularBadge {
+                            BookingBadge(
+                                current: status.limits.regularReservations.current,
+                                limit: status.limits.regularReservations.limit,
+                                color: status.limits.regularReservations.canBook ? .secondary : .red
+                            )
+                        }
+                        if showShortNoticeBadge {
+                            BookingBadge(
+                                current: status.limits.shortNoticeBookings.current,
+                                limit: status.limits.shortNoticeBookings.limit,
+                                color: status.limits.shortNoticeBookings.canBook ? .orange : .red
+                            )
                         }
                     }
                 }
             }
-
-            // Today button (only when not on today)
-            if !isToday {
-                Button("Heute", action: onToday)
-                    .font(.caption)
-                    .foregroundColor(.green)
-            }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
         .background(Color(.systemBackground))
         .cornerRadius(10)
         .shadow(radius: 1)
+        .sheet(isPresented: $showLegend) {
+            LegendSheet()
+                .presentationDetents([.height(220)])
+        }
+        .sheet(isPresented: $showDatePicker) {
+            DatePickerSheet(selectedDate: $selectedDate)
+                .presentationDetents([.medium])
+        }
     }
 }
 
-struct CompactLegendDot: View {
-    let color: Color
-    let label: String
+struct LegendSheet: View {
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        HStack(spacing: 2) {
+        NavigationView {
+            VStack(alignment: .leading, spacing: 12) {
+                LegendRow(color: .green, title: "Frei", description: "Platz verfuegbar")
+                LegendRow(color: .red, title: "Belegt", description: "Bereits gebucht")
+                LegendRow(color: .orange, title: "Kurzfristig", description: "Buchbar innerhalb 24h")
+                LegendRow(color: Color(.systemGray3), title: "Gesperrt", description: "Nicht buchbar")
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Legende")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("OK") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+struct DatePickerSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var selectedDate: Date
+
+    var body: some View {
+        NavigationView {
+            DatePicker(
+                "Datum",
+                selection: $selectedDate,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.graphical)
+            .padding()
+            .navigationTitle("Datum waehlen")
+            .navigationBarTitleDisplayMode(.inline)
+            .onChange(of: selectedDate) { _ in
+                dismiss()
+            }
+        }
+    }
+}
+
+struct LegendRow: View {
+    let color: Color
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(spacing: 12) {
             Circle()
                 .fill(color)
-                .frame(width: 8, height: 8)
-            Text(label)
-                .font(.caption2)
+                .frame(width: 20, height: 20)
+            Text(title)
+                .font(.subheadline.weight(.medium))
+            Text("– \(description)")
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         }
     }

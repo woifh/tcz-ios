@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Improved court page indicator with text labels instead of dots
 - Court grid now shows all time slots instead of limiting to 8
+- Redesigned date selector with larger touch targets
+- Legend is now accessible via info icon instead of inline display
+- Added calendar picker for quick date selection
+- Today button now always visible with visual state indication
 
 ## [3.1] - 2026-01-15
 ### Changed
