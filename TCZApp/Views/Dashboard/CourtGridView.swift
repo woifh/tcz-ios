@@ -5,14 +5,14 @@ struct CourtGridView: View {
     /// Callback when a slot is tapped: (courtId, courtNumber, time, slot)
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
 
-    // Height constants - show 8 slots at once for better readability
-    private let visibleSlots: Int = 8
+    // Height constants
     private let rowHeight: CGFloat = 50
     private let headerHeight: CGFloat = 36
-    private let pageLabelHeight: CGFloat = 30
 
+    // Calculate grid height based on all time slots
     private var gridHeight: CGFloat {
-        pageLabelHeight + headerHeight + (CGFloat(visibleSlots) * rowHeight) + 20
+        let slotCount = CGFloat(viewModel.timeSlots.count)
+        return headerHeight + (slotCount * rowHeight) + 20
     }
 
     var body: some View {
@@ -31,7 +31,6 @@ struct CourtGridView: View {
                         viewModel: viewModel,
                         pageIndex: pageIndex,
                         onSlotTap: onSlotTap,
-                        visibleSlots: visibleSlots,
                         rowHeight: rowHeight,
                         headerHeight: headerHeight
                     )
@@ -64,16 +63,23 @@ struct PageIndicatorView: View {
             }
             .disabled(currentPage == 0)
 
-            // Page dots
-            HStack(spacing: 8) {
-                ForEach(0..<totalPages, id: \.self) { page in
-                    Circle()
-                        .fill(page == currentPage ? Color.green : Color.gray.opacity(0.4))
-                        .frame(width: 8, height: 8)
-                        .onTapGesture {
-                            withAnimation { onPageChange(page) }
-                        }
-                }
+            // Page labels
+            HStack(spacing: 16) {
+                Text("Plätze 1-3")
+                    .font(.subheadline)
+                    .fontWeight(currentPage == 0 ? .semibold : .regular)
+                    .foregroundColor(currentPage == 0 ? .green : .gray)
+                    .onTapGesture {
+                        withAnimation { onPageChange(0) }
+                    }
+
+                Text("Plätze 4-6")
+                    .font(.subheadline)
+                    .fontWeight(currentPage == 1 ? .semibold : .regular)
+                    .foregroundColor(currentPage == 1 ? .green : .gray)
+                    .onTapGesture {
+                        withAnimation { onPageChange(1) }
+                    }
             }
 
             // Right arrow
@@ -97,7 +103,6 @@ struct SinglePageGrid: View {
     @ObservedObject var viewModel: DashboardViewModel
     let pageIndex: Int
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
-    let visibleSlots: Int
     let rowHeight: CGFloat
     let headerHeight: CGFloat
 
@@ -105,19 +110,8 @@ struct SinglePageGrid: View {
         viewModel.courtIndicesForPage(pageIndex)
     }
 
-    private var scrollAreaHeight: CGFloat {
-        CGFloat(visibleSlots) * rowHeight
-    }
-
     var body: some View {
         VStack(spacing: 0) {
-            // Page label
-            Text(viewModel.pageLabelForPage(pageIndex))
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
-                .padding(.bottom, 8)
-
             // Header row with court numbers (fixed)
             HStack(spacing: 0) {
                 Text("Zeit")
@@ -138,40 +132,37 @@ struct SinglePageGrid: View {
                 }
             }
 
-            // Scrollable time slot rows - shows 8 slots, scroll for more
-            ScrollView(.vertical, showsIndicators: true) {
-                VStack(spacing: 0) {
-                    ForEach(viewModel.timeSlots, id: \.self) { time in
-                        HStack(spacing: 0) {
-                            // Time label
-                            Text(time)
-                                .font(.body)
-                                .fontWeight(.medium)
-                                .frame(width: 60)
-                                .frame(height: rowHeight)
-                                .background(Color(.systemGray6))
+            // Time slot rows
+            VStack(spacing: 0) {
+                ForEach(viewModel.timeSlots, id: \.self) { time in
+                    HStack(spacing: 0) {
+                        // Time label
+                        Text(time)
+                            .font(.body)
+                            .fontWeight(.medium)
+                            .frame(width: 60)
+                            .frame(height: rowHeight)
+                            .background(Color(.systemGray6))
 
-                            // Court cells (only for this page's courts)
-                            ForEach(courtIndices, id: \.self) { courtIndex in
-                                let slot = viewModel.getSlot(courtIndex: courtIndex, time: time)
-                                let courtInfo = viewModel.getCourtInfo(courtIndex: courtIndex)
+                        // Court cells (only for this page's courts)
+                        ForEach(courtIndices, id: \.self) { courtIndex in
+                            let slot = viewModel.getSlot(courtIndex: courtIndex, time: time)
+                            let courtInfo = viewModel.getCourtInfo(courtIndex: courtIndex)
 
-                                TimeSlotCell(
-                                    slot: slot,
-                                    isPast: viewModel.isSlotInPast(time: time),
-                                    canBook: viewModel.canBookSlot(slot, time: time),
-                                    isUserBooking: viewModel.isUserBooking(slot),
-                                    rowHeight: rowHeight
-                                )
-                                .onTapGesture {
-                                    onSlotTap(courtInfo.id, courtInfo.number, time, slot)
-                                }
+                            TimeSlotCell(
+                                slot: slot,
+                                isPast: viewModel.isSlotInPast(time: time),
+                                canBook: viewModel.canBookSlot(slot, time: time),
+                                isUserBooking: viewModel.isUserBooking(slot),
+                                rowHeight: rowHeight
+                            )
+                            .onTapGesture {
+                                onSlotTap(courtInfo.id, courtInfo.number, time, slot)
                             }
                         }
                     }
                 }
             }
-            .frame(height: scrollAreaHeight)
         }
         .background(Color(.systemBackground))
         .cornerRadius(8)
