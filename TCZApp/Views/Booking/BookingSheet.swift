@@ -121,11 +121,8 @@ struct BookingSheet: View {
         .interactiveDismissDisabled(viewModel.isLoading)
     }
 
-    // Compute display values directly from view properties
     private var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        return formatter.string(from: date)
+        DateFormatterService.displayDate.string(from: date)
     }
 
     private var timeRange: String {

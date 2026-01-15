@@ -14,10 +14,10 @@ final class AuthViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let apiClient: APIClientProtocol
-    private let keychainService: KeychainService
+    private let keychainService: KeychainServiceProtocol
 
     init(apiClient: APIClientProtocol = APIClient.shared,
-         keychainService: KeychainService = .shared) {
+         keychainService: KeychainServiceProtocol = KeychainService.shared) {
         self.apiClient = apiClient
         self.keychainService = keychainService
 
@@ -79,10 +79,7 @@ final class AuthViewModel: ObservableObject {
         keychainService.delete(key: "accessToken")
 
         // Clear auth (token and cookies)
-        apiClient.setAccessToken(nil)
-        if let client = apiClient as? APIClient {
-            client.clearCookies()
-        }
+        apiClient.clearAuth()
 
         isLoading = false
     }

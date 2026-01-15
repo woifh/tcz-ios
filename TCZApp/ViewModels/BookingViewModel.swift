@@ -17,12 +17,6 @@ final class BookingViewModel: ObservableObject {
     var date: Date = Date()
     var currentUserId: String?
 
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "Europe/Berlin")
-        return formatter
-    }()
 
     init(apiClient: APIClientProtocol = APIClient.shared) {
         self.apiClient = apiClient
@@ -70,7 +64,7 @@ final class BookingViewModel: ObservableObject {
 
         let request = CreateBookingRequest(
             courtId: courtId,
-            date: dateFormatter.string(from: date),
+            date: DateFormatterService.apiDate.string(from: date),
             startTime: time,
             bookedForId: bookedForId
         )
@@ -99,8 +93,6 @@ final class BookingViewModel: ObservableObject {
     }
 
     var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        return formatter.string(from: date)
+        DateFormatterService.displayDate.string(from: date)
     }
 }

@@ -97,10 +97,7 @@ struct CompactHeaderView: View {
     let onToday: () -> Void
 
     private var compactDateString: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "de_DE")
-        formatter.dateFormat = "E, d. MMM"
-        return formatter.string(from: selectedDate)
+        DateFormatterService.compactDate.string(from: selectedDate)
     }
 
     private var showRegularBadge: Bool {

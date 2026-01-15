@@ -33,12 +33,6 @@ final class DashboardViewModel: ObservableObject {
         return "Plaetze \(start)-\(end)"
     }
 
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "Europe/Berlin")
-        return formatter
-    }()
 
     init(apiClient: APIClientProtocol = APIClient.shared) {
         self.apiClient = apiClient
@@ -62,7 +56,7 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func loadAvailability() async {
-        let dateString = dateFormatter.string(from: selectedDate)
+        let dateString = DateFormatterService.apiDate.string(from: selectedDate)
 
         do {
             availability = try await apiClient.request(.availability(date: dateString), body: nil)
@@ -196,10 +190,7 @@ final class DashboardViewModel: ObservableObject {
     }
 
     var formattedSelectedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, d. MMMM yyyy"
-        formatter.locale = Locale(identifier: "de_DE")
-        return formatter.string(from: selectedDate)
+        DateFormatterService.fullDate.string(from: selectedDate)
     }
 
     var isToday: Bool {

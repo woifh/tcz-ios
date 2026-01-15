@@ -1,7 +1,13 @@
 import Foundation
 import Security
 
-final class KeychainService {
+protocol KeychainServiceProtocol {
+    func save(key: String, data: Data) throws
+    func load(key: String) -> Data?
+    func delete(key: String)
+}
+
+final class KeychainService: KeychainServiceProtocol {
     static let shared = KeychainService()
 
     private let service = "com.tcz.tennisapp"

@@ -4,6 +4,7 @@ protocol APIClientProtocol {
     func request<T: Decodable>(_ endpoint: APIEndpoint, body: Encodable?) async throws -> T
     func requestVoid(_ endpoint: APIEndpoint, body: Encodable?) async throws
     func setAccessToken(_ token: String?)
+    func clearAuth()
 }
 
 final class APIClient: APIClientProtocol {
@@ -76,7 +77,7 @@ final class APIClient: APIClientProtocol {
         self.accessToken = token
     }
 
-    func request<T: Decodable>(_ endpoint: APIEndpoint, body: Encodable? = nil) async throws -> T {
+    private func buildRequest(for endpoint: APIEndpoint, body: Encodable?) throws -> URLRequest {
         // Use string concatenation to preserve query parameters (appendingPathComponent encodes ? and &)
         guard let url = URL(string: baseURL.absoluteString + endpoint.path) else {
             throw APIError.invalidResponse
@@ -86,16 +87,19 @@ final class APIClient: APIClientProtocol {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        // Add Bearer token if available
         if let token = accessToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 
         if let body = body {
-            let encoder = JSONEncoder()
-            request.httpBody = try encoder.encode(body)
+            request.httpBody = try JSONEncoder().encode(body)
         }
 
+        return request
+    }
+
+    func request<T: Decodable>(_ endpoint: APIEndpoint, body: Encodable? = nil) async throws -> T {
+        let request = try buildRequest(for: endpoint, body: body)
         let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
@@ -141,25 +145,7 @@ final class APIClient: APIClientProtocol {
     }
 
     func requestVoid(_ endpoint: APIEndpoint, body: Encodable? = nil) async throws {
-        // Use string concatenation to preserve query parameters (appendingPathComponent encodes ? and &)
-        guard let url = URL(string: baseURL.absoluteString + endpoint.path) else {
-            throw APIError.invalidResponse
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = endpoint.method.rawValue
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        // Add Bearer token if available
-        if let token = accessToken {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        }
-
-        if let body = body {
-            let encoder = JSONEncoder()
-            request.httpBody = try encoder.encode(body)
-        }
-
+        let request = try buildRequest(for: endpoint, body: body)
         let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {

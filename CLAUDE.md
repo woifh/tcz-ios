@@ -89,8 +89,6 @@ This codebase prioritizes flow, clarity, and fast iteration.
 - Keep changes small, reversible, and easy to delete
 - Avoid premature abstraction; duplicate a little before extracting
 - Make failures loud and obvious—no silent magic
-- When in doubt, get back and ask the user
-- You must never ever break existing functionality
 
 ### Naming & Structure
 - Use clear, descriptive names; naming is more important than comments
@@ -110,3 +108,10 @@ This codebase prioritizes flow, clarity, and fast iteration.
 - Refactor opportunistically when it improves clarity
 - Do not refactor solely for architectural purity
 - It should feel safe to rewrite or delete code
+
+## Mandatory Rules
+
+- **NEVER break existing functionality** - preserve working behavior at all costs
+- **When in doubt, ask the user** - don't guess or assume; clarify before proceeding
+- **Respect software development principles** - follow SOLID, DRY, KISS
+- **Never mention Claude Code** - no references to Claude, AI, or this tool in changelogs, commits, or any project files

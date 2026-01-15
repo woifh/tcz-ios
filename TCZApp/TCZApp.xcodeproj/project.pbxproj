@@ -34,6 +34,7 @@
 		0100000000000025 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000025 /* APIError.swift */; };
 		0100000000000026 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000026 /* KeychainService.swift */; };
 		0100000000000027 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0200000000000027 /* Assets.xcassets */; };
+		0100000000000028 /* DateFormatterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000028 /* DateFormatterService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,7 @@
 		0200000000000025 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		0200000000000026 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		0200000000000027 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0200000000000028 /* DateFormatterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterService.swift; sourceTree = "<group>"; };
 		0300000000000001 /* TCZApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TCZApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -112,6 +114,7 @@
 				0200000000000023 /* APIClient.swift */,
 				0200000000000024 /* APIEndpoints.swift */,
 				0200000000000025 /* APIError.swift */,
+				0200000000000028 /* DateFormatterService.swift */,
 				0200000000000026 /* KeychainService.swift */,
 			);
 			path = Core;
@@ -319,6 +322,7 @@
 				0100000000000024 /* APIEndpoints.swift in Sources */,
 				0100000000000025 /* APIError.swift in Sources */,
 				0100000000000026 /* KeychainService.swift in Sources */,
+				0100000000000028 /* DateFormatterService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
