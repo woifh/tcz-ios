@@ -12,6 +12,12 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 - Legend is now accessible via info icon instead of inline display
 - Added calendar picker for quick date selection
 - Today button now always visible with visual state indication
+- Added app icon to navigation bar
+- Booking limits now always visible in date selector
+- Moved legend info icon to court page indicator row
+
+### Fixed
+- App now correctly logs out when session expires
 
 ## [3.1] - 2026-01-15
 ### Changed

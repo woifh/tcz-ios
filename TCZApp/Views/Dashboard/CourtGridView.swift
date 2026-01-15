@@ -5,6 +5,8 @@ struct CourtGridView: View {
     /// Callback when a slot is tapped: (courtId, courtNumber, time, slot)
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
 
+    @State private var showLegend = false
+
     // Height constants
     private let rowHeight: CGFloat = 50
     private let headerHeight: CGFloat = 36
@@ -21,7 +23,8 @@ struct CourtGridView: View {
             PageIndicatorView(
                 currentPage: viewModel.currentPage,
                 totalPages: viewModel.totalPages,
-                onPageChange: { viewModel.currentPage = $0 }
+                onPageChange: { viewModel.currentPage = $0 },
+                onInfoTap: { showLegend = true }
             )
 
             // Swipeable pages for courts
@@ -40,6 +43,10 @@ struct CourtGridView: View {
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .frame(height: gridHeight)
         }
+        .sheet(isPresented: $showLegend) {
+            LegendSheet()
+                .presentationDetents([.height(220)])
+        }
     }
 }
 
@@ -48,6 +55,7 @@ struct PageIndicatorView: View {
     let currentPage: Int
     let totalPages: Int
     let onPageChange: (Int) -> Void
+    let onInfoTap: () -> Void
 
     var body: some View {
         HStack(spacing: 16) {
@@ -93,6 +101,13 @@ struct PageIndicatorView: View {
                     .foregroundColor(currentPage < totalPages - 1 ? .green : .gray.opacity(0.3))
             }
             .disabled(currentPage == totalPages - 1)
+
+            // Info button for legend
+            Button(action: onInfoTap) {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 18))
+                    .foregroundColor(.secondary)
+            }
         }
         .padding(.vertical, 8)
     }

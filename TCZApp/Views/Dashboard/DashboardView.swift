@@ -46,8 +46,20 @@ struct DashboardView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Platzuebersicht")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack(spacing: 8) {
+                        Image("tcz_icon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 32)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        Text("TCZ Platz Reservierung")
+                            .font(.headline)
+                    }
+                }
+            }
             .refreshable {
                 await viewModel.refresh()
             }
@@ -96,23 +108,10 @@ struct CompactHeaderView: View {
     let onNext: () -> Void
     let onToday: () -> Void
 
-    @State private var showLegend = false
     @State private var showDatePicker = false
 
     private var compactDateString: String {
         DateFormatterService.compactDate.string(from: selectedDate)
-    }
-
-    private var showRegularBadge: Bool {
-        guard let status = bookingStatus else { return false }
-        let limits = status.limits.regularReservations
-        return limits.current >= limits.limit - 1
-    }
-
-    private var showShortNoticeBadge: Bool {
-        guard let status = bookingStatus else { return false }
-        let limits = status.limits.shortNoticeBookings
-        return limits.current >= limits.limit - 1
     }
 
     var body: some View {
@@ -157,32 +156,19 @@ struct CompactHeaderView: View {
 
             Spacer()
 
-            // Legend info button
-            Button(action: { showLegend = true }) {
-                Image(systemName: "info.circle")
-                    .font(.title3)
-                    .foregroundColor(.secondary)
-            }
-
-            // Booking badges (only show when near limit)
+            // Booking badges (always show)
             if let status = bookingStatus {
-                if showRegularBadge || showShortNoticeBadge {
-                    HStack(spacing: 4) {
-                        if showRegularBadge {
-                            BookingBadge(
-                                current: status.limits.regularReservations.current,
-                                limit: status.limits.regularReservations.limit,
-                                color: status.limits.regularReservations.canBook ? .secondary : .red
-                            )
-                        }
-                        if showShortNoticeBadge {
-                            BookingBadge(
-                                current: status.limits.shortNoticeBookings.current,
-                                limit: status.limits.shortNoticeBookings.limit,
-                                color: status.limits.shortNoticeBookings.canBook ? .orange : .red
-                            )
-                        }
-                    }
+                HStack(spacing: 4) {
+                    BookingBadge(
+                        current: status.limits.regularReservations.current,
+                        limit: status.limits.regularReservations.limit,
+                        color: status.limits.regularReservations.canBook ? .secondary : .red
+                    )
+                    BookingBadge(
+                        current: status.limits.shortNoticeBookings.current,
+                        limit: status.limits.shortNoticeBookings.limit,
+                        color: status.limits.shortNoticeBookings.canBook ? .orange : .red
+                    )
                 }
             }
         }
@@ -191,10 +177,6 @@ struct CompactHeaderView: View {
         .background(Color(.systemBackground))
         .cornerRadius(10)
         .shadow(radius: 1)
-        .sheet(isPresented: $showLegend) {
-            LegendSheet()
-                .presentationDetents([.height(220)])
-        }
         .sheet(isPresented: $showDatePicker) {
             DatePickerSheet(selectedDate: $selectedDate)
                 .presentationDetents([.medium])
@@ -239,7 +221,7 @@ struct DatePickerSheet: View {
             )
             .datePickerStyle(.graphical)
             .padding()
-            .navigationTitle("Datum waehlen")
+            .navigationTitle("Datum wählen")
             .navigationBarTitleDisplayMode(.inline)
             .onChange(of: selectedDate) { _ in
                 dismiss()

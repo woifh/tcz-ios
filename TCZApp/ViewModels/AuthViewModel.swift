@@ -23,6 +23,20 @@ final class AuthViewModel: ObservableObject {
 
         // Check for stored session on init
         checkStoredSession()
+
+        // Handle session expiration from API calls
+        apiClient.setOnUnauthorized { [weak self] in
+            self?.handleSessionExpired()
+        }
+    }
+
+    private func handleSessionExpired() {
+        // Clear local state without calling server logout
+        currentUser = nil
+        isAuthenticated = false
+        keychainService.delete(key: "currentUser")
+        keychainService.delete(key: "accessToken")
+        apiClient.clearAuth()
     }
 
     func login(email: String, password: String) async {

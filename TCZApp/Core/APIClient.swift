@@ -5,6 +5,7 @@ protocol APIClientProtocol {
     func requestVoid(_ endpoint: APIEndpoint, body: Encodable?) async throws
     func setAccessToken(_ token: String?)
     func clearAuth()
+    func setOnUnauthorized(_ handler: @escaping () -> Void)
 }
 
 final class APIClient: APIClientProtocol {
@@ -17,6 +18,8 @@ final class APIClient: APIClientProtocol {
     private let redirectBlocker: RedirectBlocker
     // Bearer token for API authentication
     private var accessToken: String?
+    // Callback for handling unauthorized responses (session expired)
+    private var onUnauthorized: (() -> Void)?
 
     private init() {
         // Development URL - use your Mac's IP for device testing, 127.0.0.1 for simulator
@@ -77,6 +80,10 @@ final class APIClient: APIClientProtocol {
         self.accessToken = token
     }
 
+    func setOnUnauthorized(_ handler: @escaping () -> Void) {
+        self.onUnauthorized = handler
+    }
+
     private func buildRequest(for endpoint: APIEndpoint, body: Encodable?) throws -> URLRequest {
         // Use string concatenation to preserve query parameters (appendingPathComponent encodes ? and &)
         guard let url = URL(string: baseURL.absoluteString + endpoint.path) else {
@@ -122,8 +129,10 @@ final class APIClient: APIClientProtocol {
             }
         case 301, 302, 303, 307, 308:
             // Redirect typically means session expired (redirect to login)
+            DispatchQueue.main.async { self.onUnauthorized?() }
             throw APIError.unauthorized
         case 401:
+            DispatchQueue.main.async { self.onUnauthorized?() }
             throw APIError.unauthorized
         case 403:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
@@ -157,8 +166,10 @@ final class APIClient: APIClientProtocol {
             return
         case 301, 302, 303, 307, 308:
             // Redirect typically means session expired (redirect to login)
+            DispatchQueue.main.async { self.onUnauthorized?() }
             throw APIError.unauthorized
         case 401:
+            DispatchQueue.main.async { self.onUnauthorized?() }
             throw APIError.unauthorized
         case 403:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
