@@ -78,3 +78,35 @@ Change in `APIClient.swift` → `baseURL` property.
   - Create a meaningful commit message
   - Push to GitHub
   - Create and push a git tag matching the changelog version (format: vX.Y.0, e.g., v3.9.0 for changelog version 3.9)
+
+## Vibe Coding Principles
+
+This codebase prioritizes flow, clarity, and fast iteration.
+
+### General Guidelines
+- Prefer simple, readable code over clever abstractions
+- Optimize for local reasoning: a reader should understand code in under a minute
+- Keep changes small, reversible, and easy to delete
+- Avoid premature abstraction; duplicate a little before extracting
+- Make failures loud and obvious—no silent magic
+- When in doubt, get back and ask the user
+- You must never ever break existing functionality
+
+### Naming & Structure
+- Use clear, descriptive names; naming is more important than comments
+- Keep related logic close together
+- Avoid deep inheritance or excessive indirection
+
+### Comments & Intent
+- Comment *why* something exists, not *what the code does*
+- Explain tradeoffs, constraints, or non-obvious decisions
+
+### Testing Philosophy
+- Write tests that increase confidence without slowing momentum
+- Focus on behavior, not implementation details
+- Prefer a few high-signal tests over exhaustive coverage
+
+### Refactoring
+- Refactor opportunistically when it improves clarity
+- Do not refactor solely for architectural purity
+- It should feel safe to rewrite or delete code
