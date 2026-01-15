@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2] - 2026-01-15
+### Changed
+- Improved court page indicator with text labels instead of dots
+
 ## [3.1] - 2026-01-15
 ### Changed
 - Improved code quality with centralized date formatting

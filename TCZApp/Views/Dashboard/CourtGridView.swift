@@ -9,10 +9,9 @@ struct CourtGridView: View {
     private let visibleSlots: Int = 8
     private let rowHeight: CGFloat = 50
     private let headerHeight: CGFloat = 36
-    private let pageLabelHeight: CGFloat = 30
 
     private var gridHeight: CGFloat {
-        pageLabelHeight + headerHeight + (CGFloat(visibleSlots) * rowHeight) + 20
+        headerHeight + (CGFloat(visibleSlots) * rowHeight) + 20
     }
 
     var body: some View {
@@ -64,16 +63,23 @@ struct PageIndicatorView: View {
             }
             .disabled(currentPage == 0)
 
-            // Page dots
-            HStack(spacing: 8) {
-                ForEach(0..<totalPages, id: \.self) { page in
-                    Circle()
-                        .fill(page == currentPage ? Color.green : Color.gray.opacity(0.4))
-                        .frame(width: 8, height: 8)
-                        .onTapGesture {
-                            withAnimation { onPageChange(page) }
-                        }
-                }
+            // Page labels
+            HStack(spacing: 16) {
+                Text("Plätze 1-3")
+                    .font(.subheadline)
+                    .fontWeight(currentPage == 0 ? .semibold : .regular)
+                    .foregroundColor(currentPage == 0 ? .green : .gray)
+                    .onTapGesture {
+                        withAnimation { onPageChange(0) }
+                    }
+
+                Text("Plätze 4-6")
+                    .font(.subheadline)
+                    .fontWeight(currentPage == 1 ? .semibold : .regular)
+                    .foregroundColor(currentPage == 1 ? .green : .gray)
+                    .onTapGesture {
+                        withAnimation { onPageChange(1) }
+                    }
             }
 
             // Right arrow
@@ -111,13 +117,6 @@ struct SinglePageGrid: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Page label
-            Text(viewModel.pageLabelForPage(pageIndex))
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
-                .padding(.bottom, 8)
-
             // Header row with court numbers (fixed)
             HStack(spacing: 0) {
                 Text("Zeit")
