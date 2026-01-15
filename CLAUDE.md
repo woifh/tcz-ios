@@ -75,9 +75,15 @@ Change in `APIClient.swift` → `baseURL` property.
 - **When pushing to GitHub**:
   - Ask the user whether to increase major or minor version
   - Add a short, non-technical changelog entry to CHANGELOG.md (version format: major.minor)
+  - **Every code change must have a corresponding changelog entry** - don't push without updating the changelog first
   - Create a meaningful commit message
   - Push to GitHub
   - Create and push a git tag matching the changelog version (format: vX.Y.0, e.g., v3.9.0 for changelog version 3.9)
+
+- **Git commit rules**:
+  - NEVER use `git commit --amend` on commits that have been pushed to remote
+  - NEVER use `--force` or `--force-with-lease` push unless explicitly requested
+  - Always create new commits for fixes rather than amending
 
 ## Vibe Coding Principles
 
