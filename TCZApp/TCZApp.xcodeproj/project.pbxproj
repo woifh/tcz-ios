@@ -35,6 +35,7 @@
 		0100000000000026 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000026 /* KeychainService.swift */; };
 		0100000000000027 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0200000000000027 /* Assets.xcassets */; };
 		0100000000000028 /* DateFormatterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000028 /* DateFormatterService.swift */; };
+		054C411B2F1AEE1F00407174 /* VERSION in Resources */ = {isa = PBXBuildFile; fileRef = 054C411A2F1AEE1F00407174 /* VERSION */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +68,7 @@
 		0200000000000027 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0200000000000028 /* DateFormatterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatterService.swift; sourceTree = "<group>"; };
 		0300000000000001 /* TCZApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TCZApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		054C411A2F1AEE1F00407174 /* VERSION */ = {isa = PBXFileReference; lastKnownFileType = text; path = VERSION; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,12 +85,13 @@
 		0500000000000001 = {
 			isa = PBXGroup;
 			children = (
-				0500000000000002 /* TCZApp */,
+				054C411A2F1AEE1F00407174 /* VERSION */,
+				0500000000000002,
 				0500000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		0500000000000002 /* TCZApp */ = {
+		0500000000000002 = {
 			isa = PBXGroup;
 			children = (
 				0200000000000001 /* TCZApp.swift */,
@@ -286,6 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0100000000000027 /* Assets.xcassets in Resources */,
+				054C411B2F1AEE1F00407174 /* VERSION in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,7 +472,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -497,7 +501,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

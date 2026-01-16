@@ -5,6 +5,11 @@ struct ProfileView: View {
     @State private var showingLogoutAlert = false
 
     private var appVersion: String {
+        if let path = Bundle.main.path(forResource: "VERSION", ofType: nil),
+           let version = try? String(contentsOfFile: path, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines) {
+            return version
+        }
+        // Fallback to bundle version if VERSION file not found
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
         return "\(version) (\(build))"
