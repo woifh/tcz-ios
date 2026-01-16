@@ -4,6 +4,11 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [3.3] - 2026-01-16
+### Changed
+- Faster date switching with cached availability data
+- Adjacent dates are now preloaded in the background
+
 ## [3.2] - 2026-01-15
 ### Changed
 - Improved court page indicator with text labels instead of dots

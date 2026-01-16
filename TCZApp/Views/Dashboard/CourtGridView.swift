@@ -244,13 +244,6 @@ struct TimeSlotCell: View {
         .background(backgroundColor)
         .foregroundColor(foregroundColor)
         .opacity(isPast ? 0.5 : 1.0)
-        .overlay(
-            isUserBooking && !isPast ?
-                RoundedRectangle(cornerRadius: 2)
-                    .stroke(Color.blue, lineWidth: 2)
-                    .padding(1)
-                : nil
-        )
     }
 
     private var backgroundColor: Color {

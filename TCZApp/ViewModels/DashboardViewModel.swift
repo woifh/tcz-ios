@@ -13,6 +13,10 @@ final class DashboardViewModel: ObservableObject {
     private let apiClient: APIClientProtocol
     private(set) var currentUserId: String?
 
+    // Cache for availability data: [dateString: (response, timestamp)]
+    private var availabilityCache: [String: (AvailabilityResponse, Date)] = [:]
+    private let cacheTTL: TimeInterval = 300 // 5 minutes
+
     // Time slots: 08:00 to 21:00 (14 slots)
     let timeSlots = (8..<22).map { String(format: "%02d:00", $0) }
     let courtNumbers = [1, 2, 3, 4, 5, 6]
@@ -42,7 +46,27 @@ final class DashboardViewModel: ObservableObject {
         self.currentUserId = id
     }
 
+    // MARK: - Cache Management
+
+    private func getCachedAvailability(for dateString: String) -> AvailabilityResponse? {
+        guard let (response, timestamp) = availabilityCache[dateString] else { return nil }
+        if Date().timeIntervalSince(timestamp) < cacheTTL {
+            return response
+        }
+        availabilityCache.removeValue(forKey: dateString)
+        return nil
+    }
+
+    private func cacheAvailability(_ response: AvailabilityResponse, for dateString: String) {
+        availabilityCache[dateString] = (response, Date())
+    }
+
+    func clearCache() {
+        availabilityCache.removeAll()
+    }
+
     func loadData() async {
+        clearCache()
         isLoading = true
         error = nil
 
@@ -58,8 +82,18 @@ final class DashboardViewModel: ObservableObject {
     func loadAvailability() async {
         let dateString = DateFormatterService.apiDate.string(from: selectedDate)
 
+        // Return cached data immediately if available
+        if let cached = getCachedAvailability(for: dateString) {
+            availability = cached
+            prefetchAdjacentDates()
+            return
+        }
+
         do {
-            availability = try await apiClient.request(.availability(date: dateString), body: nil)
+            let response: AvailabilityResponse = try await apiClient.request(.availability(date: dateString), body: nil)
+            cacheAvailability(response, for: dateString)
+            availability = response
+            prefetchAdjacentDates()
         } catch let apiError as APIError {
             error = apiError.localizedDescription
         } catch {
@@ -79,6 +113,28 @@ final class DashboardViewModel: ObservableObject {
         } catch {
             // Silently ignore for anonymous users or auth errors
             bookingStatus = nil
+        }
+    }
+
+    private func prefetchAdjacentDates() {
+        Task.detached(priority: .low) { [weak self] in
+            guard let self = self else { return }
+            let calendar = Calendar.current
+            let currentDate = await self.selectedDate
+
+            for offset in [-1, 1] {
+                if let adjacentDate = calendar.date(byAdding: .day, value: offset, to: currentDate) {
+                    let dateString = DateFormatterService.apiDate.string(from: adjacentDate)
+                    if await self.getCachedAvailability(for: dateString) == nil {
+                        do {
+                            let response: AvailabilityResponse = try await self.apiClient.request(.availability(date: dateString), body: nil)
+                            await self.cacheAvailability(response, for: dateString)
+                        } catch {
+                            // Silently ignore prefetch failures
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -187,6 +243,21 @@ final class DashboardViewModel: ObservableObject {
     // Pull-to-refresh handler
     func refresh() async {
         await loadData()
+    }
+
+    // Cancel a reservation
+    func cancelReservation(_ reservationId: Int) async {
+        isLoading = true
+        do {
+            let _: CancelResponse = try await apiClient.request(
+                .cancelReservation(id: reservationId), body: nil
+            )
+            // Reload data to reflect the cancellation
+            await loadData()
+        } catch {
+            self.error = "Stornierung fehlgeschlagen"
+        }
+        isLoading = false
     }
 
     var formattedSelectedDate: String {

@@ -9,10 +9,20 @@ struct BookingSheetData: Identifiable {
     let userId: String
 }
 
+/// Data for cancellation confirmation
+struct CancelConfirmationData: Identifiable {
+    let id = UUID()
+    let reservationId: Int
+    let courtNumber: Int
+    let time: String
+    let bookedFor: String
+}
+
 struct DashboardView: View {
     @ObservedObject var viewModel: DashboardViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var bookingSheetData: BookingSheetData?
+    @State private var cancelConfirmation: CancelConfirmationData?
 
     var body: some View {
         NavigationView {
@@ -25,7 +35,8 @@ struct DashboardView: View {
                         bookingStatus: viewModel.bookingStatus,
                         onPrevious: { viewModel.changeDate(by: -1) },
                         onNext: { viewModel.changeDate(by: 1) },
-                        onToday: viewModel.goToToday
+                        onToday: viewModel.goToToday,
+                        onDateSelected: { Task { await viewModel.loadAvailability() } }
                     )
 
                     // Court Grid
@@ -76,6 +87,26 @@ struct DashboardView: View {
                     }
                 )
             }
+            .alert("Reservierung stornieren?", isPresented: Binding(
+                get: { cancelConfirmation != nil },
+                set: { if !$0 { cancelConfirmation = nil } }
+            )) {
+                Button("Abbrechen", role: .cancel) {
+                    cancelConfirmation = nil
+                }
+                Button("Stornieren", role: .destructive) {
+                    if let data = cancelConfirmation {
+                        Task {
+                            await viewModel.cancelReservation(data.reservationId)
+                        }
+                    }
+                    cancelConfirmation = nil
+                }
+            } message: {
+                if let data = cancelConfirmation {
+                    Text("Platz \(data.courtNumber) um \(data.time) Uhr fuer \(data.bookedFor) stornieren?")
+                }
+            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .task {
@@ -87,10 +118,28 @@ struct DashboardView: View {
     }
 
     private func handleSlotTap(courtId: Int, courtNumber: Int, time: String, slot: TimeSlot?) {
-        guard viewModel.canBookSlot(slot, time: time),
-              let userId = authViewModel.currentUser?.id else {
+        guard let userId = authViewModel.currentUser?.id else {
             return
         }
+
+        // Check if this is user's own booking - offer to cancel
+        if viewModel.isUserBooking(slot),
+           let details = slot?.details,
+           let reservationId = details.reservationId {
+            cancelConfirmation = CancelConfirmationData(
+                reservationId: reservationId,
+                courtNumber: courtNumber,
+                time: time,
+                bookedFor: details.bookedFor ?? "Unbekannt"
+            )
+            return
+        }
+
+        // Otherwise, try to book if possible
+        guard viewModel.canBookSlot(slot, time: time) else {
+            return
+        }
+
         bookingSheetData = BookingSheetData(
             courtId: courtId,
             courtNumber: courtNumber,
@@ -107,8 +156,10 @@ struct CompactHeaderView: View {
     let onPrevious: () -> Void
     let onNext: () -> Void
     let onToday: () -> Void
+    let onDateSelected: () -> Void
 
     @State private var showDatePicker = false
+    @State private var dateBeforePicker: Date?
 
     private var compactDateString: String {
         DateFormatterService.compactDate.string(from: selectedDate)
@@ -126,7 +177,10 @@ struct CompactHeaderView: View {
                     .cornerRadius(8)
             }
 
-            Button(action: { showDatePicker = true }) {
+            Button(action: {
+                dateBeforePicker = selectedDate
+                showDatePicker = true
+            }) {
                 Text(compactDateString)
                     .font(.subheadline.weight(.medium))
                     .lineLimit(1)
@@ -177,7 +231,12 @@ struct CompactHeaderView: View {
         .background(Color(.systemBackground))
         .cornerRadius(10)
         .shadow(radius: 1)
-        .sheet(isPresented: $showDatePicker) {
+        .sheet(isPresented: $showDatePicker, onDismiss: {
+            if let before = dateBeforePicker, !Calendar.current.isDate(before, inSameDayAs: selectedDate) {
+                onDateSelected()
+            }
+            dateBeforePicker = nil
+        }) {
             DatePickerSheet(selectedDate: $selectedDate)
                 .presentationDetents([.medium])
         }
