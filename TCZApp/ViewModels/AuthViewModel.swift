@@ -112,4 +112,14 @@ final class AuthViewModel: ObservableObject {
             }
         }
     }
+
+    /// Updates the current user and persists to Keychain
+    func updateCurrentUser(_ user: Member) {
+        currentUser = user
+
+        // Persist updated user to Keychain
+        if let userData = try? JSONEncoder().encode(user) {
+            try? keychainService.save(key: "currentUser", data: userData)
+        }
+    }
 }

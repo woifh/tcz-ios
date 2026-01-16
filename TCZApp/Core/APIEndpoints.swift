@@ -13,6 +13,8 @@ enum APIEndpoint {
     case addFavorite(memberId: String)
     case removeFavorite(memberId: String, favoriteId: String)
     case serverVersion
+    case getMember(memberId: String)
+    case updateMember(memberId: String)
 
     var path: String {
         switch self {
@@ -41,6 +43,10 @@ enum APIEndpoint {
             return "/api/members/\(memberId)/favourites"
         case .removeFavorite(let memberId, let favoriteId):
             return "/api/members/\(memberId)/favourites/\(favoriteId)"
+        case .getMember(let memberId):
+            return "/api/members/\(memberId)"
+        case .updateMember(let memberId):
+            return "/api/members/\(memberId)"
         }
     }
 
@@ -49,10 +55,12 @@ enum APIEndpoint {
         case .login, .createReservation, .addFavorite:
             return .post
         case .logout, .availability, .reservations, .reservationStatus,
-             .searchMembers, .favorites, .serverVersion:
+             .searchMembers, .favorites, .serverVersion, .getMember:
             return .get
         case .cancelReservation, .removeFavorite:
             return .delete
+        case .updateMember:
+            return .put
         }
     }
 }

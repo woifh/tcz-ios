@@ -7,6 +7,27 @@ struct Member: Codable, Identifiable, Equatable {
     let email: String
     let name: String
 
+    // Profile fields
+    let street: String?
+    let city: String?
+    let zipCode: String?
+    let phone: String?
+    let notificationsEnabled: Bool?
+    let notifyOwnBookings: Bool?
+    let notifyOtherBookings: Bool?
+    let notifyCourtBlocked: Bool?
+    let notifyBookingOverridden: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case id, firstname, lastname, email, name, street, city, phone
+        case zipCode = "zip_code"
+        case notificationsEnabled = "notifications_enabled"
+        case notifyOwnBookings = "notify_own_bookings"
+        case notifyOtherBookings = "notify_other_bookings"
+        case notifyCourtBlocked = "notify_court_blocked"
+        case notifyBookingOverridden = "notify_booking_overridden"
+    }
+
     static func == (lhs: Member, rhs: Member) -> Bool {
         lhs.id == rhs.id
     }
@@ -45,4 +66,37 @@ struct FavoritesResponse: Decodable {
 // Search response
 struct SearchResponse: Decodable {
     let results: [MemberSummary]
+}
+
+// Profile update request
+struct ProfileUpdateRequest: Encodable {
+    let firstname: String
+    let lastname: String
+    let email: String
+    let street: String?
+    let city: String?
+    let zipCode: String?
+    let phone: String?
+    let password: String?
+    let notificationsEnabled: Bool
+    let notifyOwnBookings: Bool
+    let notifyOtherBookings: Bool
+    let notifyCourtBlocked: Bool
+    let notifyBookingOverridden: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case firstname, lastname, email, street, city, phone, password
+        case zipCode = "zip_code"
+        case notificationsEnabled = "notifications_enabled"
+        case notifyOwnBookings = "notify_own_bookings"
+        case notifyOtherBookings = "notify_other_bookings"
+        case notifyCourtBlocked = "notify_court_blocked"
+        case notifyBookingOverridden = "notify_booking_overridden"
+    }
+}
+
+// Profile update response
+struct ProfileUpdateResponse: Decodable {
+    let message: String
+    let member: Member
 }

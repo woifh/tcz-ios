@@ -38,6 +38,17 @@ struct ProfileView: View {
                         }
                         .padding(.vertical, 8)
                     }
+
+                    // Edit profile section
+                    Section {
+                        NavigationLink(destination: ProfileEditView().environmentObject(authViewModel)) {
+                            HStack {
+                                Image(systemName: "pencil.circle")
+                                    .foregroundColor(.green)
+                                Text("Profil bearbeiten")
+                            }
+                        }
+                    }
                 }
 
                 // App info section

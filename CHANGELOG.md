@@ -4,6 +4,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [3.4] - 2026-01-17
+### Added
+- Profile editing: users can now update their personal data, contact info, address, password, and notification preferences
+
 ## [3.3] - 2026-01-16
 ### Changed
 - Faster date switching with cached availability data
