@@ -12,6 +12,7 @@ enum APIEndpoint {
     case favorites(memberId: String)
     case addFavorite(memberId: String)
     case removeFavorite(memberId: String, favoriteId: String)
+    case serverVersion
 
     var path: String {
         switch self {
@@ -19,6 +20,8 @@ enum APIEndpoint {
             return "/auth/login/api"
         case .logout:
             return "/auth/logout"
+        case .serverVersion:
+            return "/version"
         case .availability(let date):
             return "/api/courts/availability?date=\(date)"
         case .reservations:
@@ -46,7 +49,7 @@ enum APIEndpoint {
         case .login, .createReservation, .addFavorite:
             return .post
         case .logout, .availability, .reservations, .reservationStatus,
-             .searchMembers, .favorites:
+             .searchMembers, .favorites, .serverVersion:
             return .get
         case .cancelReservation, .removeFavorite:
             return .delete

@@ -3,6 +3,7 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var showingLogoutAlert = false
+    @State private var serverVersion: String?
 
     private var appVersion: String {
         if let path = Bundle.main.path(forResource: "VERSION", ofType: nil),
@@ -42,10 +43,21 @@ struct ProfileView: View {
                 // App info section
                 Section(header: Text("App Info")) {
                     HStack {
-                        Text("Version")
+                        Text("App-Version")
                         Spacer()
                         Text(appVersion)
                             .foregroundColor(.secondary)
+                    }
+                    HStack {
+                        Text("Server-Version")
+                        Spacer()
+                        if let version = serverVersion {
+                            Text(version)
+                                .foregroundColor(.secondary)
+                        } else {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        }
                     }
                     HStack {
                         Text("Server")
@@ -90,6 +102,18 @@ struct ProfileView: View {
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .task {
+            await loadServerVersion()
+        }
+    }
+
+    private func loadServerVersion() async {
+        do {
+            let response: ServerVersionResponse = try await APIClient.shared.request(.serverVersion, body: nil)
+            serverVersion = response.version
+        } catch {
+            serverVersion = "?"
+        }
     }
 }
 

@@ -66,7 +66,7 @@ struct DashboardView: View {
                             .scaledToFit()
                             .frame(height: 32)
                             .clipShape(RoundedRectangle(cornerRadius: 6))
-                        Text("TCZ Platz Reservierung")
+                        Text("TCZ Platz-Reservierung")
                             .font(.headline)
                     }
                 }

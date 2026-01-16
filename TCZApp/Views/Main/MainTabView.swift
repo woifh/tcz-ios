@@ -65,7 +65,7 @@ struct LoginPlaceholderView: View {
                     .font(.title)
                     .fontWeight(.semibold)
 
-                Text("Melden Sie sich an, um Plaetze zu buchen, Ihre Buchungen zu verwalten und Favoriten zu speichern.")
+                Text("Melden Sie sich an, um Plätze zu reservieren, Ihre Reservierungen zu verwalten und Favoriten zu speichern.")
                     .multilineTextAlignment(.center)
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 32)

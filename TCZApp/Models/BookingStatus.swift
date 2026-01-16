@@ -78,3 +78,7 @@ struct ReservationSummary: Codable, Identifiable {
         case isShortNotice = "is_short_notice"
     }
 }
+
+struct ServerVersionResponse: Codable {
+    let version: String
+}

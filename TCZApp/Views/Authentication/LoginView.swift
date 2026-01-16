@@ -16,15 +16,16 @@ struct LoginView: View {
                 VStack(spacing: 24) {
                     // Logo/Header
                     VStack(spacing: 8) {
-                        Image(systemName: "sportscourt")
-                            .font(.system(size: 60))
-                            .foregroundColor(.green)
+                        Image("tcz_icon")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
 
-                        Text("Tennis Club Zollikon")
+                        Text("TC Zellerndorf")
                             .font(.title)
                             .fontWeight(.bold)
 
-                        Text("Platzbuchung")
+                        Text("Platz-Reservierung")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }

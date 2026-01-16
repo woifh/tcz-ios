@@ -8,6 +8,8 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Changed
 - Faster date switching with cached availability data
 - Adjacent dates are now preloaded in the background
+- App and server version now displayed in profile
+- App icon shown on login screen
 
 ## [3.2] - 2026-01-15
 ### Changed
