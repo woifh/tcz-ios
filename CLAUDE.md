@@ -71,8 +71,8 @@ Change in `APIClient.swift` → `baseURL` property.
 
 ## Important Rules
 
-- **NEVER push to GitHub without explicit user request** - always wait for the user to ask before pushing commits
-- **When pushing to GitHub**:
+- **CRITICAL: NEVER push to GitHub without explicit user request** - NEVER run `git push` unless the user explicitly asks you to push. This is the most important rule. Always wait for explicit permission before pushing any commits or tags.
+- **When pushing to GitHub (only after user requests it)**:
   - Ask the user whether to increase major or minor version
   - Add a short, non-technical changelog entry to CHANGELOG.md (version format: major.minor)
   - **Every code change must have a corresponding changelog entry** - don't push without updating the changelog first
