@@ -243,17 +243,21 @@ struct TimeSlotCell: View {
         .padding(.horizontal, 4)
         .background(backgroundColor)
         .foregroundColor(foregroundColor)
+        .overlay(
+            Rectangle()
+                .stroke(Color(.systemGray4), lineWidth: 0.5)
+        )
         .opacity(isPast ? 0.5 : 1.0)
     }
 
     private var backgroundColor: Color {
         guard let slot = slot else {
-            return isPast ? Color(.systemGray4) : .green
+            return isPast ? Color(.systemGray5) : .white
         }
 
         switch slot.status {
         case .available:
-            return isPast ? Color(.systemGray4) : .green
+            return isPast ? Color(.systemGray5) : .white
         case .reserved:
             return .red
         case .shortNotice:
@@ -265,12 +269,12 @@ struct TimeSlotCell: View {
 
     private var foregroundColor: Color {
         guard let slot = slot else {
-            return isPast ? .gray : .white
+            return isPast ? .gray : Color(.darkGray)
         }
 
         switch slot.status {
         case .available:
-            return isPast ? .gray : .white
+            return isPast ? .gray : Color(.darkGray)
         case .blocked:
             return .primary
         default:

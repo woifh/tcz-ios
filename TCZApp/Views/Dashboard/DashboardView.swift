@@ -249,7 +249,7 @@ struct LegendSheet: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 12) {
-                LegendRow(color: .green, title: "Frei", description: "Platz verfuegbar")
+                LegendRow(color: .white, title: "Frei", description: "Platz verfuegbar", showBorder: true)
                 LegendRow(color: .red, title: "Belegt", description: "Bereits gebucht")
                 LegendRow(color: .orange, title: "Kurzfristig", description: "Buchbar innerhalb 24h")
                 LegendRow(color: Color(.systemGray3), title: "Gesperrt", description: "Nicht buchbar")
@@ -293,12 +293,17 @@ struct LegendRow: View {
     let color: Color
     let title: String
     let description: String
+    var showBorder: Bool = false
 
     var body: some View {
         HStack(spacing: 12) {
             Circle()
                 .fill(color)
                 .frame(width: 20, height: 20)
+                .overlay(
+                    Circle()
+                        .stroke(Color(.systemGray3), lineWidth: showBorder ? 1 : 0)
+                )
             Text(title)
                 .font(.subheadline.weight(.medium))
             Text("– \(description)")

@@ -4,6 +4,11 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [3.5] - 2026-01-18
+### Changed
+- Cleaner visual design for court availability grid (available slots now white instead of green)
+- Past time slots now appear more muted for better focus on current availability
+
 ## [3.4] - 2026-01-17
 ### Added
 - Profile editing: users can now update their personal data, contact info, address, password, and notification preferences
