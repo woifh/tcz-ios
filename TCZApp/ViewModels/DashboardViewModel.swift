@@ -9,6 +9,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: String?
     @Published var currentPage: Int = 0
+    @Published var isPaymentConfirmationDismissed = false
 
     private let apiClient: APIClientProtocol
     private(set) var currentUserId: String?
@@ -237,11 +238,6 @@ final class DashboardViewModel: ObservableObject {
             return false
         }
         return details.bookedForId == userId || details.bookedById == userId
-    }
-
-    // Pull-to-refresh handler
-    func refresh() async {
-        await loadData()
     }
 
     // Cancel a reservation

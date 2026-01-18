@@ -29,7 +29,7 @@ struct DashboardView: View {
         guard let user = authViewModel.currentUser else { return nil }
 
         // User has confirmed payment, waiting for approval
-        if user.hasPendingPaymentConfirmation {
+        if user.hasPendingPaymentConfirmation && !viewModel.isPaymentConfirmationDismissed {
             return .confirmationPending
         }
 
@@ -55,7 +55,12 @@ struct DashboardView: View {
                 VStack(spacing: 12) {
                     // Payment reminder banner (only for authenticated users with unpaid fee)
                     if let bannerState = paymentBannerState {
-                        PaymentReminderBanner(state: bannerState)
+                        PaymentReminderBanner(
+                            state: bannerState,
+                            onDismiss: bannerState == .confirmationPending
+                                ? { viewModel.isPaymentConfirmationDismissed = true }
+                                : nil
+                        )
                     }
 
                     // Compact Header (date selector + legend + booking badge)
@@ -101,9 +106,6 @@ struct DashboardView: View {
                     }
                 }
             }
-            .refreshable {
-                await viewModel.refresh()
-            }
             .sheet(item: $bookingSheetData) { data in
                 BookingSheet(
                     courtId: data.courtId,
@@ -146,6 +148,9 @@ struct DashboardView: View {
                 await authViewModel.refreshCurrentUser()
             }
             await viewModel.loadData()
+        }
+        .onChange(of: authViewModel.currentUser?.id) { _ in
+            viewModel.isPaymentConfirmationDismissed = false
         }
     }
 

@@ -8,6 +8,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Added
 - Payment reminder banner on dashboard shows days until payment deadline
 - Confirmation dialog before sending payment confirmation request
+- Payment confirmation info banner can now be dismissed with (X) button
 
 ### Changed
 - User data now refreshes automatically when opening the app

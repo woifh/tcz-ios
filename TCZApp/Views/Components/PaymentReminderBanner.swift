@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum PaymentBannerState {
+enum PaymentBannerState: Equatable {
     case deadlinePassed
     case deadlineUpcoming(daysUntil: Int, deadline: String)
     case confirmationPending
@@ -8,6 +8,7 @@ enum PaymentBannerState {
 
 struct PaymentReminderBanner: View {
     let state: PaymentBannerState
+    var onDismiss: (() -> Void)? = nil
 
     var body: some View {
         HStack(spacing: 12) {
@@ -25,6 +26,14 @@ struct PaymentReminderBanner: View {
             }
 
             Spacer()
+
+            if let onDismiss = onDismiss {
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
         }
         .padding()
         .background(backgroundColor)
