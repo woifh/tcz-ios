@@ -4,6 +4,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [3.7] - 2026-01-18
+### Added
+- Book on behalf of another member: search for any club member when creating a booking
+
 ## [3.6] - 2026-01-18
 ### Added
 - Changelog viewer: tap on app or server version to see release history

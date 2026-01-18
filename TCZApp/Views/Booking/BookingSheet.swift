@@ -56,6 +56,92 @@ struct BookingSheet: View {
                                     .tag(favorite.id as String?)
                             }
                         }
+
+                        Button {
+                            viewModel.toggleSearch()
+                        } label: {
+                            HStack {
+                                Image(systemName: viewModel.showSearch ? "xmark.circle" : "magnifyingglass")
+                                Text(viewModel.showSearch ? "Suche schliessen" : "Anderes Mitglied suchen")
+                            }
+                        }
+                        .foregroundColor(.blue)
+                    }
+                }
+
+                if viewModel.showSearch {
+                    Section(header: Text("Mitglied suchen")) {
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.secondary)
+                            TextField("Nach Name oder E-Mail suchen...", text: $viewModel.searchQuery)
+                                .textContentType(.name)
+                                .disableAutocorrection(true)
+                                .onChange(of: viewModel.searchQuery) { newValue in
+                                    Task {
+                                        try? await Task.sleep(nanoseconds: 300_000_000)
+                                        if viewModel.searchQuery == newValue {
+                                            await viewModel.searchMembers(query: newValue)
+                                        }
+                                    }
+                                }
+
+                            if !viewModel.searchQuery.isEmpty {
+                                Button {
+                                    viewModel.searchQuery = ""
+                                    viewModel.searchResults = []
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.secondary)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+
+                        if viewModel.isSearching {
+                            HStack {
+                                ProgressView()
+                                Text("Suche...")
+                                    .foregroundColor(.secondary)
+                            }
+                        } else if viewModel.searchResults.isEmpty && !viewModel.searchQuery.isEmpty {
+                            HStack {
+                                Image(systemName: "person.fill.questionmark")
+                                    .foregroundColor(.secondary)
+                                Text("Keine Mitglieder gefunden")
+                                    .foregroundColor(.secondary)
+                            }
+                        } else {
+                            ForEach(viewModel.searchResults) { member in
+                                Button {
+                                    Task {
+                                        await viewModel.selectSearchedMember(member)
+                                    }
+                                } label: {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(member.name)
+                                                .font(.body)
+                                                .foregroundColor(.primary)
+                                            Text(member.email)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+
+                                        Spacer()
+
+                                        if viewModel.isAddingToFavorites {
+                                            ProgressView()
+                                        } else {
+                                            Image(systemName: "checkmark.circle")
+                                                .foregroundColor(.green)
+                                        }
+                                    }
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .disabled(viewModel.isAddingToFavorites)
+                            }
+                        }
                     }
                 }
 

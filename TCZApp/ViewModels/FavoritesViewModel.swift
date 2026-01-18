@@ -1,18 +1,5 @@
 import Foundation
 
-struct AddFavoriteRequest: Encodable {
-    let favouriteId: String
-
-    enum CodingKeys: String, CodingKey {
-        case favouriteId = "favourite_id"
-    }
-}
-
-struct AddFavoriteResponse: Decodable {
-    let message: String
-    let favourite: MemberSummary
-}
-
 struct RemoveFavoriteResponse: Decodable {
     let message: String
 }

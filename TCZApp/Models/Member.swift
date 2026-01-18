@@ -68,6 +68,21 @@ struct SearchResponse: Decodable {
     let results: [MemberSummary]
 }
 
+// Add favorite request
+struct AddFavoriteRequest: Encodable {
+    let favouriteId: String
+
+    enum CodingKeys: String, CodingKey {
+        case favouriteId = "favourite_id"
+    }
+}
+
+// Add favorite response
+struct AddFavoriteResponse: Decodable {
+    let message: String
+    let favourite: MemberSummary
+}
+
 // Profile update request
 struct ProfileUpdateRequest: Encodable {
     let firstname: String

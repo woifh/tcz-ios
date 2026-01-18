@@ -9,6 +9,13 @@ final class BookingViewModel: ObservableObject {
     @Published var error: String?
     @Published var isSuccess = false
 
+    // Search-related properties
+    @Published var searchQuery = ""
+    @Published var searchResults: [MemberSummary] = []
+    @Published var isSearching = false
+    @Published var showSearch = false
+    @Published var isAddingToFavorites = false
+
     private let apiClient: APIClientProtocol
 
     var courtId: Int = 0
@@ -94,5 +101,67 @@ final class BookingViewModel: ObservableObject {
 
     var formattedDate: String {
         DateFormatterService.displayDate.string(from: date)
+    }
+
+    // MARK: - Search functionality
+
+    func searchMembers(query: String) async {
+        guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
+            searchResults = []
+            return
+        }
+
+        isSearching = true
+
+        do {
+            let response: SearchResponse = try await apiClient.request(
+                .searchMembers(query: query), body: nil
+            )
+            // Filter out already favorited members and self
+            let favoriteIds = Set(favorites.map { $0.id })
+            searchResults = response.results.filter { member in
+                member.id != currentUserId && !favoriteIds.contains(member.id)
+            }
+        } catch {
+            searchResults = []
+        }
+
+        isSearching = false
+    }
+
+    func selectSearchedMember(_ member: MemberSummary) async {
+        guard let userId = currentUserId else { return }
+
+        isAddingToFavorites = true
+
+        let request = AddFavoriteRequest(favouriteId: member.id)
+
+        do {
+            let response: AddFavoriteResponse = try await apiClient.request(
+                .addFavorite(memberId: userId), body: request
+            )
+            favorites.append(response.favourite)
+            selectedMemberId = member.id
+            resetSearch()
+        } catch {
+            // Even if adding to favorites fails, still select the member for booking
+            selectedMemberId = member.id
+            resetSearch()
+        }
+
+        isAddingToFavorites = false
+    }
+
+    func resetSearch() {
+        showSearch = false
+        searchQuery = ""
+        searchResults = []
+    }
+
+    func toggleSearch() {
+        showSearch.toggle()
+        if !showSearch {
+            resetSearch()
+        }
     }
 }
