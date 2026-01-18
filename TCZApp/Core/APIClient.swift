@@ -106,6 +106,10 @@ final class APIClient: APIClientProtocol {
     }
 
     func request<T: Decodable>(_ endpoint: APIEndpoint, body: Encodable? = nil) async throws -> T {
+        try await performRequest(endpoint, body: body, attempt: 1)
+    }
+
+    private func performRequest<T: Decodable>(_ endpoint: APIEndpoint, body: Encodable?, attempt: Int) async throws -> T {
         let request = try buildRequest(for: endpoint, body: body)
         let (data, response) = try await session.data(for: request)
 
@@ -149,6 +153,15 @@ final class APIClient: APIClientProtocol {
         case 429:
             throw APIError.rateLimited
         default:
+            // Retry once on transient server errors (500, 502, 503, 504) for GET requests
+            let isRetryableError = [500, 502, 503, 504].contains(httpResponse.statusCode)
+            if isRetryableError && endpoint.method == .get && attempt < 2 {
+                #if DEBUG
+                print("⚠️ Server error \(httpResponse.statusCode) for \(endpoint.path), retrying...")
+                #endif
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
+                return try await performRequest(endpoint, body: body, attempt: attempt + 1)
+            }
             throw APIError.serverError(httpResponse.statusCode)
         }
     }

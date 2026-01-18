@@ -4,6 +4,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [3.8] - 2026-01-18
+### Fixed
+- App now automatically retries on temporary server errors during startup
+
 ## [3.7] - 2026-01-18
 ### Added
 - Book on behalf of another member: search for any club member when creating a booking
