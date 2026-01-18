@@ -4,6 +4,12 @@ struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var showingLogoutAlert = false
     @State private var serverVersion: String?
+    @State private var showAppChangelog = false
+    @State private var showServerChangelog = false
+    @State private var appChangelogContent: String?
+    @State private var serverChangelogContent: String?
+    @State private var serverChangelogLoading = false
+    @State private var serverChangelogError: String?
 
     private var appVersion: String {
         if let path = Bundle.main.path(forResource: "VERSION", ofType: nil),
@@ -53,21 +59,40 @@ struct ProfileView: View {
 
                 // App info section
                 Section(header: Text("App Info")) {
-                    HStack {
-                        Text("App-Version")
-                        Spacer()
-                        Text(appVersion)
-                            .foregroundColor(.secondary)
-                    }
-                    HStack {
-                        Text("Server-Version")
-                        Spacer()
-                        if let version = serverVersion {
-                            Text(version)
+                    Button {
+                        showAppChangelog = true
+                    } label: {
+                        HStack {
+                            Text("App-Version")
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Text(appVersion)
                                 .foregroundColor(.secondary)
-                        } else {
-                            ProgressView()
-                                .scaleEffect(0.8)
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    Button {
+                        showServerChangelog = true
+                        Task {
+                            await loadServerChangelog()
+                        }
+                    } label: {
+                        HStack {
+                            Text("Server-Version")
+                                .foregroundColor(.primary)
+                            Spacer()
+                            if let version = serverVersion {
+                                Text(version)
+                                    .foregroundColor(.secondary)
+                            } else {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                            }
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                     }
                     HStack {
@@ -111,10 +136,29 @@ struct ProfileView: View {
                     secondaryButton: .cancel(Text("Abbrechen"))
                 )
             }
+            .sheet(isPresented: $showAppChangelog) {
+                ChangelogView(
+                    title: "App Changelog",
+                    content: appChangelogContent,
+                    isLoading: false,
+                    error: appChangelogContent == nil ? "Changelog nicht gefunden" : nil
+                )
+            }
+            .sheet(isPresented: $showServerChangelog) {
+                ChangelogView(
+                    title: "Server Changelog",
+                    content: serverChangelogContent,
+                    isLoading: serverChangelogLoading,
+                    error: serverChangelogError
+                )
+            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .task {
             await loadServerVersion()
+        }
+        .onAppear {
+            loadAppChangelog()
         }
     }
 
@@ -125,6 +169,28 @@ struct ProfileView: View {
         } catch {
             serverVersion = "?"
         }
+    }
+
+    private func loadAppChangelog() {
+        if let path = Bundle.main.path(forResource: "CHANGELOG", ofType: "md"),
+           let content = try? String(contentsOfFile: path, encoding: .utf8) {
+            appChangelogContent = content
+        }
+    }
+
+    private func loadServerChangelog() async {
+        serverChangelogLoading = true
+        serverChangelogError = nil
+        serverChangelogContent = nil
+
+        do {
+            let response: ServerChangelogResponse = try await APIClient.shared.request(.serverChangelog, body: nil)
+            serverChangelogContent = response.changelog
+        } catch {
+            serverChangelogError = "Changelog konnte nicht geladen werden"
+        }
+
+        serverChangelogLoading = false
     }
 }
 

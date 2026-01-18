@@ -38,6 +38,8 @@
 		0100000000000029 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000029 /* ProfileViewModel.swift */; };
 		0100000000000030 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000030 /* ProfileEditView.swift */; };
 		054C411B2F1AEE1F00407174 /* VERSION in Resources */ = {isa = PBXBuildFile; fileRef = 054C411A2F1AEE1F00407174 /* VERSION */; };
+		0100000000000031 /* ChangelogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000031 /* ChangelogView.swift */; };
+		054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 054C411D2F1AEE2000407174 /* CHANGELOG.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +75,8 @@
 		0200000000000030 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		0300000000000001 /* TCZApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TCZApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C411A2F1AEE1F00407174 /* VERSION */ = {isa = PBXFileReference; lastKnownFileType = text; path = VERSION; sourceTree = "<group>"; };
+		0200000000000031 /* ChangelogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangelogView.swift; sourceTree = "<group>"; };
+		054C411D2F1AEE2000407174 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +93,7 @@
 		0500000000000001 = {
 			isa = PBXGroup;
 			children = (
+				054C411D2F1AEE2000407174 /* CHANGELOG.md */,
 				054C411A2F1AEE1F00407174 /* VERSION */,
 				0500000000000002,
 				0500000000000003 /* Products */,
@@ -177,6 +182,7 @@
 		0500000000000009 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				0200000000000031 /* ChangelogView.swift */,
 				0200000000000002 /* ContentView.swift */,
 				0200000000000003 /* MainTabView.swift */,
 				0200000000000004 /* ProfileView.swift */,
@@ -304,6 +310,7 @@
 			files = (
 				0100000000000027 /* Assets.xcassets in Resources */,
 				054C411B2F1AEE1F00407174 /* VERSION in Resources */,
+				054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +350,7 @@
 				0100000000000028 /* DateFormatterService.swift in Sources */,
 				0100000000000029 /* ProfileViewModel.swift in Sources */,
 				0100000000000030 /* ProfileEditView.swift in Sources */,
+				0100000000000031 /* ChangelogView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

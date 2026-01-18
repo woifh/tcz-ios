@@ -82,3 +82,7 @@ struct ReservationSummary: Codable, Identifiable {
 struct ServerVersionResponse: Codable {
     let version: String
 }
+
+struct ServerChangelogResponse: Codable {
+    let changelog: String
+}
