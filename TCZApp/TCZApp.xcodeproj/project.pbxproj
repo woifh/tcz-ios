@@ -248,11 +248,34 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		054C411E2F1B000000407174 /* Sync Version from Changelog */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Sync Version from Changelog";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Extract version from CHANGELOG.md and update project.pbxproj\nCHANGELOG=\"${SRCROOT}/CHANGELOG.md\"\nPROJECT=\"${SRCROOT}/TCZApp.xcodeproj/project.pbxproj\"\n\nif [ -f \"$CHANGELOG\" ] && [ -f \"$PROJECT\" ]; then\n    # Find first version after [Unreleased]: ## [X.Y]\n    VERSION=$(grep -A 100 '## \\[Unreleased\\]' \"$CHANGELOG\" | grep -m 1 '## \\[[0-9]' | sed 's/.*\\[\\([0-9]*\\.[0-9]*\\)\\].*/\\1/')\n    \n    if [ -n \"$VERSION\" ]; then\n        # Get current MARKETING_VERSION from project\n        CURRENT=$(grep 'MARKETING_VERSION' \"$PROJECT\" | head -1 | sed 's/.*= \\([0-9.]*\\);/\\1/')\n        \n        if [ \"$CURRENT\" != \"$VERSION\" ]; then\n            echo \"warning: MARKETING_VERSION ($CURRENT) differs from CHANGELOG ($VERSION). Please update project.pbxproj.\"\n        fi\n    fi\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		0600000000000001 /* TCZApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0800000000000001 /* Build configuration list for PBXNativeTarget "TCZApp" */;
 			buildPhases = (
+				054C411E2F1B000000407174 /* Sync Version from Changelog */,
 				0700000000000001 /* Sources */,
 				0400000000000001 /* Frameworks */,
 				0700000000000002 /* Resources */,
@@ -492,7 +515,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3;
+				MARKETING_VERSION = 3.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -521,7 +544,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.3;
+				MARKETING_VERSION = 3.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

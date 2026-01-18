@@ -69,6 +69,9 @@ Change in `APIClient.swift` → `baseURL` property.
 - App version is parsed dynamically from CHANGELOG.md (first `## [X.Y]` entry after `[Unreleased]`)
 - Do NOT create separate VERSION files - the changelog IS the version file
 - Format: `## [major.minor] - YYYY-MM-DD` → displays as `major.minor.0` in app
+- **Xcode archive version**: `MARKETING_VERSION` in project.pbxproj must match CHANGELOG.md
+  - A build script warns if they differ, but you must update `MARKETING_VERSION` manually when bumping versions
+  - Update both Debug and Release configurations in project.pbxproj
 
 ## Important Rules
 
@@ -76,6 +79,7 @@ Change in `APIClient.swift` → `baseURL` property.
 - **When pushing to GitHub (only after user requests it)**:
   - Ask the user whether to increase major or minor version
   - Add a short, non-technical changelog entry to CHANGELOG.md (version format: major.minor)
+  - **Update MARKETING_VERSION in project.pbxproj** to match the new version (both Debug and Release)
   - **Every code change must have a corresponding changelog entry** - don't push without updating the changelog first
   - Create a meaningful commit message
   - Push to GitHub
