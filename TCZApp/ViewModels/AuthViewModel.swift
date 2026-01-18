@@ -122,4 +122,17 @@ final class AuthViewModel: ObservableObject {
             try? keychainService.save(key: "currentUser", data: userData)
         }
     }
+
+    /// Refreshes the current user from the server
+    func refreshCurrentUser() async {
+        guard let userId = currentUser?.id else { return }
+
+        do {
+            let member: Member = try await apiClient.request(.getMember(memberId: userId), body: nil)
+            updateCurrentUser(member)
+        } catch {
+            // Silently fail - user data will be stale but still usable
+            print("Failed to refresh user: \(error)")
+        }
+    }
 }

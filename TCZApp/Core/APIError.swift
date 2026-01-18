@@ -37,4 +37,43 @@ enum APIError: Error, LocalizedError {
 
 struct ErrorResponse: Decodable {
     let error: String
+    let activeSessions: [ActiveSession]?
+
+    enum CodingKeys: String, CodingKey {
+        case error
+        case activeSessions = "active_sessions"
+    }
+
+    /// Returns a full error message including active session details if available
+    var fullErrorMessage: String {
+        guard let sessions = activeSessions, !sessions.isEmpty else {
+            return error
+        }
+
+        let sessionLines = sessions.map { "• \($0.formattedDescription)" }
+        return error + "\n" + sessionLines.joined(separator: "\n")
+    }
+}
+
+struct ActiveSession: Decodable {
+    let date: String
+    let startTime: String
+    let courtNumber: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case date
+        case startTime = "start_time"
+        case courtNumber = "court_number"
+    }
+
+    var formattedDescription: String {
+        let dateParts = date.split(separator: "-")
+        let dateStr = dateParts.count == 3 ? "\(dateParts[2]).\(dateParts[1])." : date
+
+        let startHour = Int(startTime.prefix(2)) ?? 0
+        let endTime = String(format: "%02d:00", startHour + 1)
+        let courtStr = courtNumber.map { "Platz \($0)" } ?? ""
+
+        return "\(dateStr) \(startTime)-\(endTime) \(courtStr)"
+    }
 }

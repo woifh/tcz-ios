@@ -45,7 +45,7 @@ struct ProfileEditView: View {
     private var formContent: some View {
         Form {
             // Personal Information Section
-            Section(header: Text("Persoenliche Daten")) {
+            Section(header: Text("Persönliche Daten")) {
                 TextField("Vorname", text: $viewModel.firstname)
                     .textContentType(.givenName)
 
@@ -86,11 +86,11 @@ struct ProfileEditView: View {
             }
 
             // Password Section
-            Section(header: Text("Passwort aendern"), footer: Text("Lassen Sie die Felder leer, wenn Sie das Passwort nicht aendern moechten.")) {
+            Section(header: Text("Passwort ändern"), footer: Text("Lass die Felder leer, wenn du das Passwort nicht ändern möchtest.")) {
                 SecureField("Neues Passwort", text: $viewModel.password)
                     .textContentType(.newPassword)
 
-                SecureField("Passwort bestaetigen", text: $viewModel.confirmPassword)
+                SecureField("Passwort bestätigen", text: $viewModel.confirmPassword)
                     .textContentType(.newPassword)
 
                 if let passwordError = viewModel.passwordError {

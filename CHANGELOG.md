@@ -67,7 +67,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ## [1.0.0] - 2025-01-11
 ### Added
 - Initial release
-- Court availability grid with 6 courts (Plaetze 1-6)
+- Court availability grid with 6 courts (Plätze 1-6)
 - Swipeable court pages (1-3 and 4-6)
 - Improved grid readability with 8 visible time slots and vertical scrolling
 - Booking management (create, view, cancel)

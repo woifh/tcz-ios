@@ -18,14 +18,41 @@ struct Member: Codable, Identifiable, Equatable {
     let notifyCourtBlocked: Bool?
     let notifyBookingOverridden: Bool?
 
+    // Payment status fields
+    let feePaid: Bool?
+    let paymentConfirmationRequested: Bool?
+    let paymentConfirmationRequestedAt: String?
+
+    // Role/membership fields
+    let role: String?
+    let membershipType: String?
+    let isActive: Bool?
+
     enum CodingKeys: String, CodingKey {
-        case id, firstname, lastname, email, name, street, city, phone
+        case id, firstname, lastname, email, name, street, city, phone, role
         case zipCode = "zip_code"
         case notificationsEnabled = "notifications_enabled"
         case notifyOwnBookings = "notify_own_bookings"
         case notifyOtherBookings = "notify_other_bookings"
         case notifyCourtBlocked = "notify_court_blocked"
         case notifyBookingOverridden = "notify_booking_overridden"
+        case feePaid = "fee_paid"
+        case paymentConfirmationRequested = "payment_confirmation_requested"
+        case paymentConfirmationRequestedAt = "payment_confirmation_requested_at"
+        case membershipType = "membership_type"
+        case isActive = "is_active"
+    }
+
+    // Payment state helpers
+    var shouldShowPaymentReminder: Bool {
+        guard let feePaid = feePaid else { return false }
+        if feePaid { return false }
+        return !(paymentConfirmationRequested ?? false)
+    }
+
+    var hasPendingPaymentConfirmation: Bool {
+        guard let feePaid = feePaid, !feePaid else { return false }
+        return paymentConfirmationRequested ?? false
     }
 
     static func == (lhs: Member, rhs: Member) -> Bool {
@@ -114,4 +141,15 @@ struct ProfileUpdateRequest: Encodable {
 struct ProfileUpdateResponse: Decodable {
     let message: String
     let member: Member
+}
+
+// Payment confirmation response
+struct PaymentConfirmationResponse: Decodable {
+    let message: String
+    let paymentConfirmationRequested: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case message
+        case paymentConfirmationRequested = "payment_confirmation_requested"
+    }
 }

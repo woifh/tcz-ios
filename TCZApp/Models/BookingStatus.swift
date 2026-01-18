@@ -6,6 +6,7 @@ struct BookingStatusResponse: Codable {
     let limits: BookingLimits
     let activeReservations: ActiveReservationCounts
     let nextReservations: [ReservationSummary]?
+    let paymentDeadline: PaymentDeadlineInfo?
 
     enum CodingKeys: String, CodingKey {
         case currentTime = "current_time"
@@ -13,6 +14,27 @@ struct BookingStatusResponse: Codable {
         case limits
         case activeReservations = "active_reservations"
         case nextReservations = "next_reservations"
+        case paymentDeadline = "payment_deadline"
+    }
+}
+
+struct PaymentDeadlineInfo: Codable {
+    let deadline: String
+    let daysUntil: Int?
+    let isPast: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case deadline
+        case daysUntil = "days_until"
+        case isPast = "is_past"
+    }
+
+    var formattedDeadline: String {
+        let parts = deadline.split(separator: "-")
+        if parts.count == 3 {
+            return "\(parts[2]).\(parts[1]).\(parts[0])"
+        }
+        return deadline
     }
 }
 

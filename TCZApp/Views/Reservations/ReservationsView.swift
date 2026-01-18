@@ -39,7 +39,7 @@ struct ReservationsView: View {
                         }
 
                         if !viewModel.bookingsForOthers.isEmpty {
-                            Section(header: Text("Buchungen fuer andere")) {
+                            Section(header: Text("Buchungen für andere")) {
                                 ForEach(viewModel.bookingsForOthers) { reservation in
                                     ReservationRow(
                                         reservation: reservation,
@@ -126,7 +126,7 @@ struct ReservationRow: View {
                 if let bookedFor = reservation.bookedFor,
                    let bookedBy = reservation.bookedBy,
                    bookedFor != bookedBy {
-                    Text("Fuer: \(bookedFor)")
+                    Text("Für: \(bookedFor)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

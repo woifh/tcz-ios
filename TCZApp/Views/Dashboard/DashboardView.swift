@@ -25,10 +25,39 @@ struct DashboardView: View {
     @State private var bookingSheetData: BookingSheetData?
     @State private var cancelConfirmation: CancelConfirmationData?
 
+    private var paymentBannerState: PaymentBannerState? {
+        guard let user = authViewModel.currentUser else { return nil }
+
+        // User has confirmed payment, waiting for approval
+        if user.hasPendingPaymentConfirmation {
+            return .confirmationPending
+        }
+
+        // User has unpaid fee - check deadline from booking status
+        if user.shouldShowPaymentReminder {
+            if let deadline = viewModel.bookingStatus?.paymentDeadline {
+                if deadline.isPast {
+                    return .deadlinePassed
+                } else if let days = deadline.daysUntil {
+                    return .deadlineUpcoming(daysUntil: days, deadline: deadline.formattedDeadline)
+                }
+            }
+            // No deadline set, but fee is unpaid - show generic warning
+            return .deadlinePassed
+        }
+
+        return nil
+    }
+
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 12) {
+                    // Payment reminder banner (only for authenticated users with unpaid fee)
+                    if let bannerState = paymentBannerState {
+                        PaymentReminderBanner(state: bannerState)
+                    }
+
                     // Compact Header (date selector + legend + booking badge)
                     CompactHeaderView(
                         selectedDate: $viewModel.selectedDate,
@@ -106,7 +135,7 @@ struct DashboardView: View {
                 }
             } message: {
                 if let data = cancelConfirmation {
-                    Text("Platz \(data.courtNumber) um \(data.time) Uhr fuer \(data.bookedFor) stornieren?")
+                    Text("Platz \(data.courtNumber) um \(data.time) Uhr für \(data.bookedFor) stornieren?")
                 }
             }
         }
@@ -114,6 +143,7 @@ struct DashboardView: View {
         .task {
             if let userId = authViewModel.currentUser?.id {
                 viewModel.setCurrentUserId(userId)
+                await authViewModel.refreshCurrentUser()
             }
             await viewModel.loadData()
         }

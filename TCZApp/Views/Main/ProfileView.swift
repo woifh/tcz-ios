@@ -11,6 +11,9 @@ struct ProfileView: View {
     @State private var serverChangelogLoading = false
     @State private var serverChangelogError: String?
     @State private var appVersion: String = "?"
+    @State private var isConfirmingPayment = false
+    @State private var paymentError: String?
+    @State private var showingPaymentConfirmationAlert = false
 
     var body: some View {
         NavigationView {
@@ -42,6 +45,46 @@ struct ProfileView: View {
                                 Image(systemName: "pencil.circle")
                                     .foregroundColor(.green)
                                 Text("Profil bearbeiten")
+                            }
+                        }
+                    }
+
+                    // Payment status section (only when fee is unpaid)
+                    if let feePaid = user.feePaid, !feePaid {
+                        Section(header: Text("Mitgliedsbeitrag")) {
+                            HStack {
+                                Text("Status")
+                                Spacer()
+                                if user.hasPendingPaymentConfirmation {
+                                    Label("Bestätigung angefragt", systemImage: "clock.fill")
+                                        .foregroundColor(.orange)
+                                } else {
+                                    Label("Offen", systemImage: "exclamationmark.circle.fill")
+                                        .foregroundColor(.red)
+                                }
+                            }
+
+                            if !user.hasPendingPaymentConfirmation {
+                                Button {
+                                    showingPaymentConfirmationAlert = true
+                                } label: {
+                                    HStack {
+                                        Spacer()
+                                        if isConfirmingPayment {
+                                            ProgressView()
+                                        } else {
+                                            Text("Zahlung bestätigen")
+                                        }
+                                        Spacer()
+                                    }
+                                }
+                                .disabled(isConfirmingPayment)
+                            }
+
+                            if let error = paymentError {
+                                Text(error)
+                                    .font(.caption)
+                                    .foregroundColor(.red)
                             }
                         }
                     }
@@ -114,17 +157,23 @@ struct ProfileView: View {
             }
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("Profil")
-            .alert(isPresented: $showingLogoutAlert) {
-                Alert(
-                    title: Text("Abmelden?"),
-                    message: Text("Möchtest du dich wirklich abmelden?"),
-                    primaryButton: .destructive(Text("Abmelden")) {
-                        Task {
-                            await authViewModel.logout()
-                        }
-                    },
-                    secondaryButton: .cancel(Text("Abbrechen"))
-                )
+            .alert("Abmelden?", isPresented: $showingLogoutAlert) {
+                Button("Abbrechen", role: .cancel) { }
+                Button("Abmelden", role: .destructive) {
+                    Task {
+                        await authViewModel.logout()
+                    }
+                }
+            } message: {
+                Text("Möchtest du dich wirklich abmelden?")
+            }
+            .alert("Zahlung bestätigen?", isPresented: $showingPaymentConfirmationAlert) {
+                Button("Abbrechen", role: .cancel) { }
+                Button("Bestätigen") {
+                    Task { await confirmPayment() }
+                }
+            } message: {
+                Text("Hiermit bestätigst du, dass du deinen Mitgliedsbeitrag bezahlt hast. Die Bestätigung wird an den Vorstand gesendet.")
             }
             .sheet(isPresented: $showAppChangelog) {
                 ChangelogView(
@@ -202,6 +251,23 @@ struct ProfileView: View {
         }
 
         serverChangelogLoading = false
+    }
+
+    private func confirmPayment() async {
+        isConfirmingPayment = true
+        paymentError = nil
+
+        do {
+            let _: PaymentConfirmationResponse = try await APIClient.shared.request(.confirmPayment, body: nil)
+            // Refresh user data to update payment status (will show pending state)
+            await authViewModel.refreshCurrentUser()
+        } catch let apiError as APIError {
+            paymentError = apiError.localizedDescription
+        } catch {
+            paymentError = "Fehler beim Anfordern der Zahlungsbestätigung"
+        }
+
+        isConfirmingPayment = false
     }
 }
 

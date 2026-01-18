@@ -149,9 +149,9 @@ final class APIClient: APIClientProtocol {
             throw APIError.notFound
         case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
-                throw APIError.badRequest(errorResponse.error)
+                throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
-            throw APIError.badRequest("Ungueltite Anfrage")
+            throw APIError.badRequest("Ungültige Anfrage")
         case 429:
             throw APIError.rateLimited
         default:
@@ -197,9 +197,9 @@ final class APIClient: APIClientProtocol {
             throw APIError.notFound
         case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
-                throw APIError.badRequest(errorResponse.error)
+                throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
-            throw APIError.badRequest("Ungueltite Anfrage")
+            throw APIError.badRequest("Ungueltige Anfrage")
         case 429:
             throw APIError.rateLimited
         default:

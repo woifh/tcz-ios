@@ -4,6 +4,14 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [3.9] - 2026-01-18
+### Added
+- Payment reminder banner on dashboard shows days until payment deadline
+- Confirmation dialog before sending payment confirmation request
+
+### Changed
+- User data now refreshes automatically when opening the app
+
 ## [3.8] - 2026-01-18
 ### Fixed
 - App now automatically retries on temporary server errors during startup
@@ -81,7 +89,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ## [1.0.0] - 2025-01-11
 ### Added
 - Initial release
-- Court availability grid with 6 courts (Plaetze 1-6)
+- Court availability grid with 6 courts (Plätze 1-6)
 - Swipeable court pages (1-3 and 4-6)
 - Improved grid readability with 8 visible time slots and vertical scrolling
 - Booking management (create, view, cancel)

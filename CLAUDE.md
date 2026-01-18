@@ -23,6 +23,8 @@ Clean build:
 xcodebuild -project TCZApp/TCZApp.xcodeproj -scheme TCZApp clean
 ```
 
+**Note:** These commands require full Xcode installation. If only Command Line Tools are installed, build from Xcode IDE instead.
+
 ## Architecture
 
 **MVVM with SwiftUI** - Clean separation between Views, ViewModels, and Models.

@@ -34,7 +34,7 @@ final class DashboardViewModel: ObservableObject {
     func pageLabelForPage(_ page: Int) -> String {
         let start = page * courtsPerPage + 1
         let end = min(start + courtsPerPage - 1, courtNumbers.count)
-        return "Plaetze \(start)-\(end)"
+        return "Plätze \(start)-\(end)"
     }
 
 

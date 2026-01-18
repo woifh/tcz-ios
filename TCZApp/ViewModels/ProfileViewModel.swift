@@ -25,6 +25,7 @@ final class ProfileViewModel: ObservableObject {
     // State management
     @Published var isLoading = false
     @Published var isSaving = false
+    @Published var isConfirmingPayment = false
     @Published var error: String?
     @Published var successMessage: String?
 
@@ -159,6 +160,27 @@ final class ProfileViewModel: ObservableObject {
             self.error = "Fehler beim Speichern des Profils"
             isSaving = false
             return nil
+        }
+    }
+
+    func confirmPayment() async -> Bool {
+        isConfirmingPayment = true
+        error = nil
+        successMessage = nil
+
+        do {
+            let _: PaymentConfirmationResponse = try await apiClient.request(.confirmPayment, body: nil)
+            successMessage = "Zahlungsbestätigung wurde angefordert"
+            isConfirmingPayment = false
+            return true
+        } catch let apiError as APIError {
+            error = apiError.localizedDescription
+            isConfirmingPayment = false
+            return false
+        } catch {
+            self.error = "Fehler beim Anfordern der Zahlungsbestätigung"
+            isConfirmingPayment = false
+            return false
         }
     }
 }

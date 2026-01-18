@@ -39,7 +39,7 @@ struct BookingSheet: View {
                     }
                 }
 
-                Section(header: Text("Gebucht fuer")) {
+                Section(header: Text("Gebucht für")) {
                     if viewModel.isLoadingFavorites {
                         HStack {
                             ProgressView()
