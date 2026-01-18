@@ -65,9 +65,10 @@ Change in `APIClient.swift` → `baseURL` property.
 
 ## Versioning
 
-- `VERSION` file contains the current version number
-- `CHANGELOG.md` follows Keep a Changelog format
-- App bundle reads version dynamically in `ProfileView`
+- `TCZApp/CHANGELOG.md` is the **single source of truth** for version numbers
+- App version is parsed dynamically from CHANGELOG.md (first `## [X.Y]` entry after `[Unreleased]`)
+- Do NOT create separate VERSION files - the changelog IS the version file
+- Format: `## [major.minor] - YYYY-MM-DD` → displays as `major.minor.0` in app
 
 ## Important Rules
 

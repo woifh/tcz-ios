@@ -37,7 +37,6 @@
 		0100000000000028 /* DateFormatterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000028 /* DateFormatterService.swift */; };
 		0100000000000029 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000029 /* ProfileViewModel.swift */; };
 		0100000000000030 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000030 /* ProfileEditView.swift */; };
-		054C411B2F1AEE1F00407174 /* VERSION in Resources */ = {isa = PBXBuildFile; fileRef = 054C411A2F1AEE1F00407174 /* VERSION */; };
 		0100000000000031 /* ChangelogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000031 /* ChangelogView.swift */; };
 		054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 054C411D2F1AEE2000407174 /* CHANGELOG.md */; };
 /* End PBXBuildFile section */
@@ -74,7 +73,6 @@
 		0200000000000029 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		0200000000000030 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		0300000000000001 /* TCZApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TCZApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		054C411A2F1AEE1F00407174 /* VERSION */ = {isa = PBXFileReference; lastKnownFileType = text; path = VERSION; sourceTree = "<group>"; };
 		0200000000000031 /* ChangelogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangelogView.swift; sourceTree = "<group>"; };
 		054C411D2F1AEE2000407174 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				054C411D2F1AEE2000407174 /* CHANGELOG.md */,
-				054C411A2F1AEE1F00407174 /* VERSION */,
 				0500000000000002,
 				0500000000000003 /* Products */,
 			);
@@ -309,7 +306,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0100000000000027 /* Assets.xcassets in Resources */,
-				054C411B2F1AEE1F00407174 /* VERSION in Resources */,
 				054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

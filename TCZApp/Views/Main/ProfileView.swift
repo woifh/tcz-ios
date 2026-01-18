@@ -10,17 +10,7 @@ struct ProfileView: View {
     @State private var serverChangelogContent: String?
     @State private var serverChangelogLoading = false
     @State private var serverChangelogError: String?
-
-    private var appVersion: String {
-        if let path = Bundle.main.path(forResource: "VERSION", ofType: nil),
-           let version = try? String(contentsOfFile: path, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines) {
-            return version
-        }
-        // Fallback to bundle version if VERSION file not found
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"
-        return "\(version) (\(build))"
-    }
+    @State private var appVersion: String = "?"
 
     var body: some View {
         NavigationView {
@@ -158,8 +148,29 @@ struct ProfileView: View {
             await loadServerVersion()
         }
         .onAppear {
+            loadAppVersion()
             loadAppChangelog()
         }
+    }
+
+    private func loadAppVersion() {
+        // Parse version from CHANGELOG.md (single source of truth)
+        if let path = Bundle.main.path(forResource: "CHANGELOG", ofType: "md"),
+           let content = try? String(contentsOfFile: path, encoding: .utf8),
+           let unreleasedRange = content.range(of: "## [Unreleased]") {
+            // Find first "## [" after [Unreleased]
+            let searchStart = unreleasedRange.upperBound
+            if let startRange = content.range(of: "## [", range: searchStart..<content.endIndex),
+               let endRange = content.range(of: "]", range: startRange.upperBound..<content.endIndex) {
+                let version = String(content[startRange.upperBound..<endRange.lowerBound])
+                if version.contains(".") {
+                    appVersion = version + ".0"
+                    return
+                }
+            }
+        }
+        // Fallback to bundle version
+        appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
     }
 
     private func loadServerVersion() async {
