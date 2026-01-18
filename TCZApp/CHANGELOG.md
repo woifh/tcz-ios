@@ -7,6 +7,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ## [3.8] - 2026-01-18
 ### Fixed
 - App now automatically retries on temporary server errors during startup
+- Member search results now scroll into view automatically when keyboard is open
 
 ### Changed
 - Version number now read directly from changelog (no more separate VERSION file)

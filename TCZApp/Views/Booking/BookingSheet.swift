@@ -16,7 +16,8 @@ struct BookingSheet: View {
 
     var body: some View {
         NavigationView {
-            Form {
+            ScrollViewReader { scrollProxy in
+                Form {
                 Section(header: Text("Buchungsdetails")) {
                     HStack {
                         Text("Datum")
@@ -140,6 +141,7 @@ struct BookingSheet: View {
                                 .buttonStyle(PlainButtonStyle())
                                 .disabled(viewModel.isAddingToFavorites)
                             }
+                            .id("searchResults")
                         }
                     }
                 }
@@ -182,6 +184,14 @@ struct BookingSheet: View {
                     }
                 }
             )
+            .onChange(of: viewModel.searchResults) { results in
+                if !results.isEmpty {
+                    withAnimation {
+                        scrollProxy.scrollTo("searchResults", anchor: .top)
+                    }
+                }
+            }
+            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
