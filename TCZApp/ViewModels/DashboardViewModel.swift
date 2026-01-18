@@ -182,7 +182,6 @@ final class DashboardViewModel: ObservableObject {
 
     func isSlotInPast(time: String) -> Bool {
         let now = Date()
-        let calendar = Calendar.current
         let berlinTimeZone = TimeZone(identifier: "Europe/Berlin")!
 
         var berlinCalendar = Calendar.current

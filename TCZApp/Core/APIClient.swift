@@ -133,10 +133,12 @@ final class APIClient: APIClientProtocol {
             }
         case 301, 302, 303, 307, 308:
             // Redirect typically means session expired (redirect to login)
-            DispatchQueue.main.async { self.onUnauthorized?() }
+            let handler = self.onUnauthorized
+            DispatchQueue.main.async { handler?() }
             throw APIError.unauthorized
         case 401:
-            DispatchQueue.main.async { self.onUnauthorized?() }
+            let handler = self.onUnauthorized
+            DispatchQueue.main.async { handler?() }
             throw APIError.unauthorized
         case 403:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
@@ -179,10 +181,12 @@ final class APIClient: APIClientProtocol {
             return
         case 301, 302, 303, 307, 308:
             // Redirect typically means session expired (redirect to login)
-            DispatchQueue.main.async { self.onUnauthorized?() }
+            let handler = self.onUnauthorized
+            DispatchQueue.main.async { handler?() }
             throw APIError.unauthorized
         case 401:
-            DispatchQueue.main.async { self.onUnauthorized?() }
+            let handler = self.onUnauthorized
+            DispatchQueue.main.async { handler?() }
             throw APIError.unauthorized
         case 403:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
