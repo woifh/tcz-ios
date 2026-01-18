@@ -7,6 +7,7 @@ struct BookingSheetData: Identifiable {
     let courtNumber: Int
     let time: String
     let userId: String
+    let userName: String
 }
 
 /// Data for cancellation confirmation
@@ -81,6 +82,7 @@ struct DashboardView: View {
                     time: data.time,
                     date: viewModel.selectedDate,
                     currentUserId: data.userId,
+                    currentUserName: data.userName,
                     onComplete: {
                         bookingSheetData = nil
                         Task { await viewModel.loadData() }
@@ -118,7 +120,7 @@ struct DashboardView: View {
     }
 
     private func handleSlotTap(courtId: Int, courtNumber: Int, time: String, slot: TimeSlot?) {
-        guard let userId = authViewModel.currentUser?.id else {
+        guard let user = authViewModel.currentUser else {
             return
         }
 
@@ -144,7 +146,8 @@ struct DashboardView: View {
             courtId: courtId,
             courtNumber: courtNumber,
             time: time,
-            userId: userId
+            userId: user.id,
+            userName: user.name
         )
     }
 }

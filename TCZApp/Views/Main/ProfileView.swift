@@ -117,7 +117,7 @@ struct ProfileView: View {
             .alert(isPresented: $showingLogoutAlert) {
                 Alert(
                     title: Text("Abmelden?"),
-                    message: Text("Moechten Sie sich wirklich abmelden?"),
+                    message: Text("Möchtest du dich wirklich abmelden?"),
                     primaryButton: .destructive(Text("Abmelden")) {
                         Task {
                             await authViewModel.logout()

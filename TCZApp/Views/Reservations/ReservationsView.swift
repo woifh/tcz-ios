@@ -19,7 +19,7 @@ struct ReservationsView: View {
                     EmptyStateView(
                         icon: "calendar.badge.exclamationmark",
                         title: "Keine Buchungen",
-                        message: "Sie haben keine aktiven Buchungen."
+                        message: "Du hast keine aktiven Buchungen."
                     )
                 } else {
                     List {
@@ -90,7 +90,7 @@ struct ReservationsView: View {
     private var cancelAlertMessage: String {
         if let reservation = reservationToCancel {
             let courtText = reservation.courtNumber.map { "Platz \($0)" } ?? "den Platz"
-            return "Moechten Sie die Buchung fuer \(courtText) am \(reservation.formattedDate) um \(reservation.startTime) wirklich stornieren?"
+            return "Möchtest du die Buchung für \(courtText) am \(reservation.formattedDate) um \(reservation.startTime) wirklich stornieren?"
         }
         return ""
     }

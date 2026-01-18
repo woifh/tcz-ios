@@ -11,6 +11,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Changed
 - Version number now read directly from changelog (no more separate VERSION file)
 - Build warns if Xcode project version differs from changelog
+- App now uses informal "du" instead of formal "Sie" throughout
 
 ## [3.7] - 2026-01-18
 ### Added

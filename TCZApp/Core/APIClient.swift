@@ -142,7 +142,7 @@ final class APIClient: APIClientProtocol {
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
                 throw APIError.forbidden(errorResponse.error)
             }
-            throw APIError.forbidden("Sie haben keine Berechtigung fuer diese Aktion")
+            throw APIError.forbidden("Du hast keine Berechtigung für diese Aktion")
         case 404:
             throw APIError.notFound
         case 400:
@@ -188,7 +188,7 @@ final class APIClient: APIClientProtocol {
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
                 throw APIError.forbidden(errorResponse.error)
             }
-            throw APIError.forbidden("Sie haben keine Berechtigung fuer diese Aktion")
+            throw APIError.forbidden("Du hast keine Berechtigung für diese Aktion")
         case 404:
             throw APIError.notFound
         case 400:

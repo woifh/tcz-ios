@@ -29,6 +29,6 @@ struct EmptyStateView: View {
     EmptyStateView(
         icon: "calendar.badge.exclamationmark",
         title: "Keine Buchungen",
-        message: "Sie haben keine aktiven Buchungen."
+        message: "Du hast keine aktiven Buchungen."
     )
 }

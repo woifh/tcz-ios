@@ -29,7 +29,7 @@ struct ErrorView: View {
 }
 
 #Preview {
-    ErrorView(message: "Netzwerkfehler. Bitte ueberpruefen Sie Ihre Verbindung.") {
+    ErrorView(message: "Netzwerkfehler. Bitte überprüfe deine Verbindung.") {
         print("Retry")
     }
 }

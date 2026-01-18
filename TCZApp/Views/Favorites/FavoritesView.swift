@@ -20,7 +20,7 @@ struct FavoritesView: View {
                     EmptyStateView(
                         icon: "star",
                         title: "Keine Favoriten",
-                        message: "Fuegen Sie Mitglieder als Favoriten hinzu, um schneller Buchungen fuer sie zu erstellen."
+                        message: "Füge Mitglieder als Favoriten hinzu, um schneller Buchungen für sie zu erstellen."
                     )
                 } else {
                     List {
@@ -84,7 +84,7 @@ struct FavoritesView: View {
 
     private var removeAlertMessage: String {
         if let favorite = favoriteToRemove {
-            return "Moechten Sie \(favorite.name) wirklich aus Ihren Favoriten entfernen?"
+            return "Möchtest du \(favorite.name) wirklich aus deinen Favoriten entfernen?"
         }
         return ""
     }
@@ -160,7 +160,7 @@ struct AddFavoriteSheet: View {
                         Image(systemName: "magnifyingglass")
                             .font(.largeTitle)
                             .foregroundColor(.secondary)
-                        Text("Suchen Sie nach einem Mitglied")
+                        Text("Such nach einem Mitglied")
                             .foregroundColor(.secondary)
                     }
                     .padding()

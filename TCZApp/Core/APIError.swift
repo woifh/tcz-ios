@@ -16,7 +16,7 @@ enum APIError: Error, LocalizedError {
         case .invalidResponse:
             return "Ungueltige Antwort vom Server"
         case .unauthorized:
-            return "Bitte melden Sie sich erneut an"
+            return "Bitte melde dich erneut an"
         case .forbidden(let message):
             return message
         case .notFound:
@@ -24,11 +24,11 @@ enum APIError: Error, LocalizedError {
         case .badRequest(let message):
             return message
         case .rateLimited:
-            return "Zu viele Anfragen. Bitte warten Sie einen Moment."
+            return "Zu viele Anfragen. Bitte warte einen Moment."
         case .serverError(let code):
-            return "Serverfehler (\(code)). Bitte versuchen Sie es spaeter erneut."
+            return "Serverfehler (\(code)). Bitte versuche es später erneut."
         case .networkError:
-            return "Netzwerkfehler. Bitte ueberpruefen Sie Ihre Verbindung."
+            return "Netzwerkfehler. Bitte überprüfe deine Verbindung."
         case .decodingError:
             return "Fehler beim Verarbeiten der Daten"
         }

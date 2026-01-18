@@ -61,7 +61,7 @@ final class BookingViewModel: ObservableObject {
 
     func createBooking() async -> Bool {
         guard let bookedForId = selectedMemberId else {
-            error = "Bitte waehlen Sie ein Mitglied aus"
+            error = "Bitte wähle ein Mitglied aus"
             return false
         }
 
