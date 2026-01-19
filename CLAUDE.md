@@ -58,6 +58,12 @@ xcodebuild -project TCZApp/TCZApp.xcodeproj -scheme TCZApp clean
 
 Change in `APIClient.swift` → `baseURL` property.
 
+## Related Codebases
+
+The server backend and web app code is available locally for reference:
+- **Location:** `/Users/woifh/tcz/web`
+- **Use cases:** Search through these files to understand API behavior, endpoint implementations, and how the web app UI works
+
 ## Important Conventions
 
 - **Language:** All UI text is in German
