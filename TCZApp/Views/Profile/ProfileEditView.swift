@@ -55,34 +55,23 @@ struct ProfileEditView: View {
 
             // Contact Section
             Section(header: Text("Kontakt")) {
-                TextField("E-Mail", text: $viewModel.email)
-                    .textContentType(.emailAddress)
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none)
-                    .autocorrectionDisabled()
+                HStack {
+                    TextField("E-Mail", text: $viewModel.email)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        .autocorrectionDisabled()
+
+                    if let emailVerified = authViewModel.currentUser?.emailVerified {
+                        Image(systemName: emailVerified ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
+                            .foregroundColor(emailVerified ? .green : .orange)
+                    }
+                }
 
                 if let emailError = viewModel.emailError {
                     Text(emailError)
                         .foregroundColor(.red)
                         .font(.caption)
-                }
-
-                // Email verification status
-                if let emailVerified = authViewModel.currentUser?.emailVerified {
-                    HStack {
-                        Text("Status")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        if emailVerified {
-                            Label("Bestätigt", systemImage: "checkmark.seal.fill")
-                                .foregroundColor(.green)
-                                .font(.subheadline)
-                        } else {
-                            Label("Nicht bestätigt", systemImage: "exclamationmark.triangle.fill")
-                                .foregroundColor(.orange)
-                                .font(.subheadline)
-                        }
-                    }
                 }
 
                 TextField("Telefon", text: $viewModel.phone)
