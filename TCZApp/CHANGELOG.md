@@ -8,6 +8,8 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Added
 - Reservations made on behalf of others now show the booker's name in the court grid
 - "Buchungen für andere" section now displays who each booking is for
+- Email verification status badge in profile edit screen
+- Banner and section for unverified emails with option to resend verification
 
 ## [3.9] - 2026-01-18
 ### Added

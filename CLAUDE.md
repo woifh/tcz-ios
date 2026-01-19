@@ -100,6 +100,12 @@ The server backend and web app code is available locally for reference:
   - NEVER use `--force` or `--force-with-lease` push unless explicitly requested
   - Always create new commits for fixes rather than amending
 
+- **Adding new Swift files**:
+  - New `.swift` files must be manually added to `TCZApp/TCZApp.xcodeproj/project.pbxproj`
+  - Required entries in 4 sections: `PBXBuildFile`, `PBXFileReference`, `PBXGroup` (appropriate folder), and `PBXSourcesBuildPhase`
+  - Use existing file entries as templates for the format and ID generation
+  - Without these entries, Xcode will report "Cannot find X in scope" errors
+
 ## Vibe Coding Principles
 
 This codebase prioritizes flow, clarity, and fast iteration.

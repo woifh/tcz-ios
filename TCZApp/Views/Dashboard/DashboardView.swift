@@ -24,6 +24,8 @@ struct DashboardView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var bookingSheetData: BookingSheetData?
     @State private var cancelConfirmation: CancelConfirmationData?
+    @State private var isResendingVerification = false
+    @State private var showingVerificationSentAlert = false
 
     private var paymentBannerState: PaymentBannerState? {
         guard let user = authViewModel.currentUser else { return nil }
@@ -60,6 +62,17 @@ struct DashboardView: View {
                             onDismiss: bannerState == .confirmationPending
                                 ? { viewModel.isPaymentConfirmationDismissed = true }
                                 : nil
+                        )
+                    }
+
+                    // Email verification banner
+                    if let user = authViewModel.currentUser,
+                       user.shouldShowEmailVerificationReminder,
+                       !viewModel.isEmailVerificationDismissed {
+                        EmailVerificationBanner(
+                            isResending: isResendingVerification,
+                            onResend: { Task { await resendVerificationEmail() } },
+                            onDismiss: { viewModel.isEmailVerificationDismissed = true }
                         )
                     }
 
@@ -151,7 +164,27 @@ struct DashboardView: View {
         }
         .onChange(of: authViewModel.currentUser?.id) { _ in
             viewModel.isPaymentConfirmationDismissed = false
+            viewModel.isEmailVerificationDismissed = false
         }
+        .alert("E-Mail gesendet", isPresented: $showingVerificationSentAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Eine Bestätigungs-E-Mail wurde gesendet. Bitte klicke auf den Link in der E-Mail.")
+        }
+    }
+
+    private func resendVerificationEmail() async {
+        isResendingVerification = true
+        do {
+            let _: ResendVerificationResponse = try await APIClient.shared.request(
+                .resendVerificationEmail, body: nil
+            )
+            showingVerificationSentAlert = true
+            viewModel.isEmailVerificationDismissed = true
+        } catch {
+            // Silently fail - user can retry
+        }
+        isResendingVerification = false
     }
 
     private func handleSlotTap(courtId: Int, courtNumber: Int, time: String, slot: TimeSlot?) {

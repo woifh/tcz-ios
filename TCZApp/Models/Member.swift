@@ -18,6 +18,9 @@ struct Member: Codable, Identifiable, Equatable {
     let notifyCourtBlocked: Bool?
     let notifyBookingOverridden: Bool?
 
+    // Email verification
+    let emailVerified: Bool?
+
     // Payment status fields
     let feePaid: Bool?
     let paymentConfirmationRequested: Bool?
@@ -36,6 +39,7 @@ struct Member: Codable, Identifiable, Equatable {
         case notifyOtherBookings = "notify_other_bookings"
         case notifyCourtBlocked = "notify_court_blocked"
         case notifyBookingOverridden = "notify_booking_overridden"
+        case emailVerified = "email_verified"
         case feePaid = "fee_paid"
         case paymentConfirmationRequested = "payment_confirmation_requested"
         case paymentConfirmationRequestedAt = "payment_confirmation_requested_at"
@@ -53,6 +57,12 @@ struct Member: Codable, Identifiable, Equatable {
     var hasPendingPaymentConfirmation: Bool {
         guard let feePaid = feePaid, !feePaid else { return false }
         return paymentConfirmationRequested ?? false
+    }
+
+    // Email verification helper
+    var shouldShowEmailVerificationReminder: Bool {
+        guard let verified = emailVerified else { return false }
+        return !verified
     }
 
     static func == (lhs: Member, rhs: Member) -> Bool {
@@ -152,4 +162,9 @@ struct PaymentConfirmationResponse: Decodable {
         case message
         case paymentConfirmationRequested = "payment_confirmation_requested"
     }
+}
+
+// Email verification response
+struct ResendVerificationResponse: Decodable {
+    let message: String
 }

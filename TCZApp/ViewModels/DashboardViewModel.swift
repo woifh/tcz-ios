@@ -10,6 +10,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var error: String?
     @Published var currentPage: Int = 0
     @Published var isPaymentConfirmationDismissed = false
+    @Published var isEmailVerificationDismissed = false
 
     private let apiClient: APIClientProtocol
     private(set) var currentUserId: String?

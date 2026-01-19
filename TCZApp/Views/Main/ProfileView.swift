@@ -14,6 +14,9 @@ struct ProfileView: View {
     @State private var isConfirmingPayment = false
     @State private var paymentError: String?
     @State private var showingPaymentConfirmationAlert = false
+    @State private var isResendingVerification = false
+    @State private var verificationError: String?
+    @State private var showingVerificationSentAlert = false
 
     var body: some View {
         NavigationView {
@@ -86,6 +89,44 @@ struct ProfileView: View {
                                     .font(.caption)
                                     .foregroundColor(.red)
                             }
+                        }
+                    }
+                }
+
+                // Email verification section
+                if let user = authViewModel.currentUser,
+                   user.shouldShowEmailVerificationReminder {
+                    Section(header: Text("E-Mail-Bestätigung")) {
+                        HStack {
+                            Text("Status")
+                            Spacer()
+                            Label("Nicht bestätigt", systemImage: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                        }
+
+                        Text("Du erhältst keine E-Mail-Benachrichtigungen, bis deine E-Mail-Adresse bestätigt wurde.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+
+                        Button {
+                            Task { await resendVerificationEmail() }
+                        } label: {
+                            HStack {
+                                Spacer()
+                                if isResendingVerification {
+                                    ProgressView()
+                                } else {
+                                    Text("Bestätigungs-E-Mail erneut senden")
+                                }
+                                Spacer()
+                            }
+                        }
+                        .disabled(isResendingVerification)
+
+                        if let error = verificationError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.red)
                         }
                     }
                 }
@@ -174,6 +215,11 @@ struct ProfileView: View {
                 }
             } message: {
                 Text("Hiermit bestätigst du, dass du deinen Mitgliedsbeitrag bezahlt hast. Die Bestätigung wird an den Vorstand gesendet.")
+            }
+            .alert("E-Mail gesendet", isPresented: $showingVerificationSentAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Eine Bestätigungs-E-Mail wurde an deine Adresse gesendet. Bitte klicke auf den Link in der E-Mail, um deine Adresse zu bestätigen.")
             }
             .sheet(isPresented: $showAppChangelog) {
                 ChangelogView(
@@ -268,6 +314,24 @@ struct ProfileView: View {
         }
 
         isConfirmingPayment = false
+    }
+
+    private func resendVerificationEmail() async {
+        isResendingVerification = true
+        verificationError = nil
+
+        do {
+            let _: ResendVerificationResponse = try await APIClient.shared.request(
+                .resendVerificationEmail, body: nil
+            )
+            showingVerificationSentAlert = true
+        } catch let apiError as APIError {
+            verificationError = apiError.localizedDescription
+        } catch {
+            verificationError = "E-Mail konnte nicht gesendet werden"
+        }
+
+        isResendingVerification = false
     }
 }
 

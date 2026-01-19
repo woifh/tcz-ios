@@ -67,6 +67,24 @@ struct ProfileEditView: View {
                         .font(.caption)
                 }
 
+                // Email verification status
+                if let emailVerified = authViewModel.currentUser?.emailVerified {
+                    HStack {
+                        Text("Status")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        if emailVerified {
+                            Label("Bestätigt", systemImage: "checkmark.seal.fill")
+                                .foregroundColor(.green)
+                                .font(.subheadline)
+                        } else {
+                            Label("Nicht bestätigt", systemImage: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                                .font(.subheadline)
+                        }
+                    }
+                }
+
                 TextField("Telefon", text: $viewModel.phone)
                     .textContentType(.telephoneNumber)
                     .keyboardType(.phonePad)

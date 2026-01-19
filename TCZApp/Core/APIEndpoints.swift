@@ -17,6 +17,7 @@ enum APIEndpoint {
     case getMember(memberId: String)
     case updateMember(memberId: String)
     case confirmPayment
+    case resendVerificationEmail
 
     var path: String {
         switch self {
@@ -53,12 +54,14 @@ enum APIEndpoint {
             return "/api/members/\(memberId)"
         case .confirmPayment:
             return "/api/members/me/confirm-payment"
+        case .resendVerificationEmail:
+            return "/auth/resend-verification"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .login, .createReservation, .addFavorite, .confirmPayment:
+        case .login, .createReservation, .addFavorite, .confirmPayment, .resendVerificationEmail:
             return .post
         case .logout, .availability, .reservations, .reservationStatus,
              .searchMembers, .favorites, .serverVersion, .serverChangelog, .getMember:

@@ -40,6 +40,7 @@
 		0100000000000031 /* ChangelogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000031 /* ChangelogView.swift */; };
 		054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 054C411D2F1AEE2000407174 /* CHANGELOG.md */; };
 		05B623BC2F1D73E40027C4DD /* PaymentReminderBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */; };
+		05B623BD2F1D73E50027C4DD /* EmailVerificationBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +78,7 @@
 		0300000000000001 /* TCZApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TCZApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C411D2F1AEE2000407174 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentReminderBanner.swift; sourceTree = "<group>"; };
+		05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailVerificationBanner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +235,7 @@
 		0500000000000015 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */,
 				05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */,
 				0200000000000011 /* LoadingView.swift */,
 				0200000000000012 /* ErrorView.swift */,
@@ -343,6 +346,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05B623BD2F1D73E50027C4DD /* EmailVerificationBanner.swift in Sources */,
 				05B623BC2F1D73E40027C4DD /* PaymentReminderBanner.swift in Sources */,
 				0100000000000001 /* TCZApp.swift in Sources */,
 				0100000000000002 /* ContentView.swift in Sources */,
