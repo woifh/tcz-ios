@@ -4,6 +4,12 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [4.0] - 2026-01-19
+### Changed
+- New swipeable date strip for faster day-by-day navigation
+- Today indicator now shows in light orange when viewing other dates
+- "Heute" button scrolls calendar strip back to current day
+
 ## [3.11] - 2026-01-19
 ### Changed
 - Email verification badge now displays inline next to email address in profile

@@ -41,6 +41,7 @@
 		054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 054C411D2F1AEE2000407174 /* CHANGELOG.md */; };
 		05B623BC2F1D73E40027C4DD /* PaymentReminderBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */; };
 		05B623BD2F1D73E50027C4DD /* EmailVerificationBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */; };
+		0100000000000032 /* DateNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000032 /* DateNavigationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -79,6 +80,7 @@
 		054C411D2F1AEE2000407174 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentReminderBanner.swift; sourceTree = "<group>"; };
 		05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailVerificationBanner.swift; sourceTree = "<group>"; };
+		0200000000000032 /* DateNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateNavigationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +206,7 @@
 			children = (
 				0200000000000006 /* DashboardView.swift */,
 				0200000000000007 /* CourtGridView.swift */,
+				0200000000000032 /* DateNavigationView.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
@@ -378,6 +381,7 @@
 				0100000000000029 /* ProfileViewModel.swift in Sources */,
 				0100000000000030 /* ProfileEditView.swift in Sources */,
 				0100000000000031 /* ChangelogView.swift in Sources */,
+				0100000000000032 /* DateNavigationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,7 +533,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.11;
+				MARKETING_VERSION = 4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -558,7 +562,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.11;
+				MARKETING_VERSION = 4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
