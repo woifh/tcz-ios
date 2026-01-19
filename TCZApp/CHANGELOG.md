@@ -4,6 +4,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [4.1] - 2026-01-19
+### Added
+- Automatic TestFlight release notes from changelog
+
 ## [4.0] - 2026-01-19
 ### Changed
 - New swipeable date strip for faster day-by-day navigation
