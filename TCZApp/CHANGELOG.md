@@ -4,6 +4,13 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [5.0] - 2026-01-19
+### Added
+- Temporary court blocks now shown in yellow with "(vorübergehend)" label
+- Suspended reservations display "Pausiert" badge with suspension reason
+- Suspended reservations can now be cancelled from "Meine Buchungen"
+- Legend updated with temporary block indicator
+
 ## [4.1] - 2026-01-19
 ### Added
 - Automatic TestFlight release notes from changelog

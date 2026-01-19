@@ -221,6 +221,8 @@ struct DashboardView: View {
 struct LegendSheet: View {
     @Environment(\.dismiss) private var dismiss
 
+    private let temporaryBlockColor = Color(red: 251/255, green: 191/255, blue: 36/255)
+
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 12) {
@@ -228,6 +230,7 @@ struct LegendSheet: View {
                 LegendRow(color: .red, title: "Belegt", description: "Bereits gebucht")
                 LegendRow(color: .orange, title: "Kurzfristig", description: "Buchbar innerhalb 24h")
                 LegendRow(color: Color(.systemGray3), title: "Gesperrt", description: "Nicht buchbar")
+                LegendRow(color: temporaryBlockColor, title: "Vorübergehend gesperrt", description: "Kurzzeitig blockiert")
                 Spacer()
             }
             .padding()

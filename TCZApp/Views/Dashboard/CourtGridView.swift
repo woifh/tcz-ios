@@ -45,7 +45,7 @@ struct CourtGridView: View {
         }
         .sheet(isPresented: $showLegend) {
             LegendSheet()
-                .presentationDetents([.height(220)])
+                .presentationDetents([.height(260)])
         }
     }
 }
@@ -244,6 +244,39 @@ struct TimeSlotCell: View {
                     }
                     .lineLimit(3)
                     .multilineTextAlignment(.center)
+
+                case .blockedTemporary:
+                    VStack(spacing: 1) {
+                        Text(slot.details?.reason ?? "Vorübergehend gesperrt")
+                            .font(.system(size: 10))
+                            .fontWeight(.medium)
+
+                        if let details = slot.details?.details, !details.isEmpty {
+                            Text(details)
+                                .font(.system(size: 9))
+                                .opacity(0.8)
+                        }
+
+                        Text("(vorübergehend)")
+                            .font(.system(size: 8))
+                            .italic()
+                            .opacity(0.9)
+
+                        if let suspended = slot.details?.suspendedReservation {
+                            HStack(spacing: 2) {
+                                Text("\u{23F8}")
+                                    .font(.system(size: 8))
+                                Text(suspended.bookedFor)
+                                    .font(.system(size: 8))
+                            }
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 2)
+                            .background(Color.white.opacity(0.3))
+                            .cornerRadius(2)
+                        }
+                    }
+                    .lineLimit(4)
+                    .multilineTextAlignment(.center)
                 }
             } else {
                 Text("Frei")
@@ -276,6 +309,8 @@ struct TimeSlotCell: View {
             return .orange
         case .blocked:
             return Color(.systemGray3)
+        case .blockedTemporary:
+            return Color(red: 251/255, green: 191/255, blue: 36/255)
         }
     }
 
@@ -289,6 +324,8 @@ struct TimeSlotCell: View {
             return isPast ? .gray : Color(.darkGray)
         case .blocked:
             return .primary
+        case .blockedTemporary:
+            return Color(red: 113/255, green: 63/255, blue: 18/255)
         default:
             return .white
         }

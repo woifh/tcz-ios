@@ -108,7 +108,15 @@ struct ReservationRow: View {
                     Text("Platz \(reservation.courtNumber ?? 0)")
                         .font(.headline)
 
-                    if reservation.isShortNotice {
+                    if reservation.isSuspended {
+                        Text("Pausiert")
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color(red: 251/255, green: 191/255, blue: 36/255))
+                            .foregroundColor(Color(red: 113/255, green: 63/255, blue: 18/255))
+                            .cornerRadius(4)
+                    } else if reservation.isShortNotice {
                         Text("Kurzfristig")
                             .font(.caption2)
                             .padding(.horizontal, 6)
@@ -122,6 +130,12 @@ struct ReservationRow: View {
                 Text("\(reservation.formattedDate), \(reservation.timeRange)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+
+                if reservation.isSuspended, let reason = reservation.reason {
+                    Text(reason)
+                        .font(.caption)
+                        .foregroundColor(Color(red: 113/255, green: 63/255, blue: 18/255))
+                }
 
                 if let bookedFor = reservation.bookedFor,
                    reservation.bookedForId != reservation.bookedById {

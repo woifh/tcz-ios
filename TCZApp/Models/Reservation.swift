@@ -15,9 +15,14 @@ struct Reservation: Codable, Identifiable, Equatable {
     let isShortNotice: Bool
     let isActive: Bool?
     let bookingStatus: String?
+    let reason: String?
 
     var canCancel: Bool {
-        !isShortNotice && status == "active"
+        !isShortNotice && (status == "active" || status == "suspended")
+    }
+
+    var isSuspended: Bool {
+        status == "suspended"
     }
 
     var timeRange: String {
@@ -48,6 +53,7 @@ struct Reservation: Codable, Identifiable, Equatable {
         case isShortNotice = "is_short_notice"
         case isActive = "is_active"
         case bookingStatus = "booking_status"
+        case reason
     }
 
     static func == (lhs: Reservation, rhs: Reservation) -> Bool {

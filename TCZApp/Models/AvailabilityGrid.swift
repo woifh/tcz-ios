@@ -47,6 +47,19 @@ enum SlotStatus: String, Codable {
     case reserved
     case shortNotice = "short_notice"
     case blocked
+    case blockedTemporary = "blocked_temporary"
+}
+
+struct SuspendedReservation: Codable {
+    let bookedFor: String
+    let bookedForId: String
+    let reservationId: Int
+
+    enum CodingKeys: String, CodingKey {
+        case bookedFor = "booked_for"
+        case bookedForId = "booked_for_id"
+        case reservationId = "reservation_id"
+    }
 }
 
 struct SlotDetails: Codable {
@@ -63,6 +76,10 @@ struct SlotDetails: Codable {
     let details: String?
     let blockId: Int?
 
+    // For temporary blocks
+    let isTemporary: Bool?
+    let suspendedReservation: SuspendedReservation?
+
     enum CodingKeys: String, CodingKey {
         case bookedFor = "booked_for"
         case bookedForId = "booked_for_id"
@@ -72,6 +89,8 @@ struct SlotDetails: Codable {
         case isShortNotice = "is_short_notice"
         case reason, details
         case blockId = "block_id"
+        case isTemporary = "is_temporary"
+        case suspendedReservation = "suspended_reservation"
     }
 }
 
