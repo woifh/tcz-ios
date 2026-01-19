@@ -124,8 +124,7 @@ struct ReservationRow: View {
                     .foregroundColor(.secondary)
 
                 if let bookedFor = reservation.bookedFor,
-                   let bookedBy = reservation.bookedBy,
-                   bookedFor != bookedBy {
+                   reservation.bookedForId != reservation.bookedById {
                     Text("Für: \(bookedFor)")
                         .font(.caption)
                         .foregroundColor(.secondary)

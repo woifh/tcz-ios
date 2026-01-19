@@ -98,7 +98,7 @@ final class DashboardViewModel: ObservableObject {
         } catch let apiError as APIError {
             error = apiError.localizedDescription
         } catch {
-            self.error = "Fehler beim Laden der Verfuegbarkeit"
+            self.error = "Fehler beim Laden der Platz-Übersicht"
         }
     }
 

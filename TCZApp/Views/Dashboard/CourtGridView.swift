@@ -209,10 +209,22 @@ struct TimeSlotCell: View {
 
                 case .reserved, .shortNotice:
                     if let details = slot.details {
-                        Text(details.bookedFor ?? "Gebucht")
-                            .font(.system(size: 11))
-                            .lineLimit(2)
-                            .multilineTextAlignment(.center)
+                        VStack(spacing: 0) {
+                            Text(details.bookedFor ?? "Gebucht")
+                                .font(.system(size: 11))
+                                .lineLimit(1)
+
+                            if let bookedBy = details.bookedBy,
+                               let bookedForId = details.bookedForId,
+                               let bookedById = details.bookedById,
+                               bookedForId != bookedById {
+                                Text("(von \(bookedBy))")
+                                    .font(.system(size: 9))
+                                    .lineLimit(1)
+                                    .opacity(0.9)
+                            }
+                        }
+                        .multilineTextAlignment(.center)
                     } else {
                         Text("Gebucht")
                             .font(.system(size: 13))

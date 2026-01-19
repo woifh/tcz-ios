@@ -4,6 +4,11 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [3.10] - 2026-01-19
+### Added
+- Reservations made on behalf of others now show the booker's name in the court grid
+- "Buchungen für andere" section now displays who each booking is for
+
 ## [3.9] - 2026-01-18
 ### Added
 - Payment reminder banner on dashboard shows days until payment deadline
