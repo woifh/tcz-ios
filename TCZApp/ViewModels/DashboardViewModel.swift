@@ -202,7 +202,7 @@ final class DashboardViewModel: ObservableObject {
         // For today, check the hour
         let currentHour = berlinCalendar.component(.hour, from: now)
         if let slotHour = Int(time.prefix(2)) {
-            return slotHour <= currentHour
+            return slotHour < currentHour
         }
         return false
     }

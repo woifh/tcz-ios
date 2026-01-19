@@ -8,6 +8,9 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Changed
 - Email verification badge now displays inline next to email address in profile
 
+### Fixed
+- Short-term bookings now available for ongoing time slots (current hour)
+
 ## [3.10] - 2026-01-19
 ### Added
 - Reservations made on behalf of others now show the booker's name in the court grid
