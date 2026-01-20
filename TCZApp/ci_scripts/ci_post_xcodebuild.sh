@@ -3,34 +3,48 @@ set -e
 
 echo "=== ci_post_xcodebuild.sh started ==="
 echo "CI_ARCHIVE_PATH: ${CI_ARCHIVE_PATH:-not set}"
+echo "CI_APP_STORE_SIGNED_APP_PATH: ${CI_APP_STORE_SIGNED_APP_PATH:-not set}"
+echo "CI_XCODEBUILD_ACTION: ${CI_XCODEBUILD_ACTION:-not set}"
 echo "CI_PRIMARY_REPOSITORY_PATH: ${CI_PRIMARY_REPOSITORY_PATH:-not set}"
+echo "CI_PROJECT_FILE_PATH: ${CI_PROJECT_FILE_PATH:-not set}"
 
-# Only generate TestFlight notes for archive builds
-if [[ -z "$CI_ARCHIVE_PATH" ]]; then
-    echo "Not an archive build, skipping TestFlight notes generation"
+# Only generate TestFlight notes for archive builds that will be distributed
+if [[ "$CI_XCODEBUILD_ACTION" != "archive" ]]; then
+    echo "Not an archive build (CI_XCODEBUILD_ACTION=$CI_XCODEBUILD_ACTION), skipping TestFlight notes generation"
     exit 0
 fi
 
-# Xcode Cloud sets CI_PRIMARY_REPOSITORY_PATH to the repo root
+# Repository root is where Xcode Cloud expects the TestFlight folder
 REPO_ROOT="${CI_PRIMARY_REPOSITORY_PATH:-$(pwd)}"
-cd "$REPO_ROOT"
 
-CHANGELOG="TCZApp/CHANGELOG.md"
-OUTPUT_DIR="TestFlight"
+# Project root is where the .xcodeproj and CHANGELOG.md are located
+if [[ -n "$CI_PROJECT_FILE_PATH" ]]; then
+    PROJECT_ROOT=$(dirname "$CI_PROJECT_FILE_PATH")
+else
+    PROJECT_ROOT="$REPO_ROOT/TCZApp"
+fi
+
+echo "REPO_ROOT: $REPO_ROOT"
+echo "PROJECT_ROOT: $PROJECT_ROOT"
+
+CHANGELOG="$PROJECT_ROOT/CHANGELOG.md"
+# TestFlight folder must be at repository root for Xcode Cloud to find it
+OUTPUT_DIR="$REPO_ROOT/TestFlight"
 OUTPUT_FILE="$OUTPUT_DIR/WhatToTest.de-DE.txt"
 
-echo "Looking for changelog at: $REPO_ROOT/$CHANGELOG"
+echo "Looking for changelog at: $CHANGELOG"
 
 # Verify changelog exists
 if [ ! -f "$CHANGELOG" ]; then
     echo "Error: $CHANGELOG not found"
-    ls -la TCZApp/
+    echo "Contents of PROJECT_ROOT:"
+    ls -la "$PROJECT_ROOT/" || echo "Cannot list PROJECT_ROOT"
     exit 1
 fi
 
-# Create output directory at repo root
+# Create output directory alongside the .xcodeproj
 mkdir -p "$OUTPUT_DIR"
-echo "Created output directory: $REPO_ROOT/$OUTPUT_DIR"
+echo "Created output directory: $OUTPUT_DIR"
 
 # Extract latest version notes using awk:
 # - Skip [Unreleased] section
@@ -59,7 +73,7 @@ awk '
   found && /^$/ { print }
 ' "$CHANGELOG" > "$OUTPUT_FILE"
 
-echo "TestFlight notes written to $REPO_ROOT/$OUTPUT_FILE"
+echo "TestFlight notes written to $OUTPUT_FILE"
 echo "=== Contents ==="
 cat "$OUTPUT_FILE"
 echo "=== ci_post_xcodebuild.sh completed ==="
