@@ -191,6 +191,9 @@ struct BookingSheet: View {
                     }
                 }
             }
+            .onChange(of: viewModel.selectedMemberId) { _ in
+                viewModel.error = nil
+            }
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())

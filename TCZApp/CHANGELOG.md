@@ -8,6 +8,9 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Added
 - Unit test infrastructure covering ViewModels and Models
 
+### Fixed
+- Error messages in booking modal now clear when selecting a different member
+
 ## [5.1] - 2026-01-20
 ### Changed
 - Cancellation rules now determined by server for consistent behavior across all devices
