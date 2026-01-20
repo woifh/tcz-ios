@@ -5,44 +5,42 @@ struct MainTabView: View {
     @StateObject private var dashboardViewModel = DashboardViewModel()
     @StateObject private var reservationsViewModel = ReservationsViewModel()
     @StateObject private var favoritesViewModel = FavoritesViewModel()
+    @State private var selectedTab: TabItem = .dashboard
     @State private var showingLogin = false
 
     var body: some View {
-        TabView {
-            DashboardView(viewModel: dashboardViewModel)
-                .tabItem {
-                    Label("Uebersicht", systemImage: "calendar")
+        VStack(spacing: 0) {
+            // Content area
+            Group {
+                switch selectedTab {
+                case .dashboard:
+                    DashboardView(viewModel: dashboardViewModel)
+                case .reservations:
+                    if authViewModel.isAuthenticated {
+                        ReservationsView(viewModel: reservationsViewModel)
+                    }
+                case .favorites:
+                    if authViewModel.isAuthenticated {
+                        FavoritesView(viewModel: favoritesViewModel)
+                    }
+                case .profile:
+                    if authViewModel.isAuthenticated {
+                        ProfileView()
+                    } else {
+                        LoginPlaceholderView(showingLogin: $showingLogin)
+                    }
                 }
-                .tag(0)
-
-            if authViewModel.isAuthenticated {
-                ReservationsView(viewModel: reservationsViewModel)
-                    .tabItem {
-                        Label("Buchungen", systemImage: "list.bullet")
-                    }
-                    .tag(1)
-
-                FavoritesView(viewModel: favoritesViewModel)
-                    .tabItem {
-                        Label("Favoriten", systemImage: "star")
-                    }
-                    .tag(2)
-
-                ProfileView()
-                    .tabItem {
-                        Label("Profil", systemImage: "person")
-                    }
-                    .tag(3)
-            } else {
-                // Login placeholder tab for anonymous users
-                LoginPlaceholderView(showingLogin: $showingLogin)
-                    .tabItem {
-                        Label("Anmelden", systemImage: "person.badge.key")
-                    }
-                    .tag(1)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            // Custom tab bar with profile picture support
+            CustomTabBar(
+                selectedTab: $selectedTab,
+                isAuthenticated: authViewModel.isAuthenticated,
+                currentUser: authViewModel.currentUser
+            )
         }
-        .tint(.green)
+        .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $showingLogin) {
             LoginView()
                 .environmentObject(authViewModel)
@@ -50,6 +48,9 @@ struct MainTabView: View {
         .onChange(of: authViewModel.isAuthenticated) { isAuthenticated in
             if isAuthenticated {
                 showingLogin = false
+            } else {
+                // Reset to dashboard when logged out
+                selectedTab = .dashboard
             }
         }
     }
