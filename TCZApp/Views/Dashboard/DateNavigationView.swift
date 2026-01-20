@@ -132,12 +132,12 @@ struct DateStripView: View {
     let scrollToTodayTrigger: Bool
     let onDateSelected: () -> Void
 
-    // Generate dates: 365 days before and after today
+    // Generate dates: 30 days before and 90 days after today (121 total, reduced from 731)
     private static func generateDateRange() -> [Date] {
         let calendar = Calendar.current
         let today = Date()
         var dates: [Date] = []
-        for offset in -365...365 {
+        for offset in -30...90 {
             if let date = calendar.date(byAdding: .day, value: offset, to: today) {
                 dates.append(date)
             }

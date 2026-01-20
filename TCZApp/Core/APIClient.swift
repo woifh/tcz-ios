@@ -31,7 +31,7 @@ final class APIClient: APIClientProtocol {
         // To find your Mac's IP: run `ipconfig getifaddr en0` in Terminal
         // Change to "https://tcz.pythonanywhere.com" for production
         #if DEBUG
-        self.baseURL = URL(string: "http://10.0.0.147:5001")!  // Mac's local IP for device testing
+        self.baseURL = URL(string: "http://localhost:5001")!  // Use localhost for simulator (change to IP for physical device)
         #else
         self.baseURL = URL(string: "https://woifh.pythonanywhere.com")!
         #endif

@@ -7,7 +7,10 @@ final class DashboardViewModel: ObservableObject {
     @Published var availability: AvailabilityResponse?
     @Published var bookingStatus: BookingStatusResponse?
     @Published var isLoading = false
+    @Published var isRefreshing = false  // Background refresh with cached data visible
     @Published var error: String?
+    @Published var cancellationError: String?  // Error alert for failed cancellation
+    @Published var connectionError: String?    // Error alert for API/network failures
     @Published var currentPage: Int = 0
     @Published var isPaymentConfirmationDismissed = false
     @Published var isEmailVerificationDismissed = false
@@ -18,6 +21,10 @@ final class DashboardViewModel: ObservableObject {
     // Cache for availability data: [dateString: (response, timestamp)]
     private var availabilityCache: [String: (AvailabilityResponse, Date)] = [:]
     private let cacheTTL: TimeInterval = 300 // 5 minutes
+
+    // Task management for cancellation
+    private var currentAvailabilityTask: Task<Void, Never>?
+    private var debounceTask: Task<Void, Never>?
 
     // Time slots: 08:00 to 21:00 (14 slots)
     let timeSlots = (8..<22).map { String(format: "%02d:00", $0) }
@@ -68,8 +75,8 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func loadData() async {
-        clearCache()
-        isLoading = true
+        // Don't clear cache - let TTL handle staleness for better performance
+        isLoading = availability == nil
         error = nil
 
         // Load availability and booking status in parallel
@@ -81,14 +88,46 @@ final class DashboardViewModel: ObservableObject {
         isLoading = false
     }
 
-    func loadAvailability(forceRefresh: Bool = false) async {
+    /// Reload after a booking or cancellation - invalidates current date cache
+    /// Silently refreshes without showing loading indicator
+    func reloadAfterBookingChange() async {
         let dateString = DateFormatterService.apiDate.string(from: selectedDate)
+        availabilityCache.removeValue(forKey: dateString)
+
+        // Fetch fresh data silently without loading indicators
+        do {
+            let response: AvailabilityResponse = try await apiClient.request(
+                .availability(date: dateString), body: nil
+            )
+            cacheAvailability(response, for: dateString)
+            availability = response
+        } catch {
+            // Silently fail - user can pull to refresh if needed
+        }
+
+        await loadBookingStatus()
+    }
+
+    func loadAvailability(forceRefresh: Bool = false) async {
+        // Cancel any in-flight request to prevent race conditions
+        currentAvailabilityTask?.cancel()
+
+        let dateString = DateFormatterService.apiDate.string(from: selectedDate)
+        let cachedData = getCachedAvailability(for: dateString)
 
         // Return cached data immediately if available (unless forcing refresh)
-        if !forceRefresh, let cached = getCachedAvailability(for: dateString) {
+        if !forceRefresh, let cached = cachedData {
             availability = cached
             prefetchAdjacentDates()
             return
+        }
+
+        // Optimistic UI: show cached data immediately while refreshing
+        if let cached = cachedData {
+            availability = cached
+            isRefreshing = true
+        } else {
+            isLoading = true
         }
 
         // Clear cache for this date if forcing refresh
@@ -96,16 +135,54 @@ final class DashboardViewModel: ObservableObject {
             availabilityCache.removeValue(forKey: dateString)
         }
 
-        do {
-            let response: AvailabilityResponse = try await apiClient.request(.availability(date: dateString), body: nil)
-            cacheAvailability(response, for: dateString)
-            availability = response
-            prefetchAdjacentDates()
-        } catch let apiError as APIError {
-            error = apiError.localizedDescription
-        } catch {
-            self.error = "Fehler beim Laden der Platz-Übersicht"
+        // Create cancellable task for the API request
+        let task = Task { @MainActor [weak self] in
+            guard let self = self else { return }
+
+            defer {
+                self.isLoading = false
+                self.isRefreshing = false
+            }
+
+            do {
+                try Task.checkCancellation()
+
+                let response: AvailabilityResponse = try await self.apiClient.request(
+                    .availability(date: dateString), body: nil
+                )
+
+                // Check cancellation after network call
+                try Task.checkCancellation()
+
+                self.cacheAvailability(response, for: dateString)
+                self.availability = response
+                self.error = nil
+                self.prefetchAdjacentDates()
+            } catch is CancellationError {
+                // Request was cancelled - ignore silently
+            } catch let apiError as APIError {
+                if !Task.isCancelled {
+                    // If we have cached data visible, show alert popup instead of inline error
+                    if self.availability != nil {
+                        self.connectionError = apiError.localizedDescription
+                    } else {
+                        self.error = apiError.localizedDescription
+                    }
+                }
+            } catch {
+                if !Task.isCancelled {
+                    // If we have cached data visible, show alert popup instead of inline error
+                    if self.availability != nil {
+                        self.connectionError = "Server nicht erreichbar"
+                    } else {
+                        self.error = "Fehler beim Laden der Platz-Übersicht"
+                    }
+                }
+            }
         }
+
+        currentAvailabilityTask = task
+        await task.value
     }
 
     func loadBookingStatus() async {
@@ -145,20 +222,29 @@ final class DashboardViewModel: ObservableObject {
         }
     }
 
+    /// Debounced loading for rapid navigation (arrows, "Heute" button)
+    private func loadAvailabilityDebounced() {
+        debounceTask?.cancel()
+        debounceTask = Task { @MainActor in
+            do {
+                try await Task.sleep(nanoseconds: 200_000_000) // 200ms debounce
+                await loadAvailability(forceRefresh: true)
+            } catch {
+                // Debounce was cancelled - ignore
+            }
+        }
+    }
+
     func changeDate(by days: Int) {
         if let newDate = Calendar.current.date(byAdding: .day, value: days, to: selectedDate) {
             selectedDate = newDate
-            Task {
-                await loadAvailability(forceRefresh: true)
-            }
+            loadAvailabilityDebounced()
         }
     }
 
     func goToToday() {
         selectedDate = Date()
-        Task {
-            await loadAvailability(forceRefresh: true)
-        }
+        loadAvailabilityDebounced()
     }
 
     func getSlot(courtIndex: Int, time: String) -> TimeSlot? {
@@ -234,19 +320,58 @@ final class DashboardViewModel: ObservableObject {
         return details.bookedForId == userId || details.bookedById == userId
     }
 
-    // Cancel a reservation
-    func cancelReservation(_ reservationId: Int) async {
-        isLoading = true
-        do {
-            let _: CancelResponse = try await apiClient.request(
-                .cancelReservation(id: reservationId), body: nil
+    // Cancel a reservation with optimistic UI update
+    func cancelReservation(_ reservationId: Int, courtId: Int) {
+        // Store original state for rollback on error
+        let originalAvailability = availability
+        let dateString = DateFormatterService.apiDate.string(from: selectedDate)
+        let originalCached = availabilityCache[dateString]
+
+        // 1. Optimistic update - remove slot from local data immediately
+        if let currentAvailability = availability,
+           let courtIndex = currentAvailability.courts.firstIndex(where: { $0.courtId == courtId }) {
+
+            let court = currentAvailability.courts[courtIndex]
+            let filteredOccupied = court.occupied.filter { $0.details?.reservationId != reservationId }
+
+            let updatedCourt = CourtAvailability(
+                courtId: court.courtId,
+                courtNumber: court.courtNumber,
+                occupied: filteredOccupied
             )
-            // Reload data to reflect the cancellation
-            await loadData()
-        } catch {
-            self.error = "Stornierung fehlgeschlagen"
+
+            var updatedCourts = currentAvailability.courts
+            updatedCourts[courtIndex] = updatedCourt
+
+            let updatedAvailability = AvailabilityResponse(
+                date: currentAvailability.date,
+                currentHour: currentAvailability.currentHour,
+                courts: updatedCourts,
+                metadata: currentAvailability.metadata
+            )
+
+            availability = updatedAvailability
+            cacheAvailability(updatedAvailability, for: dateString)
         }
-        isLoading = false
+
+        // 2. Call API in background
+        Task {
+            do {
+                let _: CancelResponse = try await apiClient.request(
+                    .cancelReservation(id: reservationId), body: nil
+                )
+                await loadBookingStatus()
+            } catch {
+                // 3. Error - rollback to original state and show alert
+                availability = originalAvailability
+                if let cached = originalCached {
+                    availabilityCache[dateString] = cached
+                } else {
+                    availabilityCache.removeValue(forKey: dateString)
+                }
+                cancellationError = "Stornierung fehlgeschlagen"
+            }
+        }
     }
 
     var formattedSelectedDate: String {

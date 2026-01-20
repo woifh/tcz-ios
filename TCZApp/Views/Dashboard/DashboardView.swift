@@ -14,6 +14,7 @@ struct BookingSheetData: Identifiable {
 struct CancelConfirmationData: Identifiable {
     let id = UUID()
     let reservationId: Int
+    let courtId: Int
     let courtNumber: Int
     let time: String
     let bookedFor: String
@@ -122,17 +123,36 @@ struct DashboardView: View {
                 ScrollView {
                     if viewModel.isLoading && viewModel.availability == nil {
                         LoadingView()
-                    } else if let error = viewModel.error {
+                    } else if let error = viewModel.error, viewModel.availability == nil {
                         ErrorView(message: error) {
                             Task { await viewModel.loadData() }
                         }
                     } else {
-                        CourtGridView(
-                            viewModel: viewModel,
-                            onSlotTap: { courtId, courtNumber, time, slot in
-                                handleSlotTap(courtId: courtId, courtNumber: courtNumber, time: time, slot: slot)
+                        ZStack(alignment: .top) {
+                            CourtGridView(
+                                viewModel: viewModel,
+                                onSlotTap: { courtId, courtNumber, time, slot in
+                                    handleSlotTap(courtId: courtId, courtNumber: courtNumber, time: time, slot: slot)
+                                }
+                            )
+
+                            // Subtle refresh indicator when updating cached data
+                            if viewModel.isRefreshing {
+                                HStack(spacing: 6) {
+                                    ProgressView()
+                                        .scaleEffect(0.7)
+                                    Text("Aktualisiere...")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color(.systemBackground).opacity(0.95))
+                                .cornerRadius(8)
+                                .shadow(radius: 2)
+                                .padding(.top, 8)
                             }
-                        )
+                        }
                     }
                 }
                 .padding(.horizontal)
@@ -148,29 +168,43 @@ struct DashboardView: View {
                     currentUserName: data.userName,
                     onComplete: {
                         bookingSheetData = nil
-                        Task { await viewModel.loadData() }
+                        Task { await viewModel.reloadAfterBookingChange() }
                     }
                 )
                 .preferredColorScheme(appTheme.colorScheme)
             }
-            .alert("Reservierung stornieren?", isPresented: Binding(
-                get: { cancelConfirmation != nil },
-                set: { if !$0 { cancelConfirmation = nil } }
+            .alert(item: $cancelConfirmation) { data in
+                Alert(
+                    title: Text("Reservierung stornieren?"),
+                    message: Text("Platz \(data.courtNumber) um \(data.time) Uhr für \(data.bookedFor) stornieren?"),
+                    primaryButton: .destructive(Text("Stornieren")) {
+                        viewModel.cancelReservation(data.reservationId, courtId: data.courtId)
+                    },
+                    secondaryButton: .cancel(Text("Abbrechen"))
+                )
+            }
+            .alert("Fehler", isPresented: Binding(
+                get: { viewModel.cancellationError != nil },
+                set: { if !$0 { viewModel.cancellationError = nil } }
             )) {
-                Button("Abbrechen", role: .cancel) {
-                    cancelConfirmation = nil
-                }
-                Button("Stornieren", role: .destructive) {
-                    if let data = cancelConfirmation {
-                        Task {
-                            await viewModel.cancelReservation(data.reservationId)
-                        }
-                    }
-                    cancelConfirmation = nil
+                Button("OK") {
+                    viewModel.cancellationError = nil
                 }
             } message: {
-                if let data = cancelConfirmation {
-                    Text("Platz \(data.courtNumber) um \(data.time) Uhr für \(data.bookedFor) stornieren?")
+                if let error = viewModel.cancellationError {
+                    Text(error)
+                }
+            }
+            .alert("Verbindungsfehler", isPresented: Binding(
+                get: { viewModel.connectionError != nil },
+                set: { if !$0 { viewModel.connectionError = nil } }
+            )) {
+                Button("OK") {
+                    viewModel.connectionError = nil
+                }
+            } message: {
+                if let error = viewModel.connectionError {
+                    Text(error)
                 }
             }
         }
@@ -228,6 +262,7 @@ struct DashboardView: View {
            let reservationId = details.reservationId {
             cancelConfirmation = CancelConfirmationData(
                 reservationId: reservationId,
+                courtId: courtId,
                 courtNumber: courtNumber,
                 time: time,
                 bookedFor: details.bookedFor ?? "Unbekannt"

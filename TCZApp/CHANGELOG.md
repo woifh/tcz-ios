@@ -15,6 +15,9 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 - Simplified tab bar with 3 tabs (Dashboard, Bookings, Favorites)
 - Profile picture buttons now use icons instead of text
 - Logout is now instant with immediate navigation to the overview
+- Faster date navigation with instant feedback when switching days
+- Cancellations now update instantly with background server sync
+- Connection errors now show alert popups when server is unreachable
 
 ## [5.2] - 2026-01-20
 ### Added
