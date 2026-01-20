@@ -52,7 +52,6 @@
 		T100000000000008 /* ModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T200000000000008 /* ModelDecodingTests.swift */; };
 		0100000000000033 /* ProfilePictureCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000033 /* ProfilePictureCache.swift */; };
 		0100000000000034 /* ProfilePictureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000034 /* ProfilePictureView.swift */; };
-		0100000000000035 /* CustomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000035 /* CustomTabBar.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,7 +112,6 @@
 		T300000000000002 /* TCZAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TCZAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0200000000000033 /* ProfilePictureCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureCache.swift; sourceTree = "<group>"; };
 		0200000000000034 /* ProfilePictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureView.swift; sourceTree = "<group>"; };
-		0200000000000035 /* CustomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -281,7 +279,6 @@
 		0500000000000015 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				0200000000000035 /* CustomTabBar.swift */,
 				05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */,
 				05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */,
 				0200000000000011 /* LoadingView.swift */,
@@ -506,7 +503,6 @@
 				0100000000000032 /* DateNavigationView.swift in Sources */,
 				0100000000000033 /* ProfilePictureCache.swift in Sources */,
 				0100000000000034 /* ProfilePictureView.swift in Sources */,
-				0100000000000035 /* CustomTabBar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
