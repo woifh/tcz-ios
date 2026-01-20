@@ -27,11 +27,14 @@ final class APIClient: APIClientProtocol {
     private var onUnauthorized: (() -> Void)?
 
     private init() {
-        // Development URL - use your Mac's IP for device testing, 127.0.0.1 for simulator
+        // Development URL - automatically uses localhost for simulator, IP for physical device
         // To find your Mac's IP: run `ipconfig getifaddr en0` in Terminal
-        // Change to "https://tcz.pythonanywhere.com" for production
         #if DEBUG
-        self.baseURL = URL(string: "http://localhost:5001")!  // Use localhost for simulator (change to IP for physical device)
+            #if targetEnvironment(simulator)
+            self.baseURL = URL(string: "http://localhost:5001")!
+            #else
+            self.baseURL = URL(string: "http://10.0.0.147:5001")!  // Your Mac's local IP
+            #endif
         #else
         self.baseURL = URL(string: "https://woifh.pythonanywhere.com")!
         #endif
