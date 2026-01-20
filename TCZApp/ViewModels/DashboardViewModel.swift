@@ -308,16 +308,16 @@ final class DashboardViewModel: ObservableObject {
         let cacheKey = "\(start)-\(days)"
 
         // Prevent duplicate fetches for same range
-        guard await !pendingRangeFetches.contains(cacheKey) else { return }
+        guard !pendingRangeFetches.contains(cacheKey) else { return }
 
-        await MainActor.run { pendingRangeFetches.insert(cacheKey) }
-        defer { Task { @MainActor in pendingRangeFetches.remove(cacheKey) } }
+        pendingRangeFetches.insert(cacheKey)
+        defer { pendingRangeFetches.remove(cacheKey) }
 
         do {
             let response: AvailabilityRangeResponse = try await apiClient.request(
                 .availabilityRange(start: start, days: days), body: nil
             )
-            await MainActor.run { self.cacheRangeResponse(response) }
+            self.cacheRangeResponse(response)
         } catch {
             // Silently ignore prefetch failures
         }
