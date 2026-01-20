@@ -16,48 +16,10 @@ struct Reservation: Codable, Identifiable, Equatable {
     let isActive: Bool?
     let bookingStatus: String?
     let reason: String?
-
-    var canCancel: Bool {
-        // Short-notice bookings can never be cancelled
-        if isShortNotice {
-            return false
-        }
-
-        // Check time-based rules
-        if isSuspended {
-            // Suspended: can cancel if not in the past (future OR currently happening)
-            return !isInPast
-        } else if status == "active" {
-            // Active: can cancel until 15 minutes before start
-            return isMoreThan15MinutesAway
-        }
-
-        return false
-    }
+    let canCancel: Bool
 
     var isSuspended: Bool {
         status == "suspended"
-    }
-
-    /// Returns true if the reservation's start time has already passed
-    var isInPast: Bool {
-        guard let reservationStart = startDateTime else { return true }
-        return Date() >= reservationStart
-    }
-
-    /// Returns true if there's more than 15 minutes until the reservation starts
-    private var isMoreThan15MinutesAway: Bool {
-        guard let reservationStart = startDateTime else { return false }
-        let fifteenMinutesFromNow = Date().addingTimeInterval(15 * 60)
-        return reservationStart > fifteenMinutesFromNow
-    }
-
-    /// Parses date + startTime into a Date object (Europe/Berlin timezone)
-    private var startDateTime: Date? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
-        dateFormatter.timeZone = TimeZone(identifier: "Europe/Berlin")
-        return dateFormatter.date(from: "\(date) \(startTime)")
     }
 
     var timeRange: String {
@@ -89,6 +51,27 @@ struct Reservation: Codable, Identifiable, Equatable {
         case isActive = "is_active"
         case bookingStatus = "booking_status"
         case reason
+        case canCancel = "can_cancel"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(Int.self, forKey: .id)
+        courtId = try container.decode(Int.self, forKey: .courtId)
+        courtNumber = try container.decodeIfPresent(Int.self, forKey: .courtNumber)
+        date = try container.decode(String.self, forKey: .date)
+        startTime = try container.decode(String.self, forKey: .startTime)
+        endTime = try container.decode(String.self, forKey: .endTime)
+        bookedFor = try container.decodeIfPresent(String.self, forKey: .bookedFor)
+        bookedForId = try container.decode(String.self, forKey: .bookedForId)
+        bookedBy = try container.decodeIfPresent(String.self, forKey: .bookedBy)
+        bookedById = try container.decode(String.self, forKey: .bookedById)
+        status = try container.decode(String.self, forKey: .status)
+        isShortNotice = try container.decode(Bool.self, forKey: .isShortNotice)
+        isActive = try container.decodeIfPresent(Bool.self, forKey: .isActive)
+        bookingStatus = try container.decodeIfPresent(String.self, forKey: .bookingStatus)
+        reason = try container.decodeIfPresent(String.self, forKey: .reason)
+        canCancel = try container.decodeIfPresent(Bool.self, forKey: .canCancel) ?? false
     }
 
     static func == (lhs: Reservation, rhs: Reservation) -> Bool {

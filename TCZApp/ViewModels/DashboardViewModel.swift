@@ -222,19 +222,7 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func canCancelSlot(_ slot: TimeSlot?) -> Bool {
-        guard let slot = slot,
-              let details = slot.details,
-              let userId = currentUserId else {
-            return false
-        }
-
-        // Short notice bookings cannot be cancelled
-        if slot.status == .shortNotice || details.isShortNotice == true {
-            return false
-        }
-
-        // User can cancel if they booked it or if it's for them
-        return details.bookedForId == userId || details.bookedById == userId
+        return slot?.details?.canCancel ?? false
     }
 
     func isUserBooking(_ slot: TimeSlot?) -> Bool {

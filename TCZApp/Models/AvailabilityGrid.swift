@@ -70,6 +70,7 @@ struct SlotDetails: Codable {
     let bookedById: String?
     let reservationId: Int?
     let isShortNotice: Bool?
+    let canCancel: Bool?
 
     // For blocks
     let reason: String?
@@ -87,6 +88,7 @@ struct SlotDetails: Codable {
         case bookedById = "booked_by_id"
         case reservationId = "reservation_id"
         case isShortNotice = "is_short_notice"
+        case canCancel = "can_cancel"
         case reason, details
         case blockId = "block_id"
         case isTemporary = "is_temporary"

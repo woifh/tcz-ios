@@ -190,8 +190,9 @@ struct DashboardView: View {
             return
         }
 
-        // Check if this is user's own booking - offer to cancel
+        // Check if this is user's own cancellable booking - offer to cancel
         if viewModel.isUserBooking(slot),
+           slot?.details?.canCancel == true,
            let details = slot?.details,
            let reservationId = details.reservationId {
             cancelConfirmation = CancelConfirmationData(

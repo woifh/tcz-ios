@@ -5,6 +5,9 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ## [Unreleased]
 
 ## [5.1] - 2026-01-20
+### Changed
+- Cancellation rules now determined by server for consistent behavior across all devices
+
 ### Fixed
 - Court availability now always refreshes when switching dates
 - TestFlight release notes now populate automatically
