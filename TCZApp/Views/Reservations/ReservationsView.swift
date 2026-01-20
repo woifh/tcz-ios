@@ -103,6 +103,14 @@ struct ReservationRow: View {
 
     var body: some View {
         HStack {
+            ProfilePictureView(
+                memberId: reservation.bookedForId,
+                hasProfilePicture: reservation.bookedForHasProfilePicture ?? false,
+                profilePictureVersion: reservation.bookedForProfilePictureVersion ?? 0,
+                name: reservation.bookedFor ?? "",
+                size: 44
+            )
+
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text("Platz \(reservation.courtNumber ?? 0)")

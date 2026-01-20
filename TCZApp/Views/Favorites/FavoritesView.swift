@@ -96,9 +96,7 @@ struct FavoriteRow: View {
 
     var body: some View {
         HStack {
-            Image(systemName: "person.circle.fill")
-                .font(.title)
-                .foregroundColor(.green)
+            ProfilePictureView(member: favorite, size: 44)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(favorite.name)
@@ -182,6 +180,8 @@ struct AddFavoriteSheet: View {
                 } else {
                     List(viewModel.searchResults) { member in
                         HStack {
+                            ProfilePictureView(member: member, size: 40)
+
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(member.name)
                                     .font(.headline)

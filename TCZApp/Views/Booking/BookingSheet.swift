@@ -120,6 +120,8 @@ struct BookingSheet: View {
                                     }
                                 } label: {
                                     HStack {
+                                        ProfilePictureView(member: member, size: 36)
+
                                         VStack(alignment: .leading, spacing: 2) {
                                             Text(member.name)
                                                 .font(.body)

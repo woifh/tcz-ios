@@ -9,6 +9,8 @@ struct Reservation: Codable, Identifiable, Equatable {
     let endTime: String
     let bookedFor: String?
     let bookedForId: String
+    let bookedForHasProfilePicture: Bool?
+    let bookedForProfilePictureVersion: Int?
     let bookedBy: String?
     let bookedById: String
     let status: String
@@ -44,6 +46,8 @@ struct Reservation: Codable, Identifiable, Equatable {
         case endTime = "end_time"
         case bookedFor = "booked_for"
         case bookedForId = "booked_for_id"
+        case bookedForHasProfilePicture = "booked_for_has_profile_picture"
+        case bookedForProfilePictureVersion = "booked_for_profile_picture_version"
         case bookedBy = "booked_by"
         case bookedById = "booked_by_id"
         case status
@@ -64,6 +68,8 @@ struct Reservation: Codable, Identifiable, Equatable {
         endTime = try container.decode(String.self, forKey: .endTime)
         bookedFor = try container.decodeIfPresent(String.self, forKey: .bookedFor)
         bookedForId = try container.decode(String.self, forKey: .bookedForId)
+        bookedForHasProfilePicture = try container.decodeIfPresent(Bool.self, forKey: .bookedForHasProfilePicture)
+        bookedForProfilePictureVersion = try container.decodeIfPresent(Int.self, forKey: .bookedForProfilePictureVersion)
         bookedBy = try container.decodeIfPresent(String.self, forKey: .bookedBy)
         bookedById = try container.decode(String.self, forKey: .bookedById)
         status = try container.decode(String.self, forKey: .status)

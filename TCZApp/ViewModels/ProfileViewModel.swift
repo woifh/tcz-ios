@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
@@ -26,8 +27,13 @@ final class ProfileViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var isSaving = false
     @Published var isConfirmingPayment = false
+    @Published var isUploadingPicture = false
     @Published var error: String?
     @Published var successMessage: String?
+
+    // Profile picture state
+    @Published var hasProfilePicture = false
+    @Published var profilePictureVersion = 0
 
     // Validation
     @Published var emailError: String?
@@ -59,6 +65,8 @@ final class ProfileViewModel: ObservableObject {
             self.notifyOtherBookings = member.notifyOtherBookings ?? true
             self.notifyCourtBlocked = member.notifyCourtBlocked ?? true
             self.notifyBookingOverridden = member.notifyBookingOverridden ?? true
+            self.hasProfilePicture = member.hasProfilePicture ?? false
+            self.profilePictureVersion = member.profilePictureVersion ?? 0
         } catch let apiError as APIError {
             error = apiError.localizedDescription
         } catch {
@@ -181,6 +189,89 @@ final class ProfileViewModel: ObservableObject {
             self.error = "Fehler beim Anfordern der Zahlungsbestätigung"
             isConfirmingPayment = false
             return false
+        }
+    }
+
+    // MARK: - Profile Picture
+
+    func uploadProfilePicture(_ image: UIImage) async -> Member? {
+        guard let memberId = memberId else {
+            error = "Benutzer-ID fehlt"
+            return nil
+        }
+
+        // Compress to JPEG
+        guard let imageData = image.jpegData(compressionQuality: 0.9) else {
+            error = "Bild konnte nicht verarbeitet werden"
+            return nil
+        }
+
+        isUploadingPicture = true
+        error = nil
+        successMessage = nil
+
+        do {
+            let response = try await apiClient.uploadProfilePicture(memberId: memberId, imageData: imageData)
+
+            // Update local state
+            self.hasProfilePicture = response.hasProfilePicture ?? true
+            self.profilePictureVersion = response.profilePictureVersion ?? (self.profilePictureVersion + 1)
+
+            // Invalidate cache for this member
+            ProfilePictureCache.shared.invalidate(memberId: memberId)
+
+            // Reload profile to get updated member data
+            let member: Member = try await apiClient.request(.getMember(memberId: memberId), body: nil)
+
+            successMessage = "Profilbild erfolgreich hochgeladen"
+            isUploadingPicture = false
+            return member
+
+        } catch let apiError as APIError {
+            error = apiError.localizedDescription
+            isUploadingPicture = false
+            return nil
+        } catch {
+            self.error = "Fehler beim Hochladen des Profilbilds"
+            isUploadingPicture = false
+            return nil
+        }
+    }
+
+    func deleteProfilePicture() async -> Member? {
+        guard let memberId = memberId else {
+            error = "Benutzer-ID fehlt"
+            return nil
+        }
+
+        isUploadingPicture = true
+        error = nil
+        successMessage = nil
+
+        do {
+            try await apiClient.deleteProfilePicture(memberId: memberId)
+
+            // Update local state
+            self.hasProfilePicture = false
+
+            // Invalidate cache for this member
+            ProfilePictureCache.shared.invalidate(memberId: memberId)
+
+            // Reload profile to get updated member data
+            let member: Member = try await apiClient.request(.getMember(memberId: memberId), body: nil)
+
+            successMessage = "Profilbild erfolgreich entfernt"
+            isUploadingPicture = false
+            return member
+
+        } catch let apiError as APIError {
+            error = apiError.localizedDescription
+            isUploadingPicture = false
+            return nil
+        } catch {
+            self.error = "Fehler beim Entfernen des Profilbilds"
+            isUploadingPicture = false
+            return nil
         }
     }
 }

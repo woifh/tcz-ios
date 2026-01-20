@@ -6,6 +6,11 @@ protocol APIClientProtocol {
     func setAccessToken(_ token: String?)
     func clearAuth()
     func setOnUnauthorized(_ handler: @escaping () -> Void)
+
+    // Profile picture methods
+    func uploadProfilePicture(memberId: String, imageData: Data) async throws -> ProfilePictureResponse
+    func fetchProfilePicture(memberId: String) async throws -> Data
+    func deleteProfilePicture(memberId: String) async throws
 }
 
 final class APIClient: APIClientProtocol {
@@ -220,6 +225,123 @@ final class APIClient: APIClientProtocol {
     func clearAuth() {
         accessToken = nil
         clearCookies()
+    }
+
+    // MARK: - Profile Picture Methods
+
+    func uploadProfilePicture(memberId: String, imageData: Data) async throws -> ProfilePictureResponse {
+        guard let url = URL(string: baseURL.absoluteString + "/api/members/\(memberId)/profile-picture") else {
+            throw APIError.invalidResponse
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        // Build multipart body
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(imageData)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            return try decoder.decode(ProfilePictureResponse.self, from: data)
+        case 401:
+            let handler = self.onUnauthorized
+            DispatchQueue.main.async { handler?() }
+            throw APIError.unauthorized
+        case 400:
+            if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
+                throw APIError.badRequest(errorResponse.fullErrorMessage)
+            }
+            throw APIError.badRequest("Ungültige Anfrage")
+        default:
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+    }
+
+    func fetchProfilePicture(memberId: String) async throws -> Data {
+        guard let url = URL(string: baseURL.absoluteString + "/api/members/\(memberId)/profile-picture") else {
+            throw APIError.invalidResponse
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            return data
+        case 401:
+            let handler = self.onUnauthorized
+            DispatchQueue.main.async { handler?() }
+            throw APIError.unauthorized
+        case 404:
+            throw APIError.notFound
+        default:
+            throw APIError.serverError(httpResponse.statusCode)
+        }
+    }
+
+    func deleteProfilePicture(memberId: String) async throws {
+        guard let url = URL(string: baseURL.absoluteString + "/api/members/\(memberId)/profile-picture") else {
+            throw APIError.invalidResponse
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            return
+        case 401:
+            let handler = self.onUnauthorized
+            DispatchQueue.main.async { handler?() }
+            throw APIError.unauthorized
+        case 400, 404:
+            if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
+                throw APIError.badRequest(errorResponse.fullErrorMessage)
+            }
+            throw APIError.badRequest("Fehler beim Löschen")
+        default:
+            throw APIError.serverError(httpResponse.statusCode)
+        }
     }
 }
 

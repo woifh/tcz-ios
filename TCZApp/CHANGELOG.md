@@ -4,6 +4,11 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [6.0] - 2026-01-20
+### Added
+- Profile pictures: upload and display your photo across the app
+- Profile pictures shown in favorites list, member search, and bookings
+
 ## [5.2] - 2026-01-20
 ### Added
 - Unit test infrastructure covering ViewModels and Models

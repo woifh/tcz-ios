@@ -53,6 +53,37 @@ final class MockAPIClient: APIClientProtocol {
         onUnauthorizedHandler = handler
     }
 
+    // MARK: - Profile Picture Methods
+
+    var mockProfilePictureResponse: ProfilePictureResponse?
+    var mockProfilePictureData: Data?
+    var uploadProfilePictureCalled = false
+    var fetchProfilePictureCalled = false
+    var deleteProfilePictureCalled = false
+
+    func uploadProfilePicture(memberId: String, imageData: Data) async throws -> ProfilePictureResponse {
+        uploadProfilePictureCalled = true
+        if let error = mockError {
+            throw error
+        }
+        return mockProfilePictureResponse ?? ProfilePictureResponse(message: "Success", hasProfilePicture: true, profilePictureVersion: 1)
+    }
+
+    func fetchProfilePicture(memberId: String) async throws -> Data {
+        fetchProfilePictureCalled = true
+        if let error = mockError {
+            throw error
+        }
+        return mockProfilePictureData ?? Data()
+    }
+
+    func deleteProfilePicture(memberId: String) async throws {
+        deleteProfilePictureCalled = true
+        if let error = mockError {
+            throw error
+        }
+    }
+
     // Helper to reset state between tests
     func reset() {
         accessToken = nil
@@ -63,5 +94,10 @@ final class MockAPIClient: APIClientProtocol {
         lastBody = nil
         mockResponse = nil
         mockError = nil
+        mockProfilePictureResponse = nil
+        mockProfilePictureData = nil
+        uploadProfilePictureCalled = false
+        fetchProfilePictureCalled = false
+        deleteProfilePictureCalled = false
     }
 }

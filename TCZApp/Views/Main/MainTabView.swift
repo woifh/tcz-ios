@@ -13,28 +13,33 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Uebersicht", systemImage: "calendar")
                 }
+                .tag(0)
 
             if authViewModel.isAuthenticated {
                 ReservationsView(viewModel: reservationsViewModel)
                     .tabItem {
                         Label("Buchungen", systemImage: "list.bullet")
                     }
+                    .tag(1)
 
                 FavoritesView(viewModel: favoritesViewModel)
                     .tabItem {
                         Label("Favoriten", systemImage: "star")
                     }
+                    .tag(2)
 
                 ProfileView()
                     .tabItem {
                         Label("Profil", systemImage: "person")
                     }
+                    .tag(3)
             } else {
                 // Login placeholder tab for anonymous users
                 LoginPlaceholderView(showingLogin: $showingLogin)
                     .tabItem {
                         Label("Anmelden", systemImage: "person.badge.key")
                     }
+                    .tag(1)
             }
         }
         .tint(.green)

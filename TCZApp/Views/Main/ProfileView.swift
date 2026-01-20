@@ -25,9 +25,7 @@ struct ProfileView: View {
                 if let user = authViewModel.currentUser {
                     Section {
                         HStack {
-                            Image(systemName: "person.circle.fill")
-                                .font(.system(size: 60))
-                                .foregroundColor(.green)
+                            ProfilePictureView(member: user, size: 60)
 
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(user.name)

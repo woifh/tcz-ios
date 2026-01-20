@@ -21,6 +21,10 @@ struct Member: Codable, Identifiable, Equatable {
     // Email verification
     let emailVerified: Bool?
 
+    // Profile picture
+    let hasProfilePicture: Bool?
+    let profilePictureVersion: Int?
+
     // Payment status fields
     let feePaid: Bool?
     let paymentConfirmationRequested: Bool?
@@ -40,6 +44,8 @@ struct Member: Codable, Identifiable, Equatable {
         case notifyCourtBlocked = "notify_court_blocked"
         case notifyBookingOverridden = "notify_booking_overridden"
         case emailVerified = "email_verified"
+        case hasProfilePicture = "has_profile_picture"
+        case profilePictureVersion = "profile_picture_version"
         case feePaid = "fee_paid"
         case paymentConfirmationRequested = "payment_confirmation_requested"
         case paymentConfirmationRequestedAt = "payment_confirmation_requested_at"
@@ -74,6 +80,14 @@ struct MemberSummary: Codable, Identifiable, Equatable, Hashable {
     let id: String
     let name: String
     let email: String
+    let hasProfilePicture: Bool?
+    let profilePictureVersion: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, email
+        case hasProfilePicture = "has_profile_picture"
+        case profilePictureVersion = "profile_picture_version"
+    }
 
     static func == (lhs: MemberSummary, rhs: MemberSummary) -> Bool {
         lhs.id == rhs.id
@@ -167,4 +181,17 @@ struct PaymentConfirmationResponse: Decodable {
 // Email verification response
 struct ResendVerificationResponse: Decodable {
     let message: String
+}
+
+// Profile picture response
+struct ProfilePictureResponse: Decodable {
+    let message: String
+    let hasProfilePicture: Bool?
+    let profilePictureVersion: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case message
+        case hasProfilePicture = "has_profile_picture"
+        case profilePictureVersion = "profile_picture_version"
+    }
 }
