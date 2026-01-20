@@ -6,7 +6,6 @@ struct CourtGridView: View {
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
 
     @State private var showLegend = false
-    // Single source of truth for page state - only this controls the TabView
     @State private var selectedPage: Int = 0
 
     // Height constants

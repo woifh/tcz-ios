@@ -7,6 +7,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ## [5.1] - 2026-01-20
 ### Changed
 - Cancellation rules now determined by server for consistent behavior across all devices
+- Date navigation now stays visible when scrolling through court times
 
 ### Fixed
 - Court availability now always refreshes when switching dates

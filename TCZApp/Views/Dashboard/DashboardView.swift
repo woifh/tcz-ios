@@ -53,7 +53,8 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
+            VStack(spacing: 0) {
+                // Sticky header section
                 VStack(spacing: 12) {
                     // Payment reminder banner (only for authenticated users with unpaid fee)
                     if let bannerState = paymentBannerState {
@@ -84,8 +85,13 @@ struct DashboardView: View {
                         onToday: viewModel.goToToday,
                         onDateSelected: { Task { await viewModel.loadAvailability(forceRefresh: true) } }
                     )
+                }
+                .padding(.horizontal)
+                .padding(.top)
+                .background(Color(.systemBackground))
 
-                    // Court Grid
+                // Scrollable court grid
+                ScrollView {
                     if viewModel.isLoading && viewModel.availability == nil {
                         LoadingView()
                     } else if let error = viewModel.error {
@@ -101,7 +107,7 @@ struct DashboardView: View {
                         )
                     }
                 }
-                .padding()
+                .padding(.horizontal)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
