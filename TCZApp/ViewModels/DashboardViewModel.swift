@@ -81,14 +81,19 @@ final class DashboardViewModel: ObservableObject {
         isLoading = false
     }
 
-    func loadAvailability() async {
+    func loadAvailability(forceRefresh: Bool = false) async {
         let dateString = DateFormatterService.apiDate.string(from: selectedDate)
 
-        // Return cached data immediately if available
-        if let cached = getCachedAvailability(for: dateString) {
+        // Return cached data immediately if available (unless forcing refresh)
+        if !forceRefresh, let cached = getCachedAvailability(for: dateString) {
             availability = cached
             prefetchAdjacentDates()
             return
+        }
+
+        // Clear cache for this date if forcing refresh
+        if forceRefresh {
+            availabilityCache.removeValue(forKey: dateString)
         }
 
         do {
@@ -144,7 +149,7 @@ final class DashboardViewModel: ObservableObject {
         if let newDate = Calendar.current.date(byAdding: .day, value: days, to: selectedDate) {
             selectedDate = newDate
             Task {
-                await loadAvailability()
+                await loadAvailability(forceRefresh: true)
             }
         }
     }
@@ -152,7 +157,7 @@ final class DashboardViewModel: ObservableObject {
     func goToToday() {
         selectedDate = Date()
         Task {
-            await loadAvailability()
+            await loadAvailability(forceRefresh: true)
         }
     }
 

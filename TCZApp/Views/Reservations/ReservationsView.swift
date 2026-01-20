@@ -116,7 +116,9 @@ struct ReservationRow: View {
                             .background(Color(red: 251/255, green: 191/255, blue: 36/255))
                             .foregroundColor(Color(red: 113/255, green: 63/255, blue: 18/255))
                             .cornerRadius(4)
-                    } else if reservation.isShortNotice {
+                    }
+
+                    if reservation.isShortNotice {
                         Text("Kurzfristig")
                             .font(.caption2)
                             .padding(.horizontal, 6)

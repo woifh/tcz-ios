@@ -18,11 +18,46 @@ struct Reservation: Codable, Identifiable, Equatable {
     let reason: String?
 
     var canCancel: Bool {
-        !isShortNotice && (status == "active" || status == "suspended")
+        // Short-notice bookings can never be cancelled
+        if isShortNotice {
+            return false
+        }
+
+        // Check time-based rules
+        if isSuspended {
+            // Suspended: can cancel if not in the past (future OR currently happening)
+            return !isInPast
+        } else if status == "active" {
+            // Active: can cancel until 15 minutes before start
+            return isMoreThan15MinutesAway
+        }
+
+        return false
     }
 
     var isSuspended: Bool {
         status == "suspended"
+    }
+
+    /// Returns true if the reservation's start time has already passed
+    var isInPast: Bool {
+        guard let reservationStart = startDateTime else { return true }
+        return Date() >= reservationStart
+    }
+
+    /// Returns true if there's more than 15 minutes until the reservation starts
+    private var isMoreThan15MinutesAway: Bool {
+        guard let reservationStart = startDateTime else { return false }
+        let fifteenMinutesFromNow = Date().addingTimeInterval(15 * 60)
+        return reservationStart > fifteenMinutesFromNow
+    }
+
+    /// Parses date + startTime into a Date object (Europe/Berlin timezone)
+    private var startDateTime: Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+        dateFormatter.timeZone = TimeZone(identifier: "Europe/Berlin")
+        return dateFormatter.date(from: "\(date) \(startTime)")
     }
 
     var timeRange: String {

@@ -82,7 +82,7 @@ struct DashboardView: View {
                         isToday: viewModel.isToday,
                         bookingStatus: viewModel.bookingStatus,
                         onToday: viewModel.goToToday,
-                        onDateSelected: { Task { await viewModel.loadAvailability() } }
+                        onDateSelected: { Task { await viewModel.loadAvailability(forceRefresh: true) } }
                     )
 
                     // Court Grid
@@ -228,7 +228,7 @@ struct LegendSheet: View {
             VStack(alignment: .leading, spacing: 12) {
                 LegendRow(color: .white, title: "Frei", description: "Platz verfuegbar", showBorder: true)
                 LegendRow(color: .red, title: "Belegt", description: "Bereits gebucht")
-                LegendRow(color: .orange, title: "Kurzfristig", description: "Buchbar innerhalb 24h")
+                LegendRow(color: .orange, title: "Kurzfristig", description: "ab 15 Minuten vor Beginn buchbar")
                 LegendRow(color: Color(.systemGray3), title: "Gesperrt", description: "Nicht buchbar")
                 LegendRow(color: temporaryBlockColor, title: "Vorübergehend gesperrt", description: "Kurzzeitig blockiert")
                 Spacer()

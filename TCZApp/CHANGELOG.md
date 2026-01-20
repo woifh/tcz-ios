@@ -4,6 +4,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [5.1] - 2026-01-20
+### Fixed
+- Court availability now always refreshes when switching dates
+
 ## [5.0] - 2026-01-19
 ### Added
 - Temporary court blocks now shown in yellow with "(vorübergehend)" label
