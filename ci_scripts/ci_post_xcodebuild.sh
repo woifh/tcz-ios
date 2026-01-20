@@ -8,7 +8,7 @@ cd "$REPO_ROOT"
 
 CHANGELOG="TCZApp/CHANGELOG.md"
 OUTPUT_DIR="TestFlight"
-OUTPUT_FILE="$OUTPUT_DIR/WhatToTest.en-GB.txt"
+OUTPUT_FILE="$OUTPUT_DIR/WhatToTest.de-DE.txt"
 
 # Verify changelog exists
 if [ ! -f "$CHANGELOG" ]; then
