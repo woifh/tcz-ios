@@ -84,6 +84,7 @@ The server backend and web app code is available locally for reference:
 ## Important Rules
 
 - **CRITICAL: NEVER push to GitHub without explicit user request** - NEVER run `git push` unless the user explicitly asks you to push. This is the most important rule. Always wait for explicit permission before pushing any commits or tags.
+- **CRITICAL: Always show changelog before pushing** - Before any push, show the user the changelog entry that will be added and wait for their approval. Never push without giving the user a chance to review the changelog first.
 - **When pushing to GitHub (only after user requests it)**:
   - Ask the user whether to increase major or minor version
   - Add a short, non-technical changelog entry to CHANGELOG.md (version format: major.minor)
