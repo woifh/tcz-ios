@@ -249,6 +249,9 @@ struct ProfileView: View {
     }
 
     private func loadAppVersion() {
+        // Get build number from bundle (CURRENT_PROJECT_VERSION)
+        let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+
         // Parse version from CHANGELOG.md (single source of truth)
         if let path = Bundle.main.path(forResource: "CHANGELOG", ofType: "md"),
            let content = try? String(contentsOfFile: path, encoding: .utf8),
@@ -259,13 +262,14 @@ struct ProfileView: View {
                let endRange = content.range(of: "]", range: startRange.upperBound..<content.endIndex) {
                 let version = String(content[startRange.upperBound..<endRange.lowerBound])
                 if version.contains(".") {
-                    appVersion = version + ".0"
+                    appVersion = "\(version).0 (\(buildNumber))"
                     return
                 }
             }
         }
         // Fallback to bundle version
-        appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        let shortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        appVersion = "\(shortVersion) (\(buildNumber))"
     }
 
     private func loadServerVersion() async {
