@@ -6,7 +6,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [5.2] - 2026-01-20
 ### Added
-- Unit test infrastructure with 92 tests covering ViewModels and Models
+- Unit test infrastructure covering ViewModels and Models
 
 ## [5.1] - 2026-01-20
 ### Changed
