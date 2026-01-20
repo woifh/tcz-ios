@@ -10,6 +10,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ### Fixed
 - Error messages in booking modal now clear when selecting a different member
+- "No member found" message now scrolls into view when keyboard is open
 
 ## [5.1] - 2026-01-20
 ### Changed

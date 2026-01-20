@@ -111,6 +111,7 @@ struct BookingSheet: View {
                                 Text("Keine Mitglieder gefunden")
                                     .foregroundColor(.secondary)
                             }
+                            .id("noResults")
                         } else {
                             ForEach(viewModel.searchResults) { member in
                                 Button {
@@ -188,6 +189,13 @@ struct BookingSheet: View {
                 if !results.isEmpty {
                     withAnimation {
                         scrollProxy.scrollTo("searchResults", anchor: .top)
+                    }
+                }
+            }
+            .onChange(of: viewModel.isSearching) { isSearching in
+                if !isSearching && viewModel.searchResults.isEmpty && !viewModel.searchQuery.isEmpty {
+                    withAnimation {
+                        scrollProxy.scrollTo("noResults", anchor: .top)
                     }
                 }
             }
