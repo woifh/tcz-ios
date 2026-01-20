@@ -6,6 +6,8 @@ struct CourtGridView: View {
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
 
     @State private var showLegend = false
+    // Single source of truth for page state - only this controls the TabView
+    @State private var selectedPage: Int = 0
 
     // Height constants
     private let rowHeight: CGFloat = 50
@@ -21,14 +23,18 @@ struct CourtGridView: View {
         VStack(spacing: 8) {
             // Page indicator above the grid
             PageIndicatorView(
-                currentPage: viewModel.currentPage,
+                currentPage: selectedPage,
                 totalPages: viewModel.totalPages,
-                onPageChange: { viewModel.currentPage = $0 },
+                onPageChange: { newPage in
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        selectedPage = newPage
+                    }
+                },
                 onInfoTap: { showLegend = true }
             )
 
-            // Swipeable pages for courts
-            TabView(selection: $viewModel.currentPage) {
+            // Swipeable pages for courts using TabView
+            TabView(selection: $selectedPage) {
                 ForEach(0..<viewModel.totalPages, id: \.self) { pageIndex in
                     SinglePageGrid(
                         viewModel: viewModel,
@@ -40,7 +46,7 @@ struct CourtGridView: View {
                     .tag(pageIndex)
                 }
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height: gridHeight)
         }
         .sheet(isPresented: $showLegend) {
@@ -62,7 +68,7 @@ struct PageIndicatorView: View {
             // Left arrow
             Button(action: {
                 if currentPage > 0 {
-                    withAnimation { onPageChange(currentPage - 1) }
+                    onPageChange(currentPage - 1)
                 }
             }) {
                 Image(systemName: "chevron.left")
@@ -78,7 +84,7 @@ struct PageIndicatorView: View {
                     .fontWeight(currentPage == 0 ? .semibold : .regular)
                     .foregroundColor(currentPage == 0 ? .green : .gray)
                     .onTapGesture {
-                        withAnimation { onPageChange(0) }
+                        onPageChange(0)
                     }
 
                 Text("Plätze 4-6")
@@ -86,14 +92,14 @@ struct PageIndicatorView: View {
                     .fontWeight(currentPage == 1 ? .semibold : .regular)
                     .foregroundColor(currentPage == 1 ? .green : .gray)
                     .onTapGesture {
-                        withAnimation { onPageChange(1) }
+                        onPageChange(1)
                     }
             }
 
             // Right arrow
             Button(action: {
                 if currentPage < totalPages - 1 {
-                    withAnimation { onPageChange(currentPage + 1) }
+                    onPageChange(currentPage + 1)
                 }
             }) {
                 Image(systemName: "chevron.right")
@@ -164,16 +170,18 @@ struct SinglePageGrid: View {
                             let slot = viewModel.getSlot(courtIndex: courtIndex, time: time)
                             let courtInfo = viewModel.getCourtInfo(courtIndex: courtIndex)
 
-                            TimeSlotCell(
-                                slot: slot,
-                                isPast: viewModel.isSlotInPast(time: time),
-                                canBook: viewModel.canBookSlot(slot, time: time),
-                                isUserBooking: viewModel.isUserBooking(slot),
-                                rowHeight: rowHeight
-                            )
-                            .onTapGesture {
+                            Button {
                                 onSlotTap(courtInfo.id, courtInfo.number, time, slot)
+                            } label: {
+                                TimeSlotCell(
+                                    slot: slot,
+                                    isPast: viewModel.isSlotInPast(time: time),
+                                    canBook: viewModel.canBookSlot(slot, time: time),
+                                    isUserBooking: viewModel.isUserBooking(slot),
+                                    rowHeight: rowHeight
+                                )
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -183,6 +191,7 @@ struct SinglePageGrid: View {
         .cornerRadius(8)
         .shadow(radius: 2)
         .padding(.horizontal, 4)
+        .contentShape(Rectangle())
     }
 }
 

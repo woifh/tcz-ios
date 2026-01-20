@@ -7,6 +7,8 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ## [5.1] - 2026-01-20
 ### Fixed
 - Court availability now always refreshes when switching dates
+- TestFlight release notes now populate automatically
+- Court grid page switching now animates smoothly
 
 ## [5.0] - 2026-01-19
 ### Added

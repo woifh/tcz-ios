@@ -7,8 +7,8 @@ REPO_ROOT="${CI_PRIMARY_REPOSITORY_PATH:-$(pwd)}"
 cd "$REPO_ROOT"
 
 CHANGELOG="TCZApp/CHANGELOG.md"
-OUTPUT_DIR="../TestFlight/en-US"
-OUTPUT_FILE="$OUTPUT_DIR/WhatToTest.txt"
+OUTPUT_DIR="TestFlight"
+OUTPUT_FILE="$OUTPUT_DIR/WhatToTest.en-GB.txt"
 
 # Verify changelog exists
 if [ ! -f "$CHANGELOG" ]; then
