@@ -102,7 +102,7 @@ struct DateHeaderRow: View {
                     BookingBadge(
                         current: status.limits.shortNoticeBookings.current,
                         limit: status.limits.shortNoticeBookings.limit,
-                        color: status.limits.shortNoticeBookings.canBook ? .orange : .red
+                        color: .orange
                     )
                 }
             }
