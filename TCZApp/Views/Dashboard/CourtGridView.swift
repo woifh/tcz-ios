@@ -143,8 +143,8 @@ struct SinglePageGrid: View {
 
                 ForEach(courtIndices, id: \.self) { courtIndex in
                     let courtNumber = viewModel.courtNumbers[courtIndex]
-                    Text("P\(courtNumber)")
-                        .font(.body)
+                    Text("Platz \(courtNumber)")
+                        .font(.subheadline)
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .frame(height: headerHeight)
