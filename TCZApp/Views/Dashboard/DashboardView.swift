@@ -112,7 +112,7 @@ struct DashboardView: View {
                         isToday: viewModel.isToday,
                         bookingStatus: viewModel.bookingStatus,
                         onToday: viewModel.goToToday,
-                        onDateSelected: { Task { await viewModel.loadAvailability(forceRefresh: true) } }
+                        onDateSelected: { Task { await viewModel.loadAvailability() } }
                     )
                 }
                 .padding(.horizontal)

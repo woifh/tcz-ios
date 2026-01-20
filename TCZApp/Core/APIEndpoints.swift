@@ -4,6 +4,7 @@ enum APIEndpoint {
     case login
     case logout
     case availability(date: String)
+    case availabilityRange(start: String, days: Int)
     case reservations
     case reservationStatus
     case createReservation
@@ -31,6 +32,8 @@ enum APIEndpoint {
             return "/changelog"
         case .availability(let date):
             return "/api/courts/availability?date=\(date)"
+        case .availabilityRange(let start, let days):
+            return "/api/courts/availability/range?start=\(start)&days=\(days)"
         case .reservations:
             return "/api/reservations/"
         case .reservationStatus:
@@ -63,7 +66,7 @@ enum APIEndpoint {
         switch self {
         case .login, .createReservation, .addFavorite, .confirmPayment, .resendVerificationEmail:
             return .post
-        case .logout, .availability, .reservations, .reservationStatus,
+        case .logout, .availability, .availabilityRange, .reservations, .reservationStatus,
              .searchMembers, .favorites, .serverVersion, .serverChangelog, .getMember:
             return .get
         case .cancelReservation, .removeFavorite:

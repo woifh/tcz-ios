@@ -18,9 +18,29 @@ final class DashboardViewModel: ObservableObject {
     private let apiClient: APIClientProtocol
     private(set) var currentUserId: String?
 
-    // Cache for availability data: [dateString: (response, timestamp)]
-    private var availabilityCache: [String: (AvailabilityResponse, Date)] = [:]
-    private let cacheTTL: TimeInterval = 300 // 5 minutes
+    // MARK: - Cache Infrastructure
+
+    /// Cache entry with timestamp for staleness/expiry checking
+    private struct CacheEntry {
+        let response: AvailabilityResponse
+        let fetchedAt: Date
+
+        /// Cache is expired after 5 minutes (hard limit)
+        var isExpired: Bool {
+            Date().timeIntervalSince(fetchedAt) > 300
+        }
+    }
+
+    /// Cache for availability data: [dateString: CacheEntry]
+    private var availabilityCache: [String: CacheEntry] = [:]
+
+    /// Track in-flight range requests to prevent duplicates
+    private var pendingRangeFetches: Set<String> = []
+
+    // Range fetching constants
+    private let initialFetchDays = 14      // Days to fetch on app launch
+    private let prefetchDays = 7           // Days to fetch when prefetching
+    private let prefetchBuffer = 3         // Prefetch when within N days of edge
 
     // Task management for cancellation
     private var currentAvailabilityTask: Task<Void, Never>?
@@ -57,17 +77,39 @@ final class DashboardViewModel: ObservableObject {
 
     // MARK: - Cache Management
 
+    /// Get cached availability if not expired (5 min hard limit)
     private func getCachedAvailability(for dateString: String) -> AvailabilityResponse? {
-        guard let (response, timestamp) = availabilityCache[dateString] else { return nil }
-        if Date().timeIntervalSince(timestamp) < cacheTTL {
-            return response
+        guard let entry = availabilityCache[dateString], !entry.isExpired else {
+            availabilityCache.removeValue(forKey: dateString)
+            return nil
         }
-        availabilityCache.removeValue(forKey: dateString)
-        return nil
+        return entry.response
+    }
+
+    /// Check if date has any cached data (regardless of expiry)
+    private func hasCachedData(for dateString: String) -> Bool {
+        return availabilityCache[dateString] != nil
     }
 
     private func cacheAvailability(_ response: AvailabilityResponse, for dateString: String) {
-        availabilityCache[dateString] = (response, Date())
+        availabilityCache[dateString] = CacheEntry(response: response, fetchedAt: Date())
+    }
+
+    /// Cache multiple days from a range API response
+    private func cacheRangeResponse(_ rangeResponse: AvailabilityRangeResponse) {
+        for (dateString, dayData) in rangeResponse.days {
+            let response = AvailabilityResponse(
+                date: dateString,
+                currentHour: dayData.currentHour,
+                courts: dayData.courts,
+                metadata: AvailabilityMetadata(
+                    generatedAt: rangeResponse.metadata.generatedAt,
+                    usesRealtimeLogic: nil,
+                    timezone: rangeResponse.metadata.timezone
+                )
+            )
+            cacheAvailability(response, for: dateString)
+        }
     }
 
     func clearCache() {
@@ -75,17 +117,51 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func loadData() async {
-        // Don't clear cache - let TTL handle staleness for better performance
+        await initialLoad()
+    }
+
+    /// Initial load - fetch 14 days starting from today using range endpoint
+    private func initialLoad() async {
+        let today = DateFormatterService.apiDate.string(from: Date())
+
         isLoading = availability == nil
         error = nil
 
-        // Load availability and booking status in parallel
+        // Load availability (range) and booking status in parallel
         await withTaskGroup(of: Void.self) { group in
-            group.addTask { await self.loadAvailability() }
+            group.addTask { await self.fetchInitialRange(today: today) }
             group.addTask { await self.loadBookingStatus() }
         }
 
         isLoading = false
+    }
+
+    /// Fetch initial 14-day range, with fallback to single-day
+    private func fetchInitialRange(today: String) async {
+        do {
+            let response: AvailabilityRangeResponse = try await apiClient.request(
+                .availabilityRange(start: today, days: initialFetchDays), body: nil
+            )
+            cacheRangeResponse(response)
+
+            // Set current day's availability for display
+            if let todayData = response.days[today] {
+                availability = AvailabilityResponse(
+                    date: today,
+                    currentHour: todayData.currentHour,
+                    courts: todayData.courts,
+                    metadata: AvailabilityMetadata(
+                        generatedAt: response.metadata.generatedAt,
+                        usesRealtimeLogic: nil,
+                        timezone: response.metadata.timezone
+                    )
+                )
+            }
+            error = nil
+        } catch {
+            // Fallback to single-day fetch
+            await loadAvailabilitySingle(for: today)
+        }
     }
 
     /// Reload after a booking or cancellation - invalidates current date cache
@@ -108,81 +184,74 @@ final class DashboardViewModel: ObservableObject {
         await loadBookingStatus()
     }
 
-    func loadAvailability(forceRefresh: Bool = false) async {
+    func loadAvailability() async {
         // Cancel any in-flight request to prevent race conditions
         currentAvailabilityTask?.cancel()
 
         let dateString = DateFormatterService.apiDate.string(from: selectedDate)
         let cachedData = getCachedAvailability(for: dateString)
 
-        // Return cached data immediately if available (unless forcing refresh)
-        if !forceRefresh, let cached = cachedData {
-            availability = cached
-            prefetchAdjacentDates()
-            return
-        }
-
-        // Optimistic UI: show cached data immediately while refreshing
+        // Show cached data immediately (instant UI response)
         if let cached = cachedData {
             availability = cached
-            isRefreshing = true
+            // Refresh silently in background - no loading indicator needed
         } else {
             isLoading = true
         }
 
-        // Clear cache for this date if forcing refresh
-        if forceRefresh {
-            availabilityCache.removeValue(forKey: dateString)
-        }
-
-        // Create cancellable task for the API request
+        // Create cancellable task for the background refresh
         let task = Task { @MainActor [weak self] in
             guard let self = self else { return }
 
             defer {
                 self.isLoading = false
-                self.isRefreshing = false
             }
 
-            do {
-                try Task.checkCancellation()
+            // Fetch fresh data silently
+            await self.loadAvailabilitySingle(for: dateString)
 
-                let response: AvailabilityResponse = try await self.apiClient.request(
-                    .availability(date: dateString), body: nil
-                )
-
-                // Check cancellation after network call
-                try Task.checkCancellation()
-
-                self.cacheAvailability(response, for: dateString)
-                self.availability = response
-                self.error = nil
-                self.prefetchAdjacentDates()
-            } catch is CancellationError {
-                // Request was cancelled - ignore silently
-            } catch let apiError as APIError {
-                if !Task.isCancelled {
-                    // If we have cached data visible, show alert popup instead of inline error
-                    if self.availability != nil {
-                        self.connectionError = apiError.localizedDescription
-                    } else {
-                        self.error = apiError.localizedDescription
-                    }
-                }
-            } catch {
-                if !Task.isCancelled {
-                    // If we have cached data visible, show alert popup instead of inline error
-                    if self.availability != nil {
-                        self.connectionError = "Server nicht erreichbar"
-                    } else {
-                        self.error = "Fehler beim Laden der Platz-Übersicht"
-                    }
-                }
-            }
+            // Trigger prefetch check
+            self.checkAndPrefetch()
         }
 
         currentAvailabilityTask = task
         await task.value
+    }
+
+    /// Single-day fetch with caching and error handling
+    private func loadAvailabilitySingle(for dateString: String) async {
+        do {
+            try Task.checkCancellation()
+
+            let response: AvailabilityResponse = try await apiClient.request(
+                .availability(date: dateString), body: nil
+            )
+
+            try Task.checkCancellation()
+
+            cacheAvailability(response, for: dateString)
+            availability = response
+            error = nil
+        } catch is CancellationError {
+            // Request was cancelled - ignore silently
+        } catch let apiError as APIError {
+            if !Task.isCancelled {
+                handleLoadError(apiError.localizedDescription)
+            }
+        } catch {
+            if !Task.isCancelled {
+                handleLoadError("Server nicht erreichbar")
+            }
+        }
+    }
+
+    /// Handle load errors - show popup if cached data visible, inline error otherwise
+    private func handleLoadError(_ message: String) {
+        if availability != nil {
+            connectionError = message
+        } else {
+            error = message
+        }
     }
 
     func loadBookingStatus() async {
@@ -200,25 +269,57 @@ final class DashboardViewModel: ObservableObject {
         }
     }
 
-    private func prefetchAdjacentDates() {
+    /// Check if prefetch is needed and trigger range fetch if near cache edge
+    private func checkAndPrefetch() {
         Task.detached(priority: .low) { [weak self] in
             guard let self = self else { return }
+
             let calendar = Calendar.current
             let currentDate = await self.selectedDate
 
-            for offset in [-1, 1] {
-                if let adjacentDate = calendar.date(byAdding: .day, value: offset, to: currentDate) {
-                    let dateString = DateFormatterService.apiDate.string(from: adjacentDate)
-                    if await self.getCachedAvailability(for: dateString) == nil {
-                        do {
-                            let response: AvailabilityResponse = try await self.apiClient.request(.availability(date: dateString), body: nil)
-                            await self.cacheAvailability(response, for: dateString)
-                        } catch {
-                            // Silently ignore prefetch failures
-                        }
+            // Check ahead: is there a date within prefetchBuffer days that's not cached?
+            if let checkAheadDate = calendar.date(byAdding: .day, value: self.prefetchBuffer, to: currentDate) {
+                let checkAheadStr = DateFormatterService.apiDate.string(from: checkAheadDate)
+                if await !self.hasCachedData(for: checkAheadStr) {
+                    // Need to fetch ahead - start from tomorrow
+                    if let startAhead = calendar.date(byAdding: .day, value: 1, to: currentDate) {
+                        let startAheadStr = DateFormatterService.apiDate.string(from: startAhead)
+                        await self.fetchRangeIfNeeded(start: startAheadStr, days: self.prefetchDays)
                     }
                 }
             }
+
+            // Check behind: is there a date within prefetchBuffer days that's not cached?
+            if let checkBehindDate = calendar.date(byAdding: .day, value: -self.prefetchBuffer, to: currentDate) {
+                let checkBehindStr = DateFormatterService.apiDate.string(from: checkBehindDate)
+                if await !self.hasCachedData(for: checkBehindStr) {
+                    // Need to fetch behind - start 7 days ago
+                    if let startBehind = calendar.date(byAdding: .day, value: -self.prefetchDays, to: currentDate) {
+                        let startBehindStr = DateFormatterService.apiDate.string(from: startBehind)
+                        await self.fetchRangeIfNeeded(start: startBehindStr, days: self.prefetchDays)
+                    }
+                }
+            }
+        }
+    }
+
+    /// Fetch a range of dates in background, preventing duplicate requests
+    private func fetchRangeIfNeeded(start: String, days: Int) async {
+        let cacheKey = "\(start)-\(days)"
+
+        // Prevent duplicate fetches for same range
+        guard await !pendingRangeFetches.contains(cacheKey) else { return }
+
+        await MainActor.run { pendingRangeFetches.insert(cacheKey) }
+        defer { Task { @MainActor in pendingRangeFetches.remove(cacheKey) } }
+
+        do {
+            let response: AvailabilityRangeResponse = try await apiClient.request(
+                .availabilityRange(start: start, days: days), body: nil
+            )
+            await MainActor.run { self.cacheRangeResponse(response) }
+        } catch {
+            // Silently ignore prefetch failures
         }
     }
 
@@ -228,7 +329,7 @@ final class DashboardViewModel: ObservableObject {
         debounceTask = Task { @MainActor in
             do {
                 try await Task.sleep(nanoseconds: 200_000_000) // 200ms debounce
-                await loadAvailability(forceRefresh: true)
+                await loadAvailability()
             } catch {
                 // Debounce was cancelled - ignore
             }

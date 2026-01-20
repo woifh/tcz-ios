@@ -4,6 +4,11 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [6.1] - 2026-01-20
+### Changed
+- Faster calendar navigation with 14-day data preloading on app launch
+- Intelligent prefetching loads additional days as you navigate
+
 ## [6.0] - 2026-01-20
 ### Added
 - Profile pictures: upload and display your photo across the app

@@ -107,3 +107,48 @@ struct AvailabilityMetadata: Codable {
         case timezone
     }
 }
+
+// MARK: - Range API Response Models
+
+/// Response from /api/courts/availability/range endpoint
+struct AvailabilityRangeResponse: Codable {
+    let range: AvailabilityRange
+    let days: [String: DayAvailability]
+    let metadata: AvailabilityRangeMetadata
+}
+
+/// Range information from the response
+struct AvailabilityRange: Codable {
+    let start: String
+    let end: String
+    let daysRequested: Int
+
+    enum CodingKeys: String, CodingKey {
+        case start, end
+        case daysRequested = "days_requested"
+    }
+}
+
+/// Single day availability within a range response
+struct DayAvailability: Codable {
+    let currentHour: Int?
+    let courts: [CourtAvailability]
+
+    enum CodingKeys: String, CodingKey {
+        case currentHour = "current_hour"
+        case courts
+    }
+}
+
+/// Metadata for range response with cache hint
+struct AvailabilityRangeMetadata: Codable {
+    let generatedAt: String?
+    let timezone: String?
+    let cacheHintSeconds: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case generatedAt = "generated_at"
+        case timezone
+        case cacheHintSeconds = "cache_hint_seconds"
+    }
+}
