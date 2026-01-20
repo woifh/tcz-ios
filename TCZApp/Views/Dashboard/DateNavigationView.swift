@@ -9,6 +9,7 @@ struct DateNavigationView: View {
     let onToday: () -> Void
     let onDateSelected: () -> Void
 
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @State private var showDatePicker = false
     @State private var dateBeforePicker: Date?
     @State private var scrollToTodayTrigger = false
@@ -51,6 +52,7 @@ struct DateNavigationView: View {
         }) {
             DatePickerSheet(selectedDate: $selectedDate)
                 .presentationDetents([.medium])
+                .preferredColorScheme(appTheme.colorScheme)
         }
     }
 }

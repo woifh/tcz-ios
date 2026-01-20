@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @State private var showingLogoutAlert = false
     @State private var serverVersion: String?
     @State private var showAppChangelog = false
@@ -46,6 +47,22 @@ struct ProfileView: View {
                                 Image(systemName: "pencil.circle")
                                     .foregroundColor(.green)
                                 Text("Profil bearbeiten")
+                            }
+                        }
+                    }
+
+                    // Appearance section
+                    Section(header: Text("Darstellung")) {
+                        Picker(selection: $appTheme) {
+                            ForEach(AppTheme.allCases) { theme in
+                                Label(theme.displayName, systemImage: theme.iconName)
+                                    .tag(theme)
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "circle.lefthalf.filled")
+                                    .foregroundColor(.green)
+                                Text("Erscheinungsbild")
                             }
                         }
                     }
@@ -226,6 +243,7 @@ struct ProfileView: View {
                     isLoading: false,
                     error: appChangelogContent == nil ? "Changelog nicht gefunden" : nil
                 )
+                .preferredColorScheme(appTheme.colorScheme)
             }
             .sheet(isPresented: $showServerChangelog) {
                 ChangelogView(
@@ -234,6 +252,7 @@ struct ProfileView: View {
                     isLoading: serverChangelogLoading,
                     error: serverChangelogError
                 )
+                .preferredColorScheme(appTheme.colorScheme)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())

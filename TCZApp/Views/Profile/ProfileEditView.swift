@@ -114,15 +114,23 @@ struct ProfileEditView: View {
         let hasPicture = viewModel.hasProfilePicture
         return HStack(spacing: 16) {
             PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
-                Text(hasPicture ? "Ändern" : "Hinzufügen")
+                Image(systemName: hasPicture ? "pencil" : "plus")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.gray)
             }
             .buttonStyle(.bordered)
+            .tint(.gray)
 
             if hasPicture {
-                Button("Entfernen", role: .destructive) {
+                Button(role: .destructive) {
                     showDeleteConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.gray)
                 }
                 .buttonStyle(.bordered)
+                .tint(.gray)
             }
         }
     }

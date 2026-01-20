@@ -3,6 +3,7 @@ import SwiftUI
 struct FavoritesView: View {
     @ObservedObject var viewModel: FavoritesViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @State private var showingAddSheet = false
     @State private var favoriteToRemove: MemberSummary?
     @State private var showingRemoveAlert = false
@@ -53,6 +54,7 @@ struct FavoritesView: View {
             }
             .sheet(isPresented: $showingAddSheet) {
                 AddFavoriteSheet(viewModel: viewModel)
+                    .preferredColorScheme(appTheme.colorScheme)
             }
             .alert(isPresented: $showingRemoveAlert) {
                 Alert(

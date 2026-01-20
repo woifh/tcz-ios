@@ -5,6 +5,7 @@ struct CourtGridView: View {
     /// Callback when a slot is tapped: (courtId, courtNumber, time, slot)
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
 
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @State private var showLegend = false
     @State private var selectedPage: Int = 0
 
@@ -51,6 +52,7 @@ struct CourtGridView: View {
         .sheet(isPresented: $showLegend) {
             LegendSheet()
                 .presentationDetents([.height(260)])
+                .preferredColorScheme(appTheme.colorScheme)
         }
     }
 }

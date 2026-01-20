@@ -22,6 +22,7 @@ struct CancelConfirmationData: Identifiable {
 struct DashboardView: View {
     @ObservedObject var viewModel: DashboardViewModel
     @EnvironmentObject var authViewModel: AuthViewModel
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @State private var bookingSheetData: BookingSheetData?
     @State private var cancelConfirmation: CancelConfirmationData?
     @State private var isResendingVerification = false
@@ -150,6 +151,7 @@ struct DashboardView: View {
                         Task { await viewModel.loadData() }
                     }
                 )
+                .preferredColorScheme(appTheme.colorScheme)
             }
             .alert("Reservierung stornieren?", isPresented: Binding(
                 get: { cancelConfirmation != nil },
@@ -192,6 +194,7 @@ struct DashboardView: View {
         .sheet(isPresented: $showingProfile) {
             ProfileView()
                 .environmentObject(authViewModel)
+                .preferredColorScheme(appTheme.colorScheme)
         }
     }
 

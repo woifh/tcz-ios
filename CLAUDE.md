@@ -23,7 +23,7 @@ Clean build:
 xcodebuild -project TCZApp/TCZApp.xcodeproj -scheme TCZApp clean
 ```
 
-**Note:** These commands require full Xcode installation. If only Command Line Tools are installed, build from Xcode IDE instead.
+**Note:** On this machine, xcodebuild commands do not work. Always ask the user to build manually in the Xcode IDE to verify changes compile correctly.
 
 ## Architecture
 

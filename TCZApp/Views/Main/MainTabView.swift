@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @StateObject private var dashboardViewModel = DashboardViewModel()
     @StateObject private var reservationsViewModel = ReservationsViewModel()
     @StateObject private var favoritesViewModel = FavoritesViewModel()
@@ -40,6 +41,7 @@ struct MainTabView: View {
         .sheet(isPresented: $showingLogin) {
             LoginView()
                 .environmentObject(authViewModel)
+                .preferredColorScheme(appTheme.colorScheme)
         }
         .onChange(of: authViewModel.isAuthenticated) { isAuthenticated in
             if isAuthenticated {
