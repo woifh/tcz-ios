@@ -25,15 +25,14 @@ struct FavoritesView: View {
                 } else {
                     List {
                         ForEach(viewModel.favorites) { favorite in
-                            FavoriteRow(favorite: favorite)
-                                .swipeActions(edge: .trailing) {
-                                    Button(role: .destructive) {
-                                        favoriteToRemove = favorite
-                                        showingRemoveAlert = true
-                                    } label: {
-                                        Label("Entfernen", systemImage: "trash")
-                                    }
+                            FavoriteRow(
+                                favorite: favorite,
+                                isRemoving: viewModel.removingId == favorite.id,
+                                onRemove: {
+                                    favoriteToRemove = favorite
+                                    showingRemoveAlert = true
                                 }
+                            )
                         }
                     }
                     .listStyle(InsetGroupedListStyle())
@@ -92,6 +91,8 @@ struct FavoritesView: View {
 
 struct FavoriteRow: View {
     let favorite: MemberSummary
+    let isRemoving: Bool
+    let onRemove: () -> Void
 
     var body: some View {
         HStack {
@@ -105,6 +106,19 @@ struct FavoriteRow: View {
                 Text(favorite.email)
                     .font(.caption)
                     .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            if isRemoving {
+                ProgressView()
+            } else {
+                Button(action: onRemove) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.title2)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
         }
         .padding(.vertical, 4)

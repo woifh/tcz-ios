@@ -11,6 +11,7 @@ final class FavoritesViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var isSearching = false
     @Published var isAdding = false
+    @Published var removingId: String?
     @Published var error: String?
     @Published var searchQuery = ""
 
@@ -99,17 +100,22 @@ final class FavoritesViewModel: ObservableObject {
     func removeFavorite(_ favoriteId: String) async -> Bool {
         guard let userId = currentUserId else { return false }
 
+        removingId = favoriteId
+
         do {
             let _: RemoveFavoriteResponse = try await apiClient.request(
                 .removeFavorite(memberId: userId, favoriteId: favoriteId), body: nil
             )
             favorites.removeAll { $0.id == favoriteId }
+            removingId = nil
             return true
         } catch let apiError as APIError {
             error = apiError.localizedDescription
+            removingId = nil
             return false
         } catch {
             self.error = "Fehler beim Entfernen"
+            removingId = nil
             return false
         }
     }

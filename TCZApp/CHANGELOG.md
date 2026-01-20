@@ -8,6 +8,9 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Added
 - Unit test infrastructure covering ViewModels and Models
 
+### Changed
+- Favorites now show remove button directly instead of requiring swipe gesture
+
 ### Fixed
 - Error messages in booking modal now clear when selecting a different member
 - "No member found" message now scrolls into view when keyboard is open
