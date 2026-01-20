@@ -50,6 +50,8 @@
 		T100000000000006 /* BookingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T200000000000006 /* BookingViewModelTests.swift */; };
 		T100000000000007 /* ReservationsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T200000000000007 /* ReservationsViewModelTests.swift */; };
 		T100000000000008 /* ModelDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T200000000000008 /* ModelDecodingTests.swift */; };
+		T100000000000009 /* FavoritesViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T200000000000009 /* FavoritesViewModelTests.swift */; };
+		T100000000000010 /* ProfileViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T200000000000010 /* ProfileViewModelTests.swift */; };
 		0100000000000033 /* ProfilePictureCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000033 /* ProfilePictureCache.swift */; };
 		0100000000000034 /* ProfilePictureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000034 /* ProfilePictureView.swift */; };
 		0100000000000035 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000035 /* AppTheme.swift */; };
@@ -110,6 +112,8 @@
 		T200000000000006 /* BookingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookingViewModelTests.swift; sourceTree = "<group>"; };
 		T200000000000007 /* ReservationsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationsViewModelTests.swift; sourceTree = "<group>"; };
 		T200000000000008 /* ModelDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDecodingTests.swift; sourceTree = "<group>"; };
+		T200000000000009 /* FavoritesViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewModelTests.swift; sourceTree = "<group>"; };
+		T200000000000010 /* ProfileViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModelTests.swift; sourceTree = "<group>"; };
 		T300000000000002 /* TCZAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TCZAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0200000000000033 /* ProfilePictureCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureCache.swift; sourceTree = "<group>"; };
 		0200000000000034 /* ProfilePictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureView.swift; sourceTree = "<group>"; };
@@ -335,6 +339,8 @@
 				T200000000000005 /* DashboardViewModelTests.swift */,
 				T200000000000006 /* BookingViewModelTests.swift */,
 				T200000000000007 /* ReservationsViewModelTests.swift */,
+				T200000000000009 /* FavoritesViewModelTests.swift */,
+				T200000000000010 /* ProfileViewModelTests.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -522,6 +528,8 @@
 				T100000000000006 /* BookingViewModelTests.swift in Sources */,
 				T100000000000007 /* ReservationsViewModelTests.swift in Sources */,
 				T100000000000008 /* ModelDecodingTests.swift in Sources */,
+				T100000000000009 /* FavoritesViewModelTests.swift in Sources */,
+				T100000000000010 /* ProfileViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

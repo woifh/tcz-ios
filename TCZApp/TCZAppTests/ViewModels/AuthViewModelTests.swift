@@ -180,6 +180,8 @@ final class AuthViewModelTests: XCTestCase {
             notifyCourtBlocked: nil,
             notifyBookingOverridden: nil,
             emailVerified: nil,
+            hasProfilePicture: nil,
+            profilePictureVersion: nil,
             feePaid: nil,
             paymentConfirmationRequested: nil,
             paymentConfirmationRequestedAt: nil,

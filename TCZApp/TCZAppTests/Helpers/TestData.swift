@@ -21,6 +21,8 @@ enum TestData {
         "notify_court_blocked": true,
         "notify_booking_overridden": true,
         "email_verified": true,
+        "has_profile_picture": true,
+        "profile_picture_version": 1,
         "fee_paid": true,
         "payment_confirmation_requested": false,
         "role": "member",
@@ -47,6 +49,8 @@ enum TestData {
             "notify_court_blocked": true,
             "notify_booking_overridden": true,
             "email_verified": true,
+            "has_profile_picture": true,
+            "profile_picture_version": 1,
             "fee_paid": true,
             "payment_confirmation_requested": false,
             "role": "member",
@@ -61,7 +65,9 @@ enum TestData {
     {
         "id": "partner-id",
         "name": "Partner Name",
-        "email": "partner@example.com"
+        "email": "partner@example.com",
+        "has_profile_picture": false,
+        "profile_picture_version": null
     }
     """
 
@@ -71,7 +77,9 @@ enum TestData {
             {
                 "id": "partner-id",
                 "name": "Partner Name",
-                "email": "partner@example.com"
+                "email": "partner@example.com",
+                "has_profile_picture": false,
+                "profile_picture_version": null
             }
         ]
     }
