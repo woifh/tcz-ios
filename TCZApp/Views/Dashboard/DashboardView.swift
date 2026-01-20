@@ -182,9 +182,13 @@ struct DashboardView: View {
             }
             await viewModel.loadData()
         }
-        .onChange(of: authViewModel.currentUser?.id) { _ in
+        .onChange(of: authViewModel.currentUser?.id) { newId in
             viewModel.isPaymentConfirmationDismissed = false
             viewModel.isEmailVerificationDismissed = false
+            // Dismiss profile sheet on logout
+            if newId == nil {
+                showingProfile = false
+            }
         }
         .alert("E-Mail gesendet", isPresented: $showingVerificationSentAlert) {
             Button("OK", role: .cancel) { }

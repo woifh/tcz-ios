@@ -77,25 +77,21 @@ final class AuthViewModel: ObservableObject {
     }
 
     func logout() async {
-        isLoading = true
-
-        // Try to logout on server, but don't fail if it doesn't work
-        do {
-            try await apiClient.requestVoid(.logout, body: nil)
-        } catch {
-            print("Logout error: \(error)")
-        }
-
-        // Clear local state
+        // Clear local state immediately for instant UI feedback
         currentUser = nil
         isAuthenticated = false
         keychainService.delete(key: "currentUser")
         keychainService.delete(key: "accessToken")
-
-        // Clear auth (token and cookies)
         apiClient.clearAuth()
 
-        isLoading = false
+        // Fire server logout request in background (fire-and-forget)
+        Task.detached {
+            do {
+                try await APIClient.shared.requestVoid(.logout, body: nil)
+            } catch {
+                print("Logout error: \(error)")
+            }
+        }
     }
 
     private func checkStoredSession() {

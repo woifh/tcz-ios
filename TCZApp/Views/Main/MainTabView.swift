@@ -7,9 +7,10 @@ struct MainTabView: View {
     @StateObject private var reservationsViewModel = ReservationsViewModel()
     @StateObject private var favoritesViewModel = FavoritesViewModel()
     @State private var showingLogin = false
+    @State private var selectedTab = 0
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             DashboardView(viewModel: dashboardViewModel)
                 .tabItem {
                     Label("Uebersicht", systemImage: "calendar")
@@ -46,6 +47,11 @@ struct MainTabView: View {
         .onChange(of: authViewModel.isAuthenticated) { isAuthenticated in
             if isAuthenticated {
                 showingLogin = false
+                // Return to Dashboard tab on login
+                selectedTab = 0
+            } else {
+                // Return to Dashboard tab on logout
+                selectedTab = 0
             }
         }
     }

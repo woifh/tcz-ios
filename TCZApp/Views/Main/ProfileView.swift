@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @Environment(\.dismiss) private var dismiss
     @AppStorage("appTheme") private var appTheme: AppTheme = .system
     @State private var showingLogoutAlert = false
     @State private var serverVersion: String?
@@ -199,16 +200,11 @@ struct ProfileView: View {
                     }) {
                         HStack {
                             Spacer()
-                            if authViewModel.isLoading {
-                                ProgressView()
-                            } else {
-                                Text("Abmelden")
-                                    .foregroundColor(.red)
-                            }
+                            Text("Abmelden")
+                                .foregroundColor(.red)
                             Spacer()
                         }
                     }
-                    .disabled(authViewModel.isLoading)
                 }
             }
             .listStyle(InsetGroupedListStyle())
@@ -216,6 +212,8 @@ struct ProfileView: View {
             .alert("Abmelden?", isPresented: $showingLogoutAlert) {
                 Button("Abbrechen", role: .cancel) { }
                 Button("Abmelden", role: .destructive) {
+                    // Dismiss sheet first for instant feedback
+                    dismiss()
                     Task {
                         await authViewModel.logout()
                     }

@@ -14,6 +14,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 - Profile access moved to header: tap your profile picture to open settings
 - Simplified tab bar with 3 tabs (Dashboard, Bookings, Favorites)
 - Profile picture buttons now use icons instead of text
+- Logout is now instant with immediate navigation to the overview
 
 ## [5.2] - 2026-01-20
 ### Added
