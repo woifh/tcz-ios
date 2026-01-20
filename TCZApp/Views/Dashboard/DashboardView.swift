@@ -26,6 +26,7 @@ struct DashboardView: View {
     @State private var cancelConfirmation: CancelConfirmationData?
     @State private var isResendingVerification = false
     @State private var showingVerificationSentAlert = false
+    @State private var showingProfile = false
 
     private var paymentBannerState: PaymentBannerState? {
         guard let user = authViewModel.currentUser else { return nil }
@@ -54,6 +55,32 @@ struct DashboardView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
+                // App header with profile picture
+                HStack {
+                    HStack(spacing: 12) {
+                        Image("tcz_icon")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 56, height: 56)
+                            .clipShape(Circle())
+                        Text("Platz-Reservierung")
+                            .font(.title2.weight(.semibold))
+                    }
+
+                    Spacer()
+
+                    if let user = authViewModel.currentUser {
+                        Button {
+                            showingProfile = true
+                        } label: {
+                            ProfilePictureView(member: user, size: 56)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 10)
+
                 // Sticky header section
                 VStack(spacing: 12) {
                     // Payment reminder banner (only for authenticated users with unpaid fee)
@@ -109,20 +136,7 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal)
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    HStack(spacing: 8) {
-                        Image("tcz_icon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 32)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                        Text("TCZ Platz-Reservierung")
-                            .font(.headline)
-                    }
-                }
-            }
+            .navigationBarHidden(true)
             .sheet(item: $bookingSheetData) { data in
                 BookingSheet(
                     courtId: data.courtId,
@@ -174,6 +188,10 @@ struct DashboardView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("Eine Bestätigungs-E-Mail wurde gesendet. Bitte klicke auf den Link in der E-Mail.")
+        }
+        .sheet(isPresented: $showingProfile) {
+            ProfileView()
+                .environmentObject(authViewModel)
         }
     }
 

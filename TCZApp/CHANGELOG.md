@@ -9,6 +9,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 - Profile pictures: upload and display your photo across the app
 - Profile pictures shown in favorites list, member search, and bookings
 
+### Changed
+- Profile access moved to header: tap your profile picture to open settings
+- Simplified tab bar with 3 tabs (Dashboard, Bookings, Favorites)
+
 ## [5.2] - 2026-01-20
 ### Added
 - Unit test infrastructure covering ViewModels and Models

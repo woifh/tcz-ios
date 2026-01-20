@@ -27,12 +27,6 @@ struct MainTabView: View {
                         Label("Favoriten", systemImage: "star")
                     }
                     .tag(2)
-
-                ProfileView()
-                    .tabItem {
-                        Label("Profil", systemImage: "person")
-                    }
-                    .tag(3)
             } else {
                 // Login placeholder tab for anonymous users
                 LoginPlaceholderView(showingLogin: $showingLogin)
