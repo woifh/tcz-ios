@@ -53,11 +53,15 @@ enum SlotStatus: String, Codable {
 struct SuspendedReservation: Codable {
     let bookedFor: String
     let bookedForId: String
+    let bookedForHasProfilePicture: Bool?
+    let bookedForProfilePictureVersion: Int?
     let reservationId: Int
 
     enum CodingKeys: String, CodingKey {
         case bookedFor = "booked_for"
         case bookedForId = "booked_for_id"
+        case bookedForHasProfilePicture = "booked_for_has_profile_picture"
+        case bookedForProfilePictureVersion = "booked_for_profile_picture_version"
         case reservationId = "reservation_id"
     }
 }
@@ -66,8 +70,12 @@ struct SlotDetails: Codable {
     // For reservations
     let bookedFor: String?
     let bookedForId: String?
+    let bookedForHasProfilePicture: Bool?
+    let bookedForProfilePictureVersion: Int?
     let bookedBy: String?
     let bookedById: String?
+    let bookedByHasProfilePicture: Bool?
+    let bookedByProfilePictureVersion: Int?
     let reservationId: Int?
     let isShortNotice: Bool?
     let canCancel: Bool?
@@ -84,8 +92,12 @@ struct SlotDetails: Codable {
     enum CodingKeys: String, CodingKey {
         case bookedFor = "booked_for"
         case bookedForId = "booked_for_id"
+        case bookedForHasProfilePicture = "booked_for_has_profile_picture"
+        case bookedForProfilePictureVersion = "booked_for_profile_picture_version"
         case bookedBy = "booked_by"
         case bookedById = "booked_by_id"
+        case bookedByHasProfilePicture = "booked_by_has_profile_picture"
+        case bookedByProfilePictureVersion = "booked_by_profile_picture_version"
         case reservationId = "reservation_id"
         case isShortNotice = "is_short_notice"
         case canCancel = "can_cancel"

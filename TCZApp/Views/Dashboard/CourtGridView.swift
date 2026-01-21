@@ -219,22 +219,39 @@ struct TimeSlotCell: View {
 
                 case .reserved, .shortNotice:
                     if let details = slot.details {
-                        VStack(spacing: 0) {
-                            Text(details.bookedFor ?? "Gebucht")
-                                .font(.system(size: 11))
-                                .lineLimit(1)
-
-                            if let bookedBy = details.bookedBy,
-                               let bookedForId = details.bookedForId,
-                               let bookedById = details.bookedById,
-                               bookedForId != bookedById {
-                                Text("(von \(bookedBy))")
-                                    .font(.system(size: 9))
-                                    .lineLimit(1)
-                                    .opacity(0.9)
+                        VStack(spacing: 2) {
+                            // Avatar row (top-right aligned)
+                            if let memberId = details.bookedForId,
+                               details.bookedForHasProfilePicture == true {
+                                HStack {
+                                    Spacer()
+                                    ProfilePictureView(
+                                        memberId: memberId,
+                                        hasProfilePicture: true,
+                                        profilePictureVersion: details.bookedForProfilePictureVersion ?? 0,
+                                        name: details.bookedFor ?? "",
+                                        size: 16
+                                    )
+                                }
                             }
+
+                            // Text (centered)
+                            VStack(spacing: 0) {
+                                Text(details.bookedFor ?? "Gebucht")
+                                    .font(.system(size: 11))
+                                    .lineLimit(1)
+                                if let bookedBy = details.bookedBy,
+                                   let bookedForId = details.bookedForId,
+                                   let bookedById = details.bookedById,
+                                   bookedForId != bookedById {
+                                    Text("(\(bookedBy))")
+                                        .font(.system(size: 9))
+                                        .lineLimit(1)
+                                        .opacity(0.9)
+                                }
+                            }
+                            .multilineTextAlignment(.center)
                         }
-                        .multilineTextAlignment(.center)
                     } else {
                         Text("Gebucht")
                             .font(.system(size: 13))

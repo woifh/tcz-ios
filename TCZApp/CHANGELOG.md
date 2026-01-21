@@ -5,6 +5,9 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ## [Unreleased]
 
 ## [6.1] - 2026-01-20
+### Added
+- Profile pictures now shown in booking grid for reserved slots
+
 ### Changed
 - Faster calendar navigation with 14-day data preloading on app launch
 - Intelligent prefetching loads additional days as you navigate
