@@ -30,7 +30,8 @@ echo "PROJECT_ROOT: $PROJECT_ROOT"
 CHANGELOG="$PROJECT_ROOT/CHANGELOG.md"
 # TestFlight folder must be at repository root for Xcode Cloud to find it
 OUTPUT_DIR="$REPO_ROOT/TestFlight"
-OUTPUT_FILE="$OUTPUT_DIR/WhatToTest.de-DE.txt"
+# Generate for multiple locales (en-GB matches current TestFlight config, de-DE for future)
+LOCALES="en-GB de-DE"
 
 echo "Looking for changelog at: $CHANGELOG"
 
@@ -50,6 +51,7 @@ echo "Created output directory: $OUTPUT_DIR"
 # - Skip [Unreleased] section
 # - Capture from first ## [X.Y] until next ## [
 # - Clean up ### headers to plain text
+TEMP_FILE="$OUTPUT_DIR/WhatToTest.tmp"
 awk '
   /^## \[Unreleased\]/ { next }
   /^## \[[0-9]/ {
@@ -71,9 +73,16 @@ awk '
   }
   found && /^- / { print $0 }
   found && /^$/ { print }
-' "$CHANGELOG" > "$OUTPUT_FILE"
+' "$CHANGELOG" > "$TEMP_FILE"
 
-echo "TestFlight notes written to $OUTPUT_FILE"
+# Copy to all locale files
+for locale in $LOCALES; do
+    OUTPUT_FILE="$OUTPUT_DIR/WhatToTest.$locale.txt"
+    cp "$TEMP_FILE" "$OUTPUT_FILE"
+    echo "TestFlight notes written to $OUTPUT_FILE"
+done
+rm "$TEMP_FILE"
+
 echo "=== Contents ==="
-cat "$OUTPUT_FILE"
+cat "$OUTPUT_DIR/WhatToTest.en-GB.txt"
 echo "=== ci_post_xcodebuild.sh completed ==="
