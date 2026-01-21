@@ -52,20 +52,22 @@ final class AuthViewModel: ObservableObject {
             let credentials = LoginRequest(email: email, password: password)
             let response: LoginResponse = try await apiClient.request(.login, body: credentials)
 
-            // Store user info
-            currentUser = response.user
-            isAuthenticated = true
-
             // Store credentials securely for session restoration
             if let userData = try? JSONEncoder().encode(response.user) {
                 try? keychainService.save(key: "currentUser", data: userData)
             }
 
-            // Store and set access token for Bearer authentication
+            // Store and set access token BEFORE setting isAuthenticated
+            // This ensures push notification registration has a valid token
             if let tokenData = response.accessToken.data(using: .utf8) {
                 try? keychainService.save(key: "accessToken", data: tokenData)
             }
             apiClient.setAccessToken(response.accessToken)
+
+            // Set user and authentication state LAST
+            // (triggers onChange which calls pushService.reregisterIfNeeded)
+            currentUser = response.user
+            isAuthenticated = true
 
         } catch let error as APIError {
             errorMessage = error.localizedDescription

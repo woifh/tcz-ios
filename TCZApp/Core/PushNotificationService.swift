@@ -121,14 +121,9 @@ final class PushNotificationService: NSObject, ObservableObject {
         await updateAuthorizationStatus()
 
         if authorizationStatus == .authorized {
-            // Check for stored token
-            if let tokenData = keychainService.load(key: "apnsDeviceToken"),
-               let token = String(data: tokenData, encoding: .utf8) {
-                deviceToken = token
-                await sendTokenToServer(token)
-            } else {
-                registerForRemoteNotifications()
-            }
+            // Always request fresh token from APNs
+            // Token is environment-specific (sandbox vs production)
+            registerForRemoteNotifications()
         }
     }
 }
