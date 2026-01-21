@@ -19,6 +19,8 @@ enum APIEndpoint {
     case updateMember(memberId: String)
     case confirmPayment
     case resendVerificationEmail
+    case registerDeviceToken
+    case unregisterDeviceToken(token: String)
 
     var path: String {
         switch self {
@@ -59,17 +61,23 @@ enum APIEndpoint {
             return "/api/members/me/confirm-payment"
         case .resendVerificationEmail:
             return "/auth/resend-verification"
+        case .registerDeviceToken:
+            return "/api/notifications/device"
+        case .unregisterDeviceToken(let token):
+            let encoded = token.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? token
+            return "/api/notifications/device/\(encoded)"
         }
     }
 
     var method: HTTPMethod {
         switch self {
-        case .login, .createReservation, .addFavorite, .confirmPayment, .resendVerificationEmail:
+        case .login, .createReservation, .addFavorite, .confirmPayment, .resendVerificationEmail,
+             .registerDeviceToken:
             return .post
         case .logout, .availability, .availabilityRange, .reservations, .reservationStatus,
              .searchMembers, .favorites, .serverVersion, .serverChangelog, .getMember:
             return .get
-        case .cancelReservation, .removeFavorite:
+        case .cancelReservation, .removeFavorite, .unregisterDeviceToken:
             return .delete
         case .updateMember:
             return .put

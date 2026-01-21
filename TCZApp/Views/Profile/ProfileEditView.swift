@@ -4,6 +4,7 @@ import PhotosUI
 struct ProfileEditView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var pushService: PushNotificationService
     @Environment(\.dismiss) private var dismiss
 
     // Photo picker state
@@ -71,6 +72,7 @@ struct ProfileEditView: View {
             addressSection
             passwordSection
             notificationsSection
+            pushNotificationsSection
             messagesSection
         }
     }
@@ -227,6 +229,43 @@ struct ProfileEditView: View {
             Toggle("Buchungen anderer", isOn: $viewModel.notifyOtherBookings)
             Toggle("Platz gesperrt", isOn: $viewModel.notifyCourtBlocked)
             Toggle("Buchung ueberschrieben", isOn: $viewModel.notifyBookingOverridden)
+        }
+    }
+
+    private var pushNotificationsSection: some View {
+        Section(header: Text("Push-Benachrichtigungen")) {
+            if pushService.authorizationStatus == .denied {
+                HStack {
+                    Text("Push deaktiviert")
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button("Einstellungen") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                    .font(.footnote)
+                }
+            } else if pushService.authorizationStatus == .notDetermined {
+                Button("Push-Benachrichtigungen aktivieren") {
+                    Task {
+                        await pushService.requestAuthorization()
+                    }
+                }
+            } else {
+                Toggle("Push aktiviert", isOn: $viewModel.pushNotificationsEnabled)
+                pushNotificationToggles
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var pushNotificationToggles: some View {
+        if viewModel.pushNotificationsEnabled {
+            Toggle("Eigene Buchungen", isOn: $viewModel.pushNotifyOwnBookings)
+            Toggle("Buchungen fuer dich", isOn: $viewModel.pushNotifyOtherBookings)
+            Toggle("Platz gesperrt", isOn: $viewModel.pushNotifyCourtBlocked)
+            Toggle("Buchung ueberschrieben", isOn: $viewModel.pushNotifyBookingOverridden)
         }
     }
 

@@ -15,12 +15,19 @@ final class ProfileViewModel: ObservableObject {
     @Published var password = ""
     @Published var confirmPassword = ""
 
-    // Notification preferences
+    // Email notification preferences
     @Published var notificationsEnabled = true
     @Published var notifyOwnBookings = true
     @Published var notifyOtherBookings = true
     @Published var notifyCourtBlocked = true
     @Published var notifyBookingOverridden = true
+
+    // Push notification preferences
+    @Published var pushNotificationsEnabled = true
+    @Published var pushNotifyOwnBookings = true
+    @Published var pushNotifyOtherBookings = true
+    @Published var pushNotifyCourtBlocked = true
+    @Published var pushNotifyBookingOverridden = true
 
     // State management
     @Published var isLoading = false
@@ -64,6 +71,11 @@ final class ProfileViewModel: ObservableObject {
             self.notifyOtherBookings = member.notifyOtherBookings ?? true
             self.notifyCourtBlocked = member.notifyCourtBlocked ?? true
             self.notifyBookingOverridden = member.notifyBookingOverridden ?? true
+            self.pushNotificationsEnabled = member.pushNotificationsEnabled ?? true
+            self.pushNotifyOwnBookings = member.pushNotifyOwnBookings ?? true
+            self.pushNotifyOtherBookings = member.pushNotifyOtherBookings ?? true
+            self.pushNotifyCourtBlocked = member.pushNotifyCourtBlocked ?? true
+            self.pushNotifyBookingOverridden = member.pushNotifyBookingOverridden ?? true
             self.hasProfilePicture = member.hasProfilePicture ?? false
             self.profilePictureVersion = member.profilePictureVersion ?? 0
         } catch let apiError as APIError {
@@ -142,7 +154,12 @@ final class ProfileViewModel: ObservableObject {
             notifyOwnBookings: notifyOwnBookings,
             notifyOtherBookings: notifyOtherBookings,
             notifyCourtBlocked: notifyCourtBlocked,
-            notifyBookingOverridden: notifyBookingOverridden
+            notifyBookingOverridden: notifyBookingOverridden,
+            pushNotificationsEnabled: pushNotificationsEnabled,
+            pushNotifyOwnBookings: pushNotifyOwnBookings,
+            pushNotifyOtherBookings: pushNotifyOtherBookings,
+            pushNotifyCourtBlocked: pushNotifyCourtBlocked,
+            pushNotifyBookingOverridden: pushNotifyBookingOverridden
         )
 
         do {

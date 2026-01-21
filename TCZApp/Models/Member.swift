@@ -17,6 +17,11 @@ struct Member: Codable, Identifiable, Equatable {
     let notifyOtherBookings: Bool?
     let notifyCourtBlocked: Bool?
     let notifyBookingOverridden: Bool?
+    let pushNotificationsEnabled: Bool?
+    let pushNotifyOwnBookings: Bool?
+    let pushNotifyOtherBookings: Bool?
+    let pushNotifyCourtBlocked: Bool?
+    let pushNotifyBookingOverridden: Bool?
 
     // Email verification
     let emailVerified: Bool?
@@ -43,6 +48,11 @@ struct Member: Codable, Identifiable, Equatable {
         case notifyOtherBookings = "notify_other_bookings"
         case notifyCourtBlocked = "notify_court_blocked"
         case notifyBookingOverridden = "notify_booking_overridden"
+        case pushNotificationsEnabled = "push_notifications_enabled"
+        case pushNotifyOwnBookings = "push_notify_own_bookings"
+        case pushNotifyOtherBookings = "push_notify_other_bookings"
+        case pushNotifyCourtBlocked = "push_notify_court_blocked"
+        case pushNotifyBookingOverridden = "push_notify_booking_overridden"
         case emailVerified = "email_verified"
         case hasProfilePicture = "has_profile_picture"
         case profilePictureVersion = "profile_picture_version"
@@ -159,6 +169,11 @@ struct ProfileUpdateRequest: Encodable {
     let notifyOtherBookings: Bool
     let notifyCourtBlocked: Bool
     let notifyBookingOverridden: Bool
+    let pushNotificationsEnabled: Bool
+    let pushNotifyOwnBookings: Bool
+    let pushNotifyOtherBookings: Bool
+    let pushNotifyCourtBlocked: Bool
+    let pushNotifyBookingOverridden: Bool
 
     enum CodingKeys: String, CodingKey {
         case firstname, lastname, email, street, city, phone, password
@@ -168,6 +183,11 @@ struct ProfileUpdateRequest: Encodable {
         case notifyOtherBookings = "notify_other_bookings"
         case notifyCourtBlocked = "notify_court_blocked"
         case notifyBookingOverridden = "notify_booking_overridden"
+        case pushNotificationsEnabled = "push_notifications_enabled"
+        case pushNotifyOwnBookings = "push_notify_own_bookings"
+        case pushNotifyOtherBookings = "push_notify_other_bookings"
+        case pushNotifyCourtBlocked = "push_notify_court_blocked"
+        case pushNotifyBookingOverridden = "push_notify_booking_overridden"
     }
 }
 

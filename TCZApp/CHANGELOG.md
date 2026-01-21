@@ -4,6 +4,12 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [8.0] - 2026-01-21
+### Added
+- Push notifications: receive instant alerts when someone books a court for you
+- Separate notification settings for email and push notifications
+- Configure which notification types you want to receive for each channel
+
 ## [7.1] - 2026-01-21
 ### Fixed
 - Selected date now preserved when switching between tabs
