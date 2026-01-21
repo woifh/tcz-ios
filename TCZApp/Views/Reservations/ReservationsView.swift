@@ -32,7 +32,8 @@ struct ReservationsView: View {
                                         onCancel: {
                                             reservationToCancel = reservation
                                             showingCancelAlert = true
-                                        }
+                                        },
+                                        showBookedBy: true
                                     )
                                 }
                             }
@@ -47,7 +48,8 @@ struct ReservationsView: View {
                                         onCancel: {
                                             reservationToCancel = reservation
                                             showingCancelAlert = true
-                                        }
+                                        },
+                                        showBookedBy: false
                                     )
                                 }
                             }
@@ -100,6 +102,7 @@ struct ReservationRow: View {
     let reservation: Reservation
     let isCancelling: Bool
     let onCancel: () -> Void
+    let showBookedBy: Bool  // true for "Meine Buchungen", false for "Buchungen für andere"
 
     var body: some View {
         HStack {
@@ -147,11 +150,19 @@ struct ReservationRow: View {
                         .foregroundColor(Color(red: 113/255, green: 63/255, blue: 18/255))
                 }
 
-                if let bookedFor = reservation.bookedFor,
-                   reservation.bookedForId != reservation.bookedById {
-                    Text("Für: \(bookedFor)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                // Show who booked/who it's for when booker differs from recipient
+                if reservation.bookedForId != reservation.bookedById {
+                    if showBookedBy, let bookedBy = reservation.bookedBy {
+                        // In "Meine Buchungen": show who booked it for me
+                        Text("Von: \(bookedBy)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    } else if !showBookedBy, let bookedFor = reservation.bookedFor {
+                        // In "Buchungen für andere": show who it's for
+                        Text("Für: \(bookedFor)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
 
