@@ -4,6 +4,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [8.1] - 2026-01-21
+### Added
+- Take profile selfies directly with front camera
+
 ## [8.0] - 2026-01-21
 ### Added
 - Push notifications: receive instant alerts when someone books a court for you

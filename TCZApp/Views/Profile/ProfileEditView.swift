@@ -10,6 +10,9 @@ struct ProfileEditView: View {
     // Photo picker state
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showDeleteConfirmation = false
+    @State private var showImageSourceDialog = false
+    @State private var showCamera = false
+    @State private var showPhotoLibrary = false
 
     var body: some View {
         mainContent
@@ -28,6 +31,24 @@ struct ProfileEditView: View {
             } message: {
                 Text("Möchtest du dein Profilbild wirklich entfernen?")
             }
+            .confirmationDialog("Profilbild auswählen", isPresented: $showImageSourceDialog, titleVisibility: .visible) {
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    Button("Foto aufnehmen") {
+                        showCamera = true
+                    }
+                }
+                Button("Aus Fotomediathek") {
+                    showPhotoLibrary = true
+                }
+                Button("Abbrechen", role: .cancel) { }
+            }
+            .fullScreenCover(isPresented: $showCamera) {
+                CameraPicker { image in
+                    Task { await handleCapturedImage(image) }
+                }
+                .ignoresSafeArea()
+            }
+            .photosPicker(isPresented: $showPhotoLibrary, selection: $selectedPhotoItem, matching: .images)
     }
 
     @ViewBuilder
@@ -115,7 +136,9 @@ struct ProfileEditView: View {
     private var profilePictureButtons: some View {
         let hasPicture = viewModel.hasProfilePicture
         return HStack(spacing: 16) {
-            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+            Button {
+                showImageSourceDialog = true
+            } label: {
                 Image(systemName: hasPicture ? "pencil" : "plus")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.gray)
@@ -333,6 +356,16 @@ struct ProfileEditView: View {
             if let updatedMember = await viewModel.deleteProfilePicture() {
                 authViewModel.updateCurrentUser(updatedMember)
             }
+        }
+    }
+
+    private func handleCapturedImage(_ image: UIImage) async {
+        guard let jpegData = image.jpegData(compressionQuality: 0.9) else {
+            return
+        }
+
+        if let updatedMember = await viewModel.uploadProfilePicture(imageData: jpegData) {
+            authViewModel.updateCurrentUser(updatedMember)
         }
     }
 }

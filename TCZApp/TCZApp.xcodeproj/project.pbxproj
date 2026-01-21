@@ -45,6 +45,7 @@
 		0100000000000036 /* LayoutConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000036 /* LayoutConstants.swift */; };
 		0100000000000037 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000037 /* AppDelegate.swift */; };
 		0100000000000038 /* PushNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000038 /* PushNotificationService.swift */; };
+		0100000000000039 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000039 /* CameraPicker.swift */; };
 		054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 054C411D2F1AEE2000407174 /* CHANGELOG.md */; };
 		05B623BC2F1D73E40027C4DD /* PaymentReminderBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */; };
 		05B623BD2F1D73E50027C4DD /* EmailVerificationBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */; };
@@ -109,6 +110,7 @@
 		0200000000000036 /* LayoutConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutConstants.swift; sourceTree = "<group>"; };
 		0200000000000037 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0200000000000038 /* PushNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationService.swift; sourceTree = "<group>"; };
+		0200000000000039 /* CameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
 		0300000000000001 /* TCZApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TCZApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C411D2F1AEE2000407174 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		057A09C02F2100AC003AC821 /* TCZApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TCZApp.entitlements; sourceTree = "<group>"; };
@@ -297,6 +299,7 @@
 		0500000000000015 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				0200000000000039 /* CameraPicker.swift */,
 				05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */,
 				05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */,
 				0200000000000011 /* LoadingView.swift */,
@@ -527,6 +530,7 @@
 				0100000000000036 /* LayoutConstants.swift in Sources */,
 				0100000000000037 /* AppDelegate.swift in Sources */,
 				0100000000000038 /* PushNotificationService.swift in Sources */,
+				0100000000000039 /* CameraPicker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -705,7 +709,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.0;
+				MARKETING_VERSION = 8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -736,7 +740,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8.0;
+				MARKETING_VERSION = 8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
