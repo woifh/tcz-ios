@@ -10,6 +10,7 @@ struct EmptyStateView: View {
             Image(systemName: icon)
                 .font(.system(size: 50))
                 .foregroundColor(.secondary)
+                .accessibilityHidden(true)
 
             Text(title)
                 .font(.headline)
@@ -22,6 +23,8 @@ struct EmptyStateView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title). \(message)")
     }
 }
 

@@ -10,8 +10,13 @@ final class ProfilePictureCache {
     private let cacheDirectory: URL
 
     private init() {
-        // Use Caches directory for disk storage
-        let cacheDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        // Use Caches directory for disk storage, with fallback to temporary directory
+        let cacheDir: URL
+        if let cachesDir = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first {
+            cacheDir = cachesDir
+        } else {
+            cacheDir = fileManager.temporaryDirectory
+        }
         cacheDirectory = cacheDir.appendingPathComponent("ProfilePictures", isDirectory: true)
 
         // Create directory if needed

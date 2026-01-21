@@ -82,7 +82,7 @@ struct LoginView: View {
                     Spacer()
                 }
             }
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .onSubmit {

@@ -53,19 +53,29 @@ struct Member: Codable, Identifiable, Equatable {
         case isActive = "is_active"
     }
 
-    // Payment state helpers
+    // MARK: - Presentation Helpers
+    // Note: These computed properties are presentation logic for determining what UI elements to show.
+    // While they could be moved to ViewModels, they're kept here for convenience since they depend
+    // only on model properties and have no side effects. Consider moving to ViewModels if the
+    // logic becomes more complex or requires external dependencies.
+
+    /// Returns true if the payment reminder banner should be shown.
+    /// Shows when: fee is not paid AND no confirmation request is pending.
     var shouldShowPaymentReminder: Bool {
         guard let feePaid = feePaid else { return false }
         if feePaid { return false }
         return !(paymentConfirmationRequested ?? false)
     }
 
+    /// Returns true if a payment confirmation has been requested but not yet processed.
+    /// Shows when: fee is not paid AND confirmation has been requested.
     var hasPendingPaymentConfirmation: Bool {
         guard let feePaid = feePaid, !feePaid else { return false }
         return paymentConfirmationRequested ?? false
     }
 
-    // Email verification helper
+    /// Returns true if the email verification reminder should be shown.
+    /// Shows when: email is explicitly marked as not verified.
     var shouldShowEmailVerificationReminder: Bool {
         guard let verified = emailVerified else { return false }
         return !verified

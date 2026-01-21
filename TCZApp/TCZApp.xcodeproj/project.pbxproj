@@ -55,6 +55,7 @@
 		0100000000000033 /* ProfilePictureCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000033 /* ProfilePictureCache.swift */; };
 		0100000000000034 /* ProfilePictureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000034 /* ProfilePictureView.swift */; };
 		0100000000000035 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000035 /* AppTheme.swift */; };
+		0100000000000036 /* LayoutConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0200000000000036 /* LayoutConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +119,7 @@
 		0200000000000033 /* ProfilePictureCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureCache.swift; sourceTree = "<group>"; };
 		0200000000000034 /* ProfilePictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePictureView.swift; sourceTree = "<group>"; };
 		0200000000000035 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		0200000000000036 /* LayoutConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +180,7 @@
 				0200000000000035 /* AppTheme.swift */,
 				0200000000000028 /* DateFormatterService.swift */,
 				0200000000000026 /* KeychainService.swift */,
+				0200000000000036 /* LayoutConstants.swift */,
 				0200000000000033 /* ProfilePictureCache.swift */,
 			);
 			path = Core;
@@ -513,6 +516,7 @@
 				0100000000000033 /* ProfilePictureCache.swift in Sources */,
 				0100000000000034 /* ProfilePictureView.swift in Sources */,
 				0100000000000035 /* AppTheme.swift in Sources */,
+				0100000000000036 /* LayoutConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -689,7 +693,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.1;
+				MARKETING_VERSION = 7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -718,7 +722,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.1;
+				MARKETING_VERSION = 7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tcz.tennisapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

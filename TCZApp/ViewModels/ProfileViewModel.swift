@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
@@ -194,14 +193,15 @@ final class ProfileViewModel: ObservableObject {
 
     // MARK: - Profile Picture
 
-    func uploadProfilePicture(_ image: UIImage) async -> Member? {
+    /// Upload a profile picture from JPEG data.
+    /// The view is responsible for converting UIImage to JPEG Data before calling this method.
+    func uploadProfilePicture(imageData: Data) async -> Member? {
         guard let memberId = memberId else {
             error = "Benutzer-ID fehlt"
             return nil
         }
 
-        // Compress to JPEG
-        guard let imageData = image.jpegData(compressionQuality: 0.9) else {
+        guard !imageData.isEmpty else {
             error = "Bild konnte nicht verarbeitet werden"
             return nil
         }

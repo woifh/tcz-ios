@@ -112,6 +112,7 @@ struct FavoriteRow: View {
 
             if isRemoving {
                 ProgressView()
+                    .accessibilityLabel("Wird entfernt")
             } else {
                 Button(action: onRemove) {
                     Image(systemName: "xmark.circle.fill")
@@ -119,15 +120,19 @@ struct FavoriteRow: View {
                         .font(.title2)
                 }
                 .buttonStyle(PlainButtonStyle())
+                .accessibilityLabel("Favorit entfernen")
+                .accessibilityHint("Doppeltippen, um \(favorite.name) aus den Favoriten zu entfernen")
             }
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(favorite.name), \(favorite.email)")
     }
 }
 
 struct AddFavoriteSheet: View {
     @ObservedObject var viewModel: FavoritesViewModel
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
 
     var body: some View {
@@ -197,7 +202,7 @@ struct AddFavoriteSheet: View {
                             Button {
                                 Task {
                                     if await viewModel.addFavorite(member.id) {
-                                        presentationMode.wrappedValue.dismiss()
+                                        dismiss()
                                     }
                                 }
                             } label: {
@@ -221,7 +226,7 @@ struct AddFavoriteSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
             }

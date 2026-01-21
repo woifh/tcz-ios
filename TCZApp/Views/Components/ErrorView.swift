@@ -9,6 +9,7 @@ struct ErrorView: View {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 50))
                 .foregroundColor(.orange)
+                .accessibilityHidden(true)
 
             Text("Fehler")
                 .font(.headline)
@@ -22,9 +23,11 @@ struct ErrorView: View {
             Button("Erneut versuchen", action: retryAction)
                 .buttonStyle(.borderedProminent)
                 .tint(.green)
+                .accessibilityHint("Doppeltippen, um die Anfrage erneut zu senden")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+        .accessibilityElement(children: .contain)
     }
 }
 

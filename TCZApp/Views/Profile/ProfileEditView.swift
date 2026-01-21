@@ -270,8 +270,13 @@ struct ProfileEditView: View {
                 return
             }
 
+            // Convert to JPEG data in the View layer (keeps UIKit out of ViewModel)
+            guard let jpegData = uiImage.jpegData(compressionQuality: 0.9) else {
+                return
+            }
+
             // Upload the image
-            if let updatedMember = await viewModel.uploadProfilePicture(uiImage) {
+            if let updatedMember = await viewModel.uploadProfilePicture(imageData: jpegData) {
                 authViewModel.updateCurrentUser(updatedMember)
             }
 

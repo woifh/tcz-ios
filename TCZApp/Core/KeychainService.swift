@@ -22,8 +22,14 @@ final class KeychainService: KeychainServiceProtocol {
             kSecValueData as String: data
         ]
 
-        // Delete any existing item
-        SecItemDelete(query as CFDictionary)
+        // Delete any existing item first
+        let deleteStatus = SecItemDelete(query as CFDictionary)
+        // Only errSecItemNotFound is acceptable (item didn't exist)
+        if deleteStatus != errSecSuccess && deleteStatus != errSecItemNotFound {
+            #if DEBUG
+            print("Warning: Failed to delete existing keychain item before save: \(deleteStatus)")
+            #endif
+        }
 
         // Add new item
         let status = SecItemAdd(query as CFDictionary, nil)
@@ -44,6 +50,11 @@ final class KeychainService: KeychainServiceProtocol {
         let status = SecItemCopyMatching(query as CFDictionary, &result)
 
         guard status == errSecSuccess else {
+            #if DEBUG
+            if status != errSecItemNotFound {
+                print("Keychain load failed with status: \(status)")
+            }
+            #endif
             return nil
         }
 
@@ -57,12 +68,28 @@ final class KeychainService: KeychainServiceProtocol {
             kSecAttrAccount as String: key
         ]
 
-        SecItemDelete(query as CFDictionary)
+        let status = SecItemDelete(query as CFDictionary)
+        #if DEBUG
+        if status != errSecSuccess && status != errSecItemNotFound {
+            print("Warning: Keychain delete failed with status: \(status)")
+        }
+        #endif
     }
 }
 
-enum KeychainError: Error {
+enum KeychainError: Error, LocalizedError {
     case saveFailed(OSStatus)
     case loadFailed(OSStatus)
     case deleteFailed(OSStatus)
+
+    var errorDescription: String? {
+        switch self {
+        case .saveFailed(let status):
+            return "Keychain save failed with status: \(status)"
+        case .loadFailed(let status):
+            return "Keychain load failed with status: \(status)"
+        case .deleteFailed(let status):
+            return "Keychain delete failed with status: \(status)"
+        }
+    }
 }

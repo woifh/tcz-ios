@@ -4,6 +4,12 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [7.0] - 2026-01-21
+### Changed
+- Improved app stability and code quality
+- Better accessibility support with VoiceOver labels
+- Thread-safe operations for smoother performance
+
 ## [6.1] - 2026-01-20
 ### Added
 - Profile pictures now shown in booking grid for reserved slots

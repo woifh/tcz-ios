@@ -157,7 +157,7 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal)
             }
-            .navigationBarHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(item: $bookingSheetData) { data in
                 BookingSheet(
                     courtId: data.courtId,

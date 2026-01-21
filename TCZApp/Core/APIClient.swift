@@ -21,8 +21,14 @@ final class APIClient: APIClientProtocol {
     private let decoder: JSONDecoder
     // Keep a strong reference to the delegate to prevent deallocation
     private let redirectBlocker: RedirectBlocker
-    // Bearer token for API authentication
-    private var accessToken: String?
+    // Thread-safe token access using lock
+    private let tokenLock = NSLock()
+    private var _accessToken: String?
+    // Bearer token for API authentication (thread-safe accessor)
+    private var accessToken: String? {
+        get { tokenLock.withLock { _accessToken } }
+        set { tokenLock.withLock { _accessToken = newValue } }
+    }
     // Callback for handling unauthorized responses (session expired)
     private var onUnauthorized: (() -> Void)?
 
@@ -31,12 +37,21 @@ final class APIClient: APIClientProtocol {
         // To find your Mac's IP: run `ipconfig getifaddr en0` in Terminal
         #if DEBUG
             #if targetEnvironment(simulator)
-            self.baseURL = URL(string: "http://localhost:5001")!
+            guard let url = URL(string: "http://localhost:5001") else {
+                fatalError("Invalid base URL configuration for simulator")
+            }
+            self.baseURL = url
             #else
-            self.baseURL = URL(string: "http://10.0.0.147:5001")!  // Your Mac's local IP
+            guard let url = URL(string: "http://10.0.0.147:5001") else {
+                fatalError("Invalid base URL configuration for device")
+            }
+            self.baseURL = url  // Your Mac's local IP
             #endif
         #else
-        self.baseURL = URL(string: "https://woifh.pythonanywhere.com")!
+        guard let url = URL(string: "https://woifh.pythonanywhere.com") else {
+            fatalError("Invalid base URL configuration for production")
+        }
+        self.baseURL = url
         #endif
 
         // Configure session with cookie storage for Flask session management
@@ -249,11 +264,17 @@ final class APIClient: APIClientProtocol {
 
         // Build multipart body
         var body = Data()
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"profile.jpg\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        guard let boundaryStart = "--\(boundary)\r\n".data(using: .utf8),
+              let contentDisposition = "Content-Disposition: form-data; name=\"file\"; filename=\"profile.jpg\"\r\n".data(using: .utf8),
+              let contentType = "Content-Type: image/jpeg\r\n\r\n".data(using: .utf8),
+              let boundaryEnd = "\r\n--\(boundary)--\r\n".data(using: .utf8) else {
+            throw APIError.invalidData
+        }
+        body.append(boundaryStart)
+        body.append(contentDisposition)
+        body.append(contentType)
         body.append(imageData)
-        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        body.append(boundaryEnd)
 
         request.httpBody = body
 

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BookingSheet: View {
     @StateObject private var viewModel = BookingViewModel()
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     // Store booking details directly in the view
     let courtId: Int
@@ -161,7 +161,7 @@ struct BookingSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Abbrechen") {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     }
                 }
 

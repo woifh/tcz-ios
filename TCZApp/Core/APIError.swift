@@ -2,6 +2,7 @@ import Foundation
 
 enum APIError: Error, LocalizedError {
     case invalidResponse
+    case invalidData
     case unauthorized
     case forbidden(String)
     case notFound
@@ -15,6 +16,8 @@ enum APIError: Error, LocalizedError {
         switch self {
         case .invalidResponse:
             return "Ungueltige Antwort vom Server"
+        case .invalidData:
+            return "Fehler beim Erstellen der Anfragedaten"
         case .unauthorized:
             return "Bitte melde dich erneut an"
         case .forbidden(let message):

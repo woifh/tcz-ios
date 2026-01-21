@@ -26,6 +26,7 @@ struct ProfilePictureView: View {
         .task(id: cacheKey) {
             await loadImage()
         }
+        .accessibilityLabel("Profilbild von \(name)")
     }
 
     private var initialsView: some View {
