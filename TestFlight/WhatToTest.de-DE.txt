@@ -1,0 +1,9 @@
+Version 6.1
+
+Added:
+- Profile pictures now shown in booking grid for reserved slots
+
+Changed:
+- Faster calendar navigation with 14-day data preloading on app launch
+- Intelligent prefetching loads additional days as you navigate
+

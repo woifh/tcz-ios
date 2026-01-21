@@ -4,6 +4,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [7.1] - 2026-01-21
+### Fixed
+- Selected date now preserved when switching between tabs
+
 ## [7.0] - 2026-01-21
 ### Changed
 - Improved app stability and code quality

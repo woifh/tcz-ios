@@ -46,6 +46,9 @@ final class DashboardViewModel: ObservableObject {
     private var currentAvailabilityTask: Task<Void, Never>?
     private var debounceTask: Task<Void, Never>?
 
+    // Track if initial load has completed to avoid resetting to today on tab return
+    private var hasPerformedInitialLoad = false
+
     // Time slots: 08:00 to 21:00 (14 slots)
     let timeSlots = (8..<22).map { String(format: "%02d:00", $0) }
     let courtNumbers = [1, 2, 3, 4, 5, 6]
@@ -117,7 +120,13 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func loadData() async {
-        await initialLoad()
+        if hasPerformedInitialLoad {
+            // Already loaded once - refresh for the selected date, not today
+            await loadAvailability()
+        } else {
+            await initialLoad()
+            hasPerformedInitialLoad = true
+        }
     }
 
     /// Initial load - fetch 14 days starting from today using range endpoint
