@@ -16,61 +16,53 @@ struct BookingSheet: View {
 
     var body: some View {
         NavigationView {
-            ScrollViewReader { scrollProxy in
+            VStack(spacing: 0) {
                 Form {
-                Section(header: Text("Buchungsdetails")) {
-                    HStack {
-                        Text("Datum")
-                        Spacer()
-                        Text(formattedDate)
-                            .foregroundColor(.secondary)
-                    }
-                    HStack {
-                        Text("Platz")
-                        Spacer()
-                        Text("Platz \(courtNumber)")
-                            .foregroundColor(.secondary)
-                    }
-                    HStack {
-                        Text("Uhrzeit")
-                        Spacer()
-                        Text(timeRange)
-                            .foregroundColor(.secondary)
-                    }
-                }
-
-                Section(header: Text("Gebucht für")) {
-                    if viewModel.isLoadingFavorites {
+                    // 1. Booking details section
+                    Section(header: Text("Buchungsdetails")) {
                         HStack {
-                            ProgressView()
-                            Text("Lade Favoriten...")
+                            Text("Platz")
+                            Spacer()
+                            Text("Platz \(courtNumber)")
                                 .foregroundColor(.secondary)
                         }
-                    } else {
-                        Picker("Mitglied", selection: $viewModel.selectedMemberId) {
-                            Text(currentUserName)
-                                .tag(currentUserId as String?)
-
-                            ForEach(viewModel.favorites) { favorite in
-                                Text(favorite.name)
-                                    .tag(favorite.id as String?)
-                            }
+                        HStack {
+                            Text("Datum")
+                            Spacer()
+                            Text(formattedDate)
+                                .foregroundColor(.secondary)
                         }
-
-                        Button {
-                            viewModel.toggleSearch()
-                        } label: {
-                            HStack {
-                                Image(systemName: viewModel.showSearch ? "xmark.circle" : "magnifyingglass")
-                                Text(viewModel.showSearch ? "Suche schliessen" : "Anderes Mitglied suchen")
-                            }
+                        HStack {
+                            Text("Uhrzeit")
+                            Spacer()
+                            Text(timeRange)
+                                .foregroundColor(.secondary)
                         }
-                        .foregroundColor(.blue)
                     }
-                }
 
-                if viewModel.showSearch {
-                    Section(header: Text("Mitglied suchen")) {
+                    // 2. Member picker section
+                    Section(header: Text("Buchung für")) {
+                        if viewModel.isLoadingFavorites {
+                            HStack {
+                                ProgressView()
+                                Text("Lade Favoriten...")
+                                    .foregroundColor(.secondary)
+                            }
+                        } else {
+                            Picker("Mitglied", selection: $viewModel.selectedMemberId) {
+                                Text(currentUserName)
+                                    .tag(currentUserId as String?)
+
+                                ForEach(viewModel.favorites) { favorite in
+                                    Text(favorite.name)
+                                        .tag(favorite.id as String?)
+                                }
+                            }
+                        }
+                    }
+
+                    // 3. Search section
+                    Section(header: Text("Anderes Mitglied suchen")) {
                         HStack {
                             Image(systemName: "magnifyingglass")
                                 .foregroundColor(.secondary)
@@ -98,6 +90,7 @@ struct BookingSheet: View {
                             }
                         }
 
+                        // Search results with limited height
                         if viewModel.isSearching {
                             HStack {
                                 ProgressView()
@@ -111,9 +104,8 @@ struct BookingSheet: View {
                                 Text("Keine Mitglieder gefunden")
                                     .foregroundColor(.secondary)
                             }
-                            .id("noResults")
                         } else {
-                            ForEach(viewModel.searchResults) { member in
+                            ForEach(viewModel.searchResults.prefix(5)) { member in
                                 Button {
                                     Task {
                                         await viewModel.selectSearchedMember(member)
@@ -144,66 +136,57 @@ struct BookingSheet: View {
                                 .buttonStyle(PlainButtonStyle())
                                 .disabled(viewModel.isAddingToFavorites)
                             }
-                            .id("searchResults")
+                        }
+                    }
+
+                    // Error section
+                    if let error = viewModel.error {
+                        Section {
+                            Text(error)
+                                .foregroundColor(.red)
                         }
                     }
                 }
 
-                if let error = viewModel.error {
-                    Section {
-                        Text(error)
-                            .foregroundColor(.red)
+                // 4. Fixed bottom button
+                Button {
+                    Task {
+                        if await viewModel.createBooking() {
+                            onComplete()
+                        }
+                    }
+                } label: {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Text("Buchung bestätigen")
+                            .fontWeight(.semibold)
                     }
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(viewModel.selectedMemberId == nil || viewModel.isLoading ? Color.gray : Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .disabled(viewModel.isLoading || viewModel.selectedMemberId == nil)
+                .padding()
+                .background(Color(.systemGroupedBackground))
             }
-            .navigationTitle("Buchung erstellen")
+            .navigationTitle("Platz buchen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Abbrechen") {
+                    Button {
                         dismiss()
-                    }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Buchen") {
-                        Task {
-                            if await viewModel.createBooking() {
-                                onComplete()
-                            }
-                        }
-                    }
-                    .disabled(viewModel.isLoading || viewModel.selectedMemberId == nil)
-                }
-            }
-            .overlay(
-                Group {
-                    if viewModel.isLoading {
-                        Color.black.opacity(0.3)
-                            .ignoresSafeArea()
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    }
-                }
-            )
-            .onChange(of: viewModel.searchResults) { results in
-                if !results.isEmpty {
-                    withAnimation {
-                        scrollProxy.scrollTo("searchResults", anchor: .top)
-                    }
-                }
-            }
-            .onChange(of: viewModel.isSearching) { isSearching in
-                if !isSearching && viewModel.searchResults.isEmpty && !viewModel.searchQuery.isEmpty {
-                    withAnimation {
-                        scrollProxy.scrollTo("noResults", anchor: .top)
+                    } label: {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.gray)
                     }
                 }
             }
             .onChange(of: viewModel.selectedMemberId) { _ in
                 viewModel.error = nil
-            }
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
@@ -212,7 +195,6 @@ struct BookingSheet: View {
             print("📋 BookingSheet appeared - courtId: \(courtId), courtNumber: \(courtNumber), time: \(time), userId: \(currentUserId)")
             #endif
             if !isInitialized {
-                // Setup viewModel with booking data
                 viewModel.courtId = courtId
                 viewModel.courtNumber = courtNumber
                 viewModel.time = time
