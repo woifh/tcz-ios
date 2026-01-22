@@ -4,6 +4,16 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
 
+## [8.2] - 2026-01-22
+### Changed
+- Redesigned court grid with rounded tile styling and spacing between cells
+- Available slots now show dashed green border
+- Profile pictures centered in booked slots with initials fallback
+
+### Fixed
+- Profile picture now loads correctly when opening profile settings
+- Dashboard properly refreshes when logging out
+
 ## [8.1] - 2026-01-21
 ### Added
 - Take profile selfies directly with front camera

@@ -52,6 +52,11 @@ final class ProfileViewModel: ObservableObject {
         self.apiClient = apiClient
     }
 
+    func initializeProfilePicture(from member: Member) {
+        self.hasProfilePicture = member.hasProfilePicture ?? false
+        self.profilePictureVersion = member.profilePictureVersion ?? 0
+    }
+
     func loadProfile(memberId: String) async {
         self.memberId = memberId
         isLoading = true

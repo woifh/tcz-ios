@@ -18,11 +18,21 @@ enum LayoutConstants {
 
     // MARK: - Court Grid
     /// Height of each time slot row in the court grid
-    static let courtGridRowHeight: CGFloat = 50
+    static let courtGridRowHeight: CGFloat = 65
     /// Height of the court header row
     static let courtGridHeaderHeight: CGFloat = 36
     /// Width of the time column in the grid
     static let courtGridTimeColumnWidth: CGFloat = 60
+    /// Corner radius for court grid cells
+    static let courtGridCellCornerRadius: CGFloat = 8
+    /// Spacing between court grid cells
+    static let courtGridCellSpacing: CGFloat = 8
+    /// Profile picture size for booked slot cells
+    static let courtGridProfilePictureSize: CGFloat = 28
+    /// Dash pattern for available slot border [dash length, gap length]
+    static let courtGridAvailableBorderDash: [CGFloat] = [4, 3]
+    /// Border width for available slot dashed border
+    static let courtGridAvailableBorderWidth: CGFloat = 1.5
 
     // MARK: - Date Navigation
     /// Height of the date strip view

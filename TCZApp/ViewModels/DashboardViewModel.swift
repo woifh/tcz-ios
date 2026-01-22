@@ -78,6 +78,10 @@ final class DashboardViewModel: ObservableObject {
         self.currentUserId = id
     }
 
+    func clearCurrentUserId() {
+        self.currentUserId = nil
+    }
+
     // MARK: - Cache Management
 
     /// Get cached availability if not expired (5 min hard limit)

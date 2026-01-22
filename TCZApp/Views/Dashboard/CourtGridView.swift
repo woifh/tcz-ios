@@ -10,13 +10,15 @@ struct CourtGridView: View {
     @State private var selectedPage: Int = 0
 
     // Height constants
-    private let rowHeight: CGFloat = 50
+    private let rowHeight: CGFloat = LayoutConstants.courtGridRowHeight
     private let headerHeight: CGFloat = 36
 
     // Calculate grid height based on all time slots
     private var gridHeight: CGFloat {
         let slotCount = CGFloat(viewModel.timeSlots.count)
-        return headerHeight + (slotCount * rowHeight) + 20
+        let spacingCount = CGFloat(max(0, viewModel.timeSlots.count - 1))
+        let cellSpacing = LayoutConstants.courtGridCellSpacing
+        return headerHeight + (slotCount * rowHeight) + (spacingCount * cellSpacing) + 20
     }
 
     var body: some View {
@@ -135,13 +137,14 @@ struct SinglePageGrid: View {
     var body: some View {
         VStack(spacing: 0) {
             // Header row with court numbers (fixed)
-            HStack(spacing: 0) {
+            HStack(spacing: LayoutConstants.courtGridCellSpacing) {
                 Text("Zeit")
                     .font(.body)
                     .fontWeight(.semibold)
                     .frame(width: 60)
                     .frame(height: headerHeight)
                     .background(Color(.systemGray5))
+                    .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius))
 
                 ForEach(courtIndices, id: \.self) { courtIndex in
                     let courtNumber = viewModel.courtNumbers[courtIndex]
@@ -151,20 +154,21 @@ struct SinglePageGrid: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: headerHeight)
                         .background(Color(.systemGray5))
+                        .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius))
                 }
             }
+            .padding(.bottom, LayoutConstants.courtGridCellSpacing)
 
             // Time slot rows
-            VStack(spacing: 0) {
+            VStack(spacing: LayoutConstants.courtGridCellSpacing) {
                 ForEach(viewModel.timeSlots, id: \.self) { time in
-                    HStack(spacing: 0) {
+                    HStack(spacing: LayoutConstants.courtGridCellSpacing) {
                         // Time label
                         Text(time)
                             .font(.body)
                             .fontWeight(.medium)
                             .frame(width: 60)
                             .frame(height: rowHeight)
-                            .background(Color(.systemGray6))
 
                         // Court cells (only for this page's courts)
                         ForEach(courtIndices, id: \.self) { courtIndex in
@@ -188,10 +192,6 @@ struct SinglePageGrid: View {
                 }
             }
         }
-        .background(Color(.systemBackground))
-        .cornerRadius(8)
-        .shadow(radius: 2)
-        .padding(.horizontal, 4)
         .contentShape(Rectangle())
     }
 }
@@ -219,33 +219,27 @@ struct TimeSlotCell: View {
 
                 case .reserved, .shortNotice:
                     if let details = slot.details {
-                        VStack(spacing: 2) {
-                            // Avatar row (top-right aligned)
-                            if let memberId = details.bookedForId,
-                               details.bookedForHasProfilePicture == true {
-                                HStack {
-                                    Spacer()
-                                    ProfilePictureView(
-                                        memberId: memberId,
-                                        hasProfilePicture: true,
-                                        profilePictureVersion: details.bookedForProfilePictureVersion ?? 0,
-                                        name: details.bookedFor ?? "",
-                                        size: 16
-                                    )
-                                }
-                            }
+                        VStack(spacing: 3) {
+                            // Centered profile picture (always shown - has initials fallback)
+                            ProfilePictureView(
+                                memberId: details.bookedForId,
+                                hasProfilePicture: details.bookedForHasProfilePicture ?? false,
+                                profilePictureVersion: details.bookedForProfilePictureVersion ?? 0,
+                                name: details.bookedFor ?? "?",
+                                size: LayoutConstants.courtGridProfilePictureSize
+                            )
 
-                            // Text (centered)
+                            // Name below
                             VStack(spacing: 0) {
                                 Text(details.bookedFor ?? "Gebucht")
-                                    .font(.system(size: 11))
+                                    .font(.system(size: 10))
                                     .lineLimit(1)
                                 if let bookedBy = details.bookedBy,
                                    let bookedForId = details.bookedForId,
                                    let bookedById = details.bookedById,
                                    bookedForId != bookedById {
                                     Text("(\(bookedBy))")
-                                        .font(.system(size: 9))
+                                        .font(.system(size: 8))
                                         .lineLimit(1)
                                         .opacity(0.9)
                                 }
@@ -315,10 +309,8 @@ struct TimeSlotCell: View {
         .padding(.horizontal, 4)
         .background(backgroundColor)
         .foregroundColor(foregroundColor)
-        .overlay(
-            Rectangle()
-                .stroke(Color(.systemGray4), lineWidth: 0.5)
-        )
+        .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius))
+        .overlay(borderOverlay)
         .opacity(isPast ? 0.5 : 1.0)
     }
 
@@ -355,6 +347,32 @@ struct TimeSlotCell: View {
             return Color(red: 113/255, green: 63/255, blue: 18/255)
         default:
             return .white
+        }
+    }
+
+    private var isAvailableSlot: Bool {
+        guard let slot = slot else { return true }
+        return slot.status == .available
+    }
+
+    @ViewBuilder
+    private var borderOverlay: some View {
+        let cornerRadius = LayoutConstants.courtGridCellCornerRadius
+
+        if isAvailableSlot && !isPast {
+            // Dashed green border for available, non-past slots
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(
+                    Color.green,
+                    style: StrokeStyle(
+                        lineWidth: LayoutConstants.courtGridAvailableBorderWidth,
+                        dash: LayoutConstants.courtGridAvailableBorderDash
+                    )
+                )
+        } else {
+            // Subtle solid border for all other slots
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(Color(.systemGray4), lineWidth: 0.5)
         }
     }
 }

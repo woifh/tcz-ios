@@ -118,6 +118,7 @@ struct DashboardView: View {
                 .padding(.horizontal)
                 .padding(.top)
                 .background(Color(.systemBackground))
+                .zIndex(1)
 
                 // Scrollable court grid
                 ScrollView {
@@ -219,9 +220,15 @@ struct DashboardView: View {
         .onChange(of: authViewModel.currentUser?.id) { newId in
             viewModel.isPaymentConfirmationDismissed = false
             viewModel.isEmailVerificationDismissed = false
-            // Dismiss profile sheet on logout
+            if let userId = newId {
+                viewModel.setCurrentUserId(userId)
+            }
+            // Handle logout - clear user ID, cache, and reload
             if newId == nil {
                 showingProfile = false
+                viewModel.clearCurrentUserId()
+                viewModel.clearCache()
+                Task { await viewModel.loadData() }
             }
         }
         .alert("E-Mail gesendet", isPresented: $showingVerificationSentAlert) {

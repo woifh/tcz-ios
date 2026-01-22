@@ -80,8 +80,9 @@ struct ProfileEditView: View {
     }
 
     private func loadProfileTask() async {
-        if let userId = authViewModel.currentUser?.id {
-            await viewModel.loadProfile(memberId: userId)
+        if let user = authViewModel.currentUser {
+            viewModel.initializeProfilePicture(from: user)
+            await viewModel.loadProfile(memberId: user.id)
         }
     }
 
