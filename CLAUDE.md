@@ -1,145 +1,229 @@
-# CLAUDE.md
+# CLAUDE.md — TCZ iOS (SwiftUI)
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file contains iOS-specific guidance.
+Shared rules (git, releases, vibe coding) are in `/Users/woifh/tcz/CLAUDE.md`.
 
-## Project Overview
+---
 
-TCZ Tennis Club Booking iOS App - a SwiftUI app for managing tennis court reservations. Current version: 3.0.0 (compatible with server v3.7.0).
+## 🔗 Cross-Project Context
 
-## Build Commands
+This app **consumes the API** defined by the web backend.
 
-Build the app:
+### Related Codebases
+
+| Project | Path | Relationship |
+|---------|------|--------------|
+| Web Backend | `/Users/woifh/tcz/tcz-web` | Defines API we consume |
+| Android App | `/Users/woifh/tcz/tcz-android` | Sibling app, same API |
+
+### Cross-Project Search
+
+See "Cross-Project Search" in the parent CLAUDE.md (`/Users/woifh/tcz/CLAUDE.md`) for grep commands.
+
+### API Debugging Tips
+
+- **Getting unexpected data?** → Check endpoint in `tcz-web/app/routes/api/`
+- **401 errors?** → Check auth flow in `tcz-web/app/routes/api/auth.py`
+- **Different behavior than Android?** → Compare implementations
+- **New endpoint needed?** → Ask to create it in tcz-web first
+
+---
+
+## 🔧 Build Commands
+
 ```bash
+# Build (Debug)
 xcodebuild -project TCZApp/TCZApp.xcodeproj -scheme TCZApp -configuration Debug build
-```
 
-Build for simulator:
-```bash
-xcodebuild -project TCZApp/TCZApp.xcodeproj -scheme TCZApp -sdk iphonesimulator -configuration Debug build
-```
+# Build for Simulator
+xcodebuild -project TCZApp/TCZApp.xcodeproj -scheme TCZApp -sdk iphonesimulator build
 
-Clean build:
-```bash
+# Clean
 xcodebuild -project TCZApp/TCZApp.xcodeproj -scheme TCZApp clean
 ```
 
-**Note:** On this machine, xcodebuild commands do not work. Always ask the user to build manually in the Xcode IDE to verify changes compile correctly.
+⚠️ **Note:** On this machine, xcodebuild commands may not work reliably. Always ask the user to build manually in Xcode to verify changes compile correctly.
 
-## Architecture
+---
 
-**MVVM with SwiftUI** - Clean separation between Views, ViewModels, and Models.
+## 🏗️ Architecture
 
-### Source Structure (TCZApp/TCZApp/)
-- **Core/** - Networking layer: `APIClient.swift` (HTTP client with Bearer auth), `APIEndpoints.swift` (route definitions), `KeychainService.swift` (secure storage)
-- **Models/** - Codable data structures: `Member`, `Reservation`, `AvailabilityGrid`, `BookingStatus`
-- **ViewModels/** - State management with `@MainActor`: `AuthViewModel`, `DashboardViewModel`, `BookingViewModel`, `ReservationsViewModel`, `FavoritesViewModel`
-- **Views/** - SwiftUI components organized by feature: Main, Authentication, Dashboard, Booking, Reservations, Favorites, Components
+**MVVM with SwiftUI** — Clean separation between Views, ViewModels, and Models.
+
+### Source Structure (TCZApp/)
+
+```
+TCZApp/
+├── Core/           # Networking, services, utilities
+├── Models/         # Codable data structures
+├── ViewModels/     # State management (@MainActor)
+├── Views/          # SwiftUI views organized by feature
+│   ├── Authentication/
+│   ├── Booking/
+│   ├── Components/
+│   ├── Dashboard/
+│   ├── Favorites/
+│   ├── Main/
+│   ├── Profile/
+│   └── Reservations/
+├── Resources/      # Assets.xcassets
+└── TCZAppTests/    # Unit tests with mocks
+```
+
+### Where to Put Things
+
+| Type | Location |
+|------|----------|
+| API client code | `Core/` |
+| Data models | `Models/` |
+| Business logic | `ViewModels/` |
+| UI components | `Views/` |
 
 ### Key Patterns
+
 - All ViewModels use `@MainActor` for thread-safe UI updates
-- `APIClientProtocol` enables dependency injection for testability
-- Authentication uses Bearer tokens stored in Keychain
-- Sparse data format for court availability (only occupied slots returned from API)
+- `APIClientProtocol` enables dependency injection
+- Bearer tokens stored in Keychain
+- Sparse data format for availability (only occupied slots)
 
 ### Authentication Flow
-1. Login via `APIClient.login()` → stores access token in Keychain
-2. Bearer token added to all authenticated requests via `APIClient`
-3. Session restoration on app launch via `AuthViewModel.checkStoredSession()`
+
+1. Login via `APIClient.login()` → stores token in Keychain
+2. Bearer token added to all authenticated requests
+3. Session restore on launch via `AuthViewModel.checkStoredSession()`
 
 ### Navigation
+
 - `MainTabView` with conditional tabs based on auth state
 - Anonymous: Dashboard + Login placeholder
 - Authenticated: Dashboard + Reservations + Favorites + Profile
 
-## Server Configuration
+---
 
-- **Debug builds:** `http://10.0.0.147:5001` (local development)
-- **Production:** `https://woifh.pythonanywhere.com`
+## 🧪 Testing
 
-Change in `APIClient.swift` → `baseURL` property.
+### Test Commands
 
-## Related Codebases
+```bash
+# Run all tests
+xcodebuild test -project TCZApp/TCZApp.xcodeproj -scheme TCZApp \
+  -destination 'platform=iOS Simulator,name=iPhone 15'
 
-The server backend and web app code is available locally for reference:
-- **Location:** `/Users/woifh/tcz/web`
-- **Use cases:** Search through these files to understand API behavior, endpoint implementations, and how the web app UI works
+# Run specific test class
+xcodebuild test -project TCZApp/TCZApp.xcodeproj -scheme TCZApp \
+  -destination 'platform=iOS Simulator,name=iPhone 15' \
+  -only-testing:TCZAppTests/AuthViewModelTests
+```
 
-## Important Conventions
+⚠️ **Note:** If xcodebuild fails, ask user to run tests manually in Xcode (⌘U).
 
-- **Language:** All UI text is in German
-- **Timezone:** Uses `Europe/Berlin` for all date operations
-- **Error messages:** German localized via `APIError` enum
-- **Date formats:** Custom JSON decoder handles multiple API date formats
+### When to Test
 
-## Versioning
+- After modifying ViewModels
+- After changing API integration
+- After modifying model decoding
+- Before declaring a feature complete
 
-- `TCZApp/CHANGELOG.md` is the **single source of truth** for version numbers
-- App version is parsed dynamically from CHANGELOG.md (first `## [X.Y]` entry after `[Unreleased]`)
-- Do NOT create separate VERSION files - the changelog IS the version file
-- Format: `## [major.minor] - YYYY-MM-DD` → displays as `major.minor.0` in app
-- **Xcode archive version**: `MARKETING_VERSION` in project.pbxproj must match CHANGELOG.md
-  - A build script warns if they differ, but you must update `MARKETING_VERSION` manually when bumping versions
-  - Update both Debug and Release configurations in project.pbxproj
+### Manual Testing
 
-## Important Rules
+Always ask user to verify changes in Xcode:
+1. Build succeeds (⌘B)
+2. App runs in simulator
+3. Affected feature works correctly
 
-- **CRITICAL: NEVER push to GitHub without explicit user request** - NEVER run `git push` unless the user explicitly asks you to push. This is the most important rule. Always wait for explicit permission before pushing any commits or tags.
-- **CRITICAL: Always show changelog and wait for explicit approval before pushing** - Before any push, show the user the changelog entry that will be added. Then use AskUserQuestion to get explicit user confirmation before running git commit or git push. Do not proceed until the user explicitly approves the changelog.
-- **When pushing to GitHub (only after user requests it)**:
-  - Ask the user whether to increase major or minor version
-  - Add a short, non-technical changelog entry to CHANGELOG.md (version format: major.minor)
-  - **Update MARKETING_VERSION in project.pbxproj** to match the new version (both Debug and Release)
-  - **Every code change must have a corresponding changelog entry** - don't push without updating the changelog first
-  - Create a meaningful commit message
-  - Push to GitHub
-  - Create and push a git tag matching the changelog version (format: vX.Y.0, e.g., v3.9.0 for changelog version 3.9)
-    - **Version sync rule**: CHANGELOG.md version and git tag MUST always match (e.g., changelog 3.10 → tag v3.10.0)
+### Test Infrastructure
 
+The project has comprehensive test coverage with mocks for dependency injection:
 
-- **Git commit rules**:
-  - NEVER use `git commit --amend` on commits that have been pushed to remote
-  - NEVER use `--force` or `--force-with-lease` push unless explicitly requested
-  - Always create new commits for fixes rather than amending
+- `TCZAppTests/Mocks/MockAPIClient.swift` — Mock API client for unit tests
+- `TCZAppTests/Mocks/MockKeychainService.swift` — Mock keychain for auth tests
+- `TCZAppTests/Helpers/TestData.swift` — Shared test fixtures
 
-- **Adding new Swift files**:
-  - New `.swift` files must be manually added to `TCZApp/TCZApp.xcodeproj/project.pbxproj`
-  - Required entries in 4 sections: `PBXBuildFile`, `PBXFileReference`, `PBXGroup` (appropriate folder), and `PBXSourcesBuildPhase`
-  - Use existing file entries as templates for the format and ID generation
-  - Without these entries, Xcode will report "Cannot find X in scope" errors
+Test files exist for all ViewModels (AuthViewModelTests, DashboardViewModelTests, etc.)
 
-## Vibe Coding Principles
+---
 
-This codebase prioritizes flow, clarity, and fast iteration.
+## 🌐 Server Configuration
 
-### General Guidelines
-- Prefer simple, readable code over clever abstractions
-- Optimize for local reasoning: a reader should understand code in under a minute
-- Keep changes small, reversible, and easy to delete
-- Avoid premature abstraction; duplicate a little before extracting
-- Make failures loud and obvious—no silent magic
+Server URL is set at **compile-time** via `#if DEBUG` in `Core/APIClient.swift`:
 
-### Naming & Structure
-- Use clear, descriptive names; naming is more important than comments
-- Keep related logic close together
-- Avoid deep inheritance or excessive indirection
+| Build | URL |
+|-------|-----|
+| Debug (Simulator) | `http://localhost:5001` |
+| Debug (Device) | `http://10.0.0.147:5001` |
+| Release | `https://woifh.pythonanywhere.com` |
 
-### Comments & Intent
-- Comment *why* something exists, not *what the code does*
-- Explain tradeoffs, constraints, or non-obvious decisions
+### Changing Local Dev IP
 
-### Testing Philosophy
-- Write tests that increase confidence without slowing momentum
-- Focus on behavior, not implementation details
-- Prefer a few high-signal tests over exhaustive coverage
+If your Mac's IP changes from `10.0.0.147`:
 
-### Refactoring
-- Refactor opportunistically when it improves clarity
-- Do not refactor solely for architectural purity
-- It should feel safe to rewrite or delete code
+1. Find new IP: `ipconfig getifaddr en0`
+2. Edit `TCZApp/Core/APIClient.swift`
+3. Update the IP in the `#else` branch under `#if DEBUG`
+4. Rebuild the app
 
-## Mandatory Rules
+### Network Security
 
-- **NEVER break existing functionality** - preserve working behavior at all costs
-- **When in doubt, ask the user** - don't guess or assume; clarify before proceeding
-- **Respect software development principles** - follow SOLID, DRY, KISS
-- **Never mention Claude Code** - no references to Claude, AI, or this tool in changelogs, commits, or any project files
+- `NSAllowsLocalNetworking` enabled in `Info.plist` for local dev
+- Release builds enforce HTTPS (will fail on HTTP URLs)
+
+---
+
+## 📦 Versioning
+
+- `TCZApp/CHANGELOG.md` is the **single source of truth**
+- App version parsed dynamically from CHANGELOG.md
+- Format: `## [major.minor] - YYYY-MM-DD` → displays as `major.minor.0`
+- Git tag format: `vX.Y.0` (e.g., changelog 3.10 → tag v3.10.0)
+
+### Xcode Version Sync
+
+- `MARKETING_VERSION` in `project.pbxproj` must match CHANGELOG.md
+- Update both Debug and Release configurations when bumping versions
+
+---
+
+## 📝 Adding New Swift Files
+
+New `.swift` files must be manually added to `TCZApp/TCZApp.xcodeproj/project.pbxproj`.
+
+Required entries in 4 sections:
+1. `PBXBuildFile`
+2. `PBXFileReference`
+3. `PBXGroup` (appropriate folder)
+4. `PBXSourcesBuildPhase`
+
+Use existing file entries as templates. Without these entries, Xcode reports "Cannot find X in scope".
+
+**Tip:** After adding a file, always ask user to verify it compiles in Xcode.
+
+---
+
+## ⚠️ Common Mistakes to Avoid
+
+- New files must be added to `project.pbxproj` manually
+- `@MainActor` required on all ViewModels
+- Keychain access can fail silently in simulator — test on device for auth issues
+- Don't assume API response format — check tcz-web implementation
+- Don't forget to handle token expiration (401 responses)
+
+---
+
+## 📚 Key Files
+
+| File | Purpose |
+|------|---------|
+| `TCZApp.swift` | App entry point |
+| `Core/APIClient.swift` | Network layer, server URL config |
+| `Core/APIEndpoints.swift` | Endpoint URL construction |
+| `Core/APIError.swift` | API error type definitions |
+| `Core/AppDelegate.swift` | App lifecycle, push notifications |
+| `Core/AppTheme.swift` | App-wide theme/styling constants |
+| `Core/DateFormatterService.swift` | Date formatting utilities |
+| `Core/KeychainService.swift` | Secure token storage |
+| `Core/LayoutConstants.swift` | UI layout constants |
+| `Core/ProfilePictureCache.swift` | Profile image caching |
+| `Core/PushNotificationService.swift` | Push notification handling |
+| `Models/Reservation.swift` | Core data model |
+| `ViewModels/AuthViewModel.swift` | Authentication state |
+| `CHANGELOG.md` | Version source of truth |
