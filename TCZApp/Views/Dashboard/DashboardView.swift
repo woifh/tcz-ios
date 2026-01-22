@@ -120,43 +120,43 @@ struct DashboardView: View {
                 .background(Color(.systemBackground))
                 .zIndex(1)
 
-                // Scrollable court grid
-                ScrollView {
-                    if viewModel.isLoading && viewModel.availability == nil {
-                        LoadingView()
-                    } else if let error = viewModel.error, viewModel.availability == nil {
-                        ErrorView(message: error) {
-                            Task { await viewModel.loadData() }
-                        }
-                    } else {
-                        ZStack(alignment: .top) {
-                            CourtGridView(
-                                viewModel: viewModel,
-                                onSlotTap: { courtId, courtNumber, time, slot in
-                                    handleSlotTap(courtId: courtId, courtNumber: courtNumber, time: time, slot: slot)
-                                }
-                            )
-
-                            // Subtle refresh indicator when updating cached data
-                            if viewModel.isRefreshing {
-                                HStack(spacing: 6) {
-                                    ProgressView()
-                                        .scaleEffect(0.7)
-                                    Text("Aktualisiere...")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(Color(.systemBackground).opacity(0.95))
-                                .cornerRadius(8)
-                                .shadow(radius: 2)
-                                .padding(.top, 8)
+                // Court grid (handles its own scrolling internally)
+                if viewModel.isLoading && viewModel.availability == nil {
+                    LoadingView()
+                        .padding(.horizontal)
+                } else if let error = viewModel.error, viewModel.availability == nil {
+                    ErrorView(message: error) {
+                        Task { await viewModel.loadData() }
+                    }
+                    .padding(.horizontal)
+                } else {
+                    ZStack(alignment: .top) {
+                        CourtGridView(
+                            viewModel: viewModel,
+                            onSlotTap: { courtId, courtNumber, time, slot in
+                                handleSlotTap(courtId: courtId, courtNumber: courtNumber, time: time, slot: slot)
                             }
+                        )
+                        .padding(.horizontal)
+
+                        // Subtle refresh indicator when updating cached data
+                        if viewModel.isRefreshing {
+                            HStack(spacing: 6) {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                Text("Aktualisiere...")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color(.systemBackground).opacity(0.95))
+                            .cornerRadius(8)
+                            .shadow(radius: 2)
+                            .padding(.top, 8)
                         }
                     }
                 }
-                .padding(.horizontal)
             }
             .toolbar(.hidden, for: .navigationBar)
             .sheet(item: $bookingSheetData) { data in

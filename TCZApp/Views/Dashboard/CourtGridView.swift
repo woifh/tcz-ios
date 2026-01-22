@@ -11,19 +11,19 @@ struct CourtGridView: View {
 
     // Height constants
     private let rowHeight: CGFloat = LayoutConstants.courtGridRowHeight
-    private let headerHeight: CGFloat = 36
+    private let headerHeight: CGFloat = LayoutConstants.courtGridHeaderHeight
 
-    // Calculate grid height based on all time slots
-    private var gridHeight: CGFloat {
+    // Calculate height for time slots only (no header)
+    private var timeSlotsHeight: CGFloat {
         let slotCount = CGFloat(viewModel.timeSlots.count)
         let spacingCount = CGFloat(max(0, viewModel.timeSlots.count - 1))
         let cellSpacing = LayoutConstants.courtGridCellSpacing
-        return headerHeight + (slotCount * rowHeight) + (spacingCount * cellSpacing) + 20
+        return (slotCount * rowHeight) + (spacingCount * cellSpacing)
     }
 
     var body: some View {
-        VStack(spacing: 8) {
-            // Page indicator above the grid
+        VStack(spacing: 0) {
+            // STICKY: Page indicator
             PageIndicatorView(
                 currentPage: selectedPage,
                 totalPages: viewModel.totalPages,
@@ -35,21 +35,30 @@ struct CourtGridView: View {
                 onInfoTap: { showLegend = true }
             )
 
-            // Swipeable pages for courts using TabView
-            TabView(selection: $selectedPage) {
-                ForEach(0..<viewModel.totalPages, id: \.self) { pageIndex in
-                    SinglePageGrid(
-                        viewModel: viewModel,
-                        pageIndex: pageIndex,
-                        onSlotTap: onSlotTap,
-                        rowHeight: rowHeight,
-                        headerHeight: headerHeight
-                    )
-                    .tag(pageIndex)
+            // STICKY: Court header row
+            CourtHeaderRow(
+                viewModel: viewModel,
+                selectedPage: selectedPage,
+                headerHeight: headerHeight
+            )
+            .padding(.bottom, LayoutConstants.courtGridCellSpacing)
+
+            // SCROLLABLE: Time slot rows only
+            ScrollView {
+                TabView(selection: $selectedPage) {
+                    ForEach(0..<viewModel.totalPages, id: \.self) { pageIndex in
+                        TimeSlotRowsView(
+                            viewModel: viewModel,
+                            pageIndex: pageIndex,
+                            onSlotTap: onSlotTap,
+                            rowHeight: rowHeight
+                        )
+                        .tag(pageIndex)
+                    }
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: timeSlotsHeight)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: gridHeight)
         }
         .sheet(isPresented: $showLegend) {
             LegendSheet()
@@ -84,7 +93,7 @@ struct PageIndicatorView: View {
             HStack(spacing: 16) {
                 Text("Plätze 1-3")
                     .font(.subheadline)
-                    .fontWeight(currentPage == 0 ? .semibold : .regular)
+                    .fontWeight(.medium)
                     .foregroundColor(currentPage == 0 ? .green : .gray)
                     .onTapGesture {
                         onPageChange(0)
@@ -92,8 +101,8 @@ struct PageIndicatorView: View {
 
                 Text("Plätze 4-6")
                     .font(.subheadline)
-                    .fontWeight(currentPage == 1 ? .semibold : .regular)
-                    .foregroundColor(currentPage == 1 ? .green : .gray)
+                    .fontWeight(.medium)
+                    .foregroundColor(currentPage == 0 ? .gray : .green)
                     .onTapGesture {
                         onPageChange(1)
                     }
@@ -122,72 +131,79 @@ struct PageIndicatorView: View {
     }
 }
 
-/// Grid for a single page of courts (3 courts per page)
-struct SinglePageGrid: View {
+/// Sticky header row showing court names for the selected page
+struct CourtHeaderRow: View {
+    @ObservedObject var viewModel: DashboardViewModel
+    let selectedPage: Int
+    let headerHeight: CGFloat
+
+    private var courtIndices: Range<Int> {
+        viewModel.courtIndicesForPage(selectedPage)
+    }
+
+    var body: some View {
+        HStack(spacing: LayoutConstants.courtGridCellSpacing) {
+            Text("Zeit")
+                .font(.body)
+                .fontWeight(.semibold)
+                .frame(width: 60)
+                .frame(height: headerHeight)
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius))
+
+            ForEach(courtIndices, id: \.self) { courtIndex in
+                let courtNumber = viewModel.courtNumbers[courtIndex]
+                Text("Platz \(courtNumber)")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: headerHeight)
+                    .background(Color(.systemGray5))
+                    .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius))
+            }
+        }
+    }
+}
+
+/// Time slot rows for a single page of courts (no header)
+struct TimeSlotRowsView: View {
     @ObservedObject var viewModel: DashboardViewModel
     let pageIndex: Int
     let onSlotTap: (Int, Int, String, TimeSlot?) -> Void
     let rowHeight: CGFloat
-    let headerHeight: CGFloat
 
     private var courtIndices: Range<Int> {
         viewModel.courtIndicesForPage(pageIndex)
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header row with court numbers (fixed)
-            HStack(spacing: LayoutConstants.courtGridCellSpacing) {
-                Text("Zeit")
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .frame(width: 60)
-                    .frame(height: headerHeight)
-                    .background(Color(.systemGray5))
-                    .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius))
+        VStack(spacing: LayoutConstants.courtGridCellSpacing) {
+            ForEach(viewModel.timeSlots, id: \.self) { time in
+                HStack(spacing: LayoutConstants.courtGridCellSpacing) {
+                    // Time label
+                    Text(time)
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 60)
+                        .frame(height: rowHeight)
 
-                ForEach(courtIndices, id: \.self) { courtIndex in
-                    let courtNumber = viewModel.courtNumbers[courtIndex]
-                    Text("Platz \(courtNumber)")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: headerHeight)
-                        .background(Color(.systemGray5))
-                        .clipShape(RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius))
-                }
-            }
-            .padding(.bottom, LayoutConstants.courtGridCellSpacing)
+                    // Court cells (only for this page's courts)
+                    ForEach(courtIndices, id: \.self) { courtIndex in
+                        let slot = viewModel.getSlot(courtIndex: courtIndex, time: time)
+                        let courtInfo = viewModel.getCourtInfo(courtIndex: courtIndex)
 
-            // Time slot rows
-            VStack(spacing: LayoutConstants.courtGridCellSpacing) {
-                ForEach(viewModel.timeSlots, id: \.self) { time in
-                    HStack(spacing: LayoutConstants.courtGridCellSpacing) {
-                        // Time label
-                        Text(time)
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .frame(width: 60)
-                            .frame(height: rowHeight)
-
-                        // Court cells (only for this page's courts)
-                        ForEach(courtIndices, id: \.self) { courtIndex in
-                            let slot = viewModel.getSlot(courtIndex: courtIndex, time: time)
-                            let courtInfo = viewModel.getCourtInfo(courtIndex: courtIndex)
-
-                            Button {
-                                onSlotTap(courtInfo.id, courtInfo.number, time, slot)
-                            } label: {
-                                TimeSlotCell(
-                                    slot: slot,
-                                    isPast: viewModel.isSlotInPast(time: time),
-                                    canBook: viewModel.canBookSlot(slot, time: time),
-                                    isUserBooking: viewModel.isUserBooking(slot),
-                                    rowHeight: rowHeight
-                                )
-                            }
-                            .buttonStyle(.plain)
+                        Button {
+                            onSlotTap(courtInfo.id, courtInfo.number, time, slot)
+                        } label: {
+                            TimeSlotCell(
+                                slot: slot,
+                                isPast: viewModel.isSlotInPast(time: time),
+                                canBook: viewModel.canBookSlot(slot, time: time),
+                                isUserBooking: viewModel.isUserBooking(slot),
+                                rowHeight: rowHeight
+                            )
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
