@@ -10,6 +10,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 - Available slots now show dashed green border
 - Profile pictures centered in booked slots with initials fallback
 - Court header and page navigation now stay visible when scrolling
+- Booking modal now has fixed confirm button at bottom for better usability
 
 ### Fixed
 - Profile picture now loads correctly when opening profile settings
