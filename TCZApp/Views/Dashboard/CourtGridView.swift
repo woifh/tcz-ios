@@ -341,7 +341,7 @@ struct TimeSlotCell: View {
         case .available:
             return isPast ? Color(.systemGray5) : .white
         case .reserved:
-            return .red
+            return .green
         case .shortNotice:
             return .orange
         case .blocked:
@@ -364,33 +364,14 @@ struct TimeSlotCell: View {
         case .blockedTemporary:
             return Color(red: 113/255, green: 63/255, blue: 18/255)
         default:
-            return .white
+            return .black
         }
-    }
-
-    private var isAvailableSlot: Bool {
-        guard let slot = slot else { return true }
-        return slot.status == .available
     }
 
     @ViewBuilder
     private var borderOverlay: some View {
-        let cornerRadius = LayoutConstants.courtGridCellCornerRadius
-
-        if isAvailableSlot && !isPast {
-            // Dashed green border for available, non-past slots
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(
-                    Color.green,
-                    style: StrokeStyle(
-                        lineWidth: LayoutConstants.courtGridAvailableBorderWidth,
-                        dash: LayoutConstants.courtGridAvailableBorderDash
-                    )
-                )
-        } else {
-            // Subtle solid border for all other slots
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(Color(.systemGray4), lineWidth: 0.5)
-        }
+        // Subtle solid grey border for all slots
+        RoundedRectangle(cornerRadius: LayoutConstants.courtGridCellCornerRadius)
+            .stroke(Color(.systemGray4), lineWidth: 0.5)
     }
 }

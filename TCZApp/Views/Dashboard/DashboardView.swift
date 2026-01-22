@@ -301,7 +301,7 @@ struct LegendSheet: View {
         NavigationView {
             VStack(alignment: .leading, spacing: 12) {
                 LegendRow(color: .white, title: "Frei", description: "Platz verfuegbar", showBorder: true)
-                LegendRow(color: .red, title: "Belegt", description: "Bereits gebucht")
+                LegendRow(color: .green, title: "Belegt", description: "Bereits gebucht")
                 LegendRow(color: .orange, title: "Kurzfristig", description: "ab 15 Minuten vor Beginn buchbar")
                 LegendRow(color: Color(.systemGray3), title: "Gesperrt", description: "Nicht buchbar")
                 LegendRow(color: temporaryBlockColor, title: "Vorübergehend gesperrt", description: "Kurzzeitig blockiert")
