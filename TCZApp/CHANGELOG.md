@@ -8,7 +8,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Changed
 - Redesigned court grid with rounded tile styling and spacing between cells
 - Available slots now show dashed green border
-- Profile pictures centered in booked slots with initials fallback
+- Profile pictures centered in booked slots (name only when no picture)
 - Court header and page navigation now stay visible when scrolling
 - Booking modal now has fixed confirm button at bottom for better usability
 

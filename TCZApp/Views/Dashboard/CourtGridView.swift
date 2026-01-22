@@ -236,16 +236,18 @@ struct TimeSlotCell: View {
                 case .reserved, .shortNotice:
                     if let details = slot.details {
                         VStack(spacing: 3) {
-                            // Centered profile picture (always shown - has initials fallback)
-                            ProfilePictureView(
-                                memberId: details.bookedForId,
-                                hasProfilePicture: details.bookedForHasProfilePicture ?? false,
-                                profilePictureVersion: details.bookedForProfilePictureVersion ?? 0,
-                                name: details.bookedFor ?? "?",
-                                size: LayoutConstants.courtGridProfilePictureSize
-                            )
+                            // Only show profile picture if member has one
+                            if details.bookedForHasProfilePicture ?? false {
+                                ProfilePictureView(
+                                    memberId: details.bookedForId,
+                                    hasProfilePicture: true,
+                                    profilePictureVersion: details.bookedForProfilePictureVersion ?? 0,
+                                    name: details.bookedFor ?? "?",
+                                    size: LayoutConstants.courtGridProfilePictureSize
+                                )
+                            }
 
-                            // Name below
+                            // Name below (or centered if no picture)
                             VStack(spacing: 0) {
                                 Text(details.bookedFor ?? "Gebucht")
                                     .font(.system(size: 10))
