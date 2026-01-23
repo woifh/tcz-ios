@@ -3,6 +3,9 @@
 All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Redesigned booking modal with compact chip layout for better keyboard handling
+- Member search results now stay visible when typing with phone keyboard
 
 ## [8.2] - 2026-01-22
 ### Changed
