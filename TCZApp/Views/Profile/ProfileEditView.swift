@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 
 struct ProfileEditView: View {
     @StateObject private var viewModel = ProfileViewModel()
@@ -8,11 +7,11 @@ struct ProfileEditView: View {
     @Environment(\.dismiss) private var dismiss
 
     // Photo picker state
-    @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showDeleteConfirmation = false
     @State private var showImageSourceDialog = false
     @State private var showCamera = false
     @State private var showPhotoLibrary = false
+    @State private var imageToCrop: UIImage?
 
     var body: some View {
         mainContent
@@ -22,9 +21,6 @@ struct ProfileEditView: View {
             .overlay { loadingOverlay }
             .task { await loadProfileTask() }
             .interactiveDismissDisabled(viewModel.isSaving || viewModel.isUploadingPicture)
-            .onChange(of: selectedPhotoItem) { newItem in
-                Task { await handlePhotoSelection(newItem) }
-            }
             .alert("Profilbild entfernen", isPresented: $showDeleteConfirmation) {
                 Button("Abbrechen", role: .cancel) { }
                 Button("Entfernen", role: .destructive) { deleteProfilePicture() }
@@ -44,11 +40,33 @@ struct ProfileEditView: View {
             }
             .fullScreenCover(isPresented: $showCamera) {
                 CameraPicker { image in
-                    Task { await handleCapturedImage(image) }
+                    imageToCrop = image
                 }
                 .ignoresSafeArea()
             }
-            .photosPicker(isPresented: $showPhotoLibrary, selection: $selectedPhotoItem, matching: .images)
+            .fullScreenCover(isPresented: $showPhotoLibrary) {
+                ImageLibraryPicker { image in
+                    imageToCrop = image
+                }
+            }
+            .fullScreenCover(isPresented: Binding(
+                get: { imageToCrop != nil },
+                set: { if !$0 { imageToCrop = nil } }
+            )) {
+                if let image = imageToCrop {
+                    ImageCropView(
+                        image: image,
+                        onCrop: { croppedImage in
+                            imageToCrop = nil
+                            Task { await handleCapturedImage(croppedImage) }
+                        },
+                        onCancel: {
+                            imageToCrop = nil
+                        }
+                    )
+                    .ignoresSafeArea()
+                }
+            }
     }
 
     @ViewBuilder
@@ -320,35 +338,6 @@ struct ProfileEditView: View {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 dismiss()
             }
-        }
-    }
-
-    private func handlePhotoSelection(_ item: PhotosPickerItem?) async {
-        guard let item = item else { return }
-
-        do {
-            // Load the image data
-            guard let data = try await item.loadTransferable(type: Data.self),
-                  let uiImage = UIImage(data: data) else {
-                return
-            }
-
-            // Convert to JPEG data in the View layer (keeps UIKit out of ViewModel)
-            guard let jpegData = uiImage.jpegData(compressionQuality: 0.9) else {
-                return
-            }
-
-            // Upload the image
-            if let updatedMember = await viewModel.uploadProfilePicture(imageData: jpegData) {
-                authViewModel.updateCurrentUser(updatedMember)
-            }
-
-            // Clear selection to allow re-selecting same image
-            selectedPhotoItem = nil
-        } catch {
-            #if DEBUG
-            print("Error loading photo: \(error)")
-            #endif
         }
     }
 

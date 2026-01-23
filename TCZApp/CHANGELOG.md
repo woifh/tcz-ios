@@ -3,9 +3,14 @@
 All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
+### Added
+- About screen: tap TCZ logo on dashboard to view app info, licenses, and impressum
+- Profile picture cropping: zoom and move to select the perfect area for your photo
+
 ### Changed
 - Redesigned booking modal with compact chip layout for better keyboard handling
 - Member search results now stay visible when typing with phone keyboard
+- Moved App Info section from Profile to new About screen
 
 ## [8.2] - 2026-01-22
 ### Changed

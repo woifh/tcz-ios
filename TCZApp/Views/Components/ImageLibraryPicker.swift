@@ -1,19 +1,16 @@
 import SwiftUI
 import UIKit
 
-/// A SwiftUI wrapper for UIImagePickerController to capture photos from the camera.
-struct CameraPicker: UIViewControllerRepresentable {
+/// A SwiftUI wrapper for UIImagePickerController to select photos from the library.
+struct ImageLibraryPicker: UIViewControllerRepresentable {
     @Environment(\.dismiss) private var dismiss
-    let onImageCaptured: (UIImage) -> Void
+    let onImageSelected: (UIImage) -> Void
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.cameraDevice = .front
+        picker.sourceType = .photoLibrary
         picker.delegate = context.coordinator
         picker.allowsEditing = false
-        // Mirror the camera view to match the viewfinder preview
-        picker.cameraViewTransform = CGAffineTransform(scaleX: -1, y: 1)
         return picker
     }
 
@@ -24,9 +21,9 @@ struct CameraPicker: UIViewControllerRepresentable {
     }
 
     class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: CameraPicker
+        let parent: ImageLibraryPicker
 
-        init(_ parent: CameraPicker) {
+        init(_ parent: ImageLibraryPicker) {
             self.parent = parent
         }
 
@@ -36,7 +33,7 @@ struct CameraPicker: UIViewControllerRepresentable {
             let image = info[.originalImage] as? UIImage
             if let image = image {
                 let normalizedImage = image.normalizedImage()
-                parent.onImageCaptured(normalizedImage)
+                parent.onImageSelected(normalizedImage)
             }
             parent.dismiss()
         }
@@ -44,19 +41,5 @@ struct CameraPicker: UIViewControllerRepresentable {
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             parent.dismiss()
         }
-    }
-}
-
-extension UIImage {
-    /// Normalizes the image orientation to .up, fixing rotation issues from camera capture.
-    func normalizedImage() -> UIImage {
-        guard imageOrientation != .up else { return self }
-
-        UIGraphicsBeginImageContextWithOptions(size, false, scale)
-        draw(in: CGRect(origin: .zero, size: size))
-        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        return normalizedImage ?? self
     }
 }

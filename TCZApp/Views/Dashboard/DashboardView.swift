@@ -29,6 +29,7 @@ struct DashboardView: View {
     @State private var isResendingVerification = false
     @State private var showingVerificationSentAlert = false
     @State private var showingProfile = false
+    @State private var showingAbout = false
 
     private var paymentBannerState: PaymentBannerState? {
         guard let user = authViewModel.currentUser else { return nil }
@@ -60,11 +61,16 @@ struct DashboardView: View {
                 // App header with profile picture
                 HStack {
                     HStack(spacing: 12) {
-                        Image("tcz_icon")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 56, height: 56)
-                            .clipShape(Circle())
+                        Button {
+                            showingAbout = true
+                        } label: {
+                            Image("tcz_icon")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 56, height: 56)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
                         Text("Platz-Reservierung")
                             .font(.title2.weight(.semibold))
                     }
@@ -239,6 +245,10 @@ struct DashboardView: View {
         .sheet(isPresented: $showingProfile) {
             ProfileView()
                 .environmentObject(authViewModel)
+                .preferredColorScheme(appTheme.colorScheme)
+        }
+        .sheet(isPresented: $showingAbout) {
+            AboutView()
                 .preferredColorScheme(appTheme.colorScheme)
         }
     }
