@@ -12,6 +12,9 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 - Member search results now stay visible when typing with phone keyboard
 - Moved App Info section from Profile to new About screen
 
+### Fixed
+- Xcode Cloud build now resolves Swift Package dependencies correctly
+
 ## [8.2] - 2026-01-22
 ### Changed
 - Redesigned court grid with rounded tile styling and spacing between cells

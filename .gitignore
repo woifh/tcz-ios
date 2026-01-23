@@ -36,7 +36,6 @@ Carthage/Build/
 # Swift Package Manager
 .build/
 .swiftpm/
-Package.resolved
 Packages/
 
 # Playgrounds
