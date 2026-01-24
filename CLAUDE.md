@@ -181,6 +181,15 @@ If your Mac's IP changes from `10.0.0.147`:
 - `MARKETING_VERSION` in `project.pbxproj` must match CHANGELOG.md
 - Update both Debug and Release configurations when bumping versions
 
+### Release Configuration (for woifh workflows)
+
+| Setting | Value |
+|---------|-------|
+| CHANGELOG | `TCZApp/CHANGELOG.md` |
+| Version file | `TCZApp/TCZApp.xcodeproj/project.pbxproj` |
+| Version keys | `MARKETING_VERSION` (both Debug and Release) |
+| Test command | Manual in Xcode (⌘U) or `xcodebuild test ...` |
+
 ---
 
 ## 📝 Adding New Swift Files
