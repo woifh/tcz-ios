@@ -3,6 +3,8 @@
 All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Dashboard and Reservations screens now auto-refresh when changes are made on the other screen
 
 ## [8.3] - 2026-01-24
 ### Added

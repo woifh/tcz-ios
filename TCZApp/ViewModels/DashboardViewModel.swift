@@ -46,6 +46,9 @@ final class DashboardViewModel: ObservableObject {
     private var currentAvailabilityTask: Task<Void, Never>?
     private var debounceTask: Task<Void, Never>?
 
+    // Combine subscriptions for cross-screen refresh
+    private var cancellables = Set<AnyCancellable>()
+
     // Track if initial load has completed to avoid resetting to today on tab return
     private var hasPerformedInitialLoad = false
 
@@ -72,6 +75,18 @@ final class DashboardViewModel: ObservableObject {
 
     init(apiClient: APIClientProtocol = APIClient.shared) {
         self.apiClient = apiClient
+        observeRefreshEvents()
+    }
+
+    private func observeRefreshEvents() {
+        RefreshCoordinator.shared.availabilityRefresh
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                Task { @MainActor in
+                    await self?.reloadAfterBookingChange()
+                }
+            }
+            .store(in: &cancellables)
     }
 
     func setCurrentUserId(_ id: String) {
@@ -477,6 +492,8 @@ final class DashboardViewModel: ObservableObject {
                     .cancelReservation(id: reservationId), body: nil
                 )
                 await loadBookingStatus()
+                // Notify Reservations screen to refresh
+                RefreshCoordinator.shared.reservationsRefresh.send()
             } catch {
                 // 3. Error - rollback to original state and show alert
                 availability = originalAvailability

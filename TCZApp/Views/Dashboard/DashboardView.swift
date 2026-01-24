@@ -186,7 +186,11 @@ struct DashboardView: View {
                     currentUserName: data.userName,
                     onComplete: {
                         bookingSheetData = nil
-                        Task { await viewModel.reloadAfterBookingChange() }
+                        Task {
+                            await viewModel.reloadAfterBookingChange()
+                            // Notify Reservations screen to refresh
+                            RefreshCoordinator.shared.reservationsRefresh.send()
+                        }
                     }
                 )
                 .preferredColorScheme(appTheme.colorScheme)

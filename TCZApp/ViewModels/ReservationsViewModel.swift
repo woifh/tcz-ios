@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 @MainActor
 final class ReservationsViewModel: ObservableObject {
@@ -9,9 +10,33 @@ final class ReservationsViewModel: ObservableObject {
 
     private let apiClient: APIClientProtocol
     private(set) var currentUserId: String?
+    private var cancellables = Set<AnyCancellable>()
 
     init(apiClient: APIClientProtocol = APIClient.shared) {
         self.apiClient = apiClient
+        observeRefreshEvents()
+    }
+
+    private func observeRefreshEvents() {
+        RefreshCoordinator.shared.reservationsRefresh
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                Task { @MainActor in
+                    await self?.silentRefresh()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    func silentRefresh() async {
+        do {
+            let response: ReservationsResponse = try await apiClient.request(.reservations, body: nil)
+            if response.reservations != reservations {
+                reservations = response.reservations
+            }
+        } catch {
+            // Silently ignore
+        }
     }
 
     func setCurrentUserId(_ id: String) {
@@ -46,6 +71,10 @@ final class ReservationsViewModel: ObservableObject {
             reservations.removeAll { $0.id == id }
 
             cancellingId = nil
+
+            // Notify Dashboard to refresh availability
+            RefreshCoordinator.shared.availabilityRefresh.send()
+
             return true
         } catch let apiError as APIError {
             error = apiError.localizedDescription

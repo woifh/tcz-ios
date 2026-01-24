@@ -49,6 +49,7 @@
 		010000000000003A /* ImageLibraryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000003A /* ImageLibraryPicker.swift */; };
 		010000000000003B /* ImageCropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000003B /* ImageCropView.swift */; };
 		010000000000003C /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000003C /* AboutView.swift */; };
+		010000000000003D /* RefreshCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020000000000003D /* RefreshCoordinator.swift */; };
 		054C411C2F1AEE2000407174 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 054C411D2F1AEE2000407174 /* CHANGELOG.md */; };
 		05B623BC2F1D73E40027C4DD /* PaymentReminderBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BB2F1D73E40027C4DD /* PaymentReminderBanner.swift */; };
 		05B623BD2F1D73E50027C4DD /* EmailVerificationBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B623BE2F1D73E50027C4DD /* EmailVerificationBanner.swift */; };
@@ -117,6 +118,7 @@
 		020000000000003A /* ImageLibraryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLibraryPicker.swift; sourceTree = "<group>"; };
 		020000000000003B /* ImageCropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropView.swift; sourceTree = "<group>"; };
 		020000000000003C /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		020000000000003D /* RefreshCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshCoordinator.swift; sourceTree = "<group>"; };
 		0300000000000001 /* TCZApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TCZApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C411D2F1AEE2000407174 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		057A09C02F2100AC003AC821 /* TCZApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TCZApp.entitlements; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 				0200000000000036 /* LayoutConstants.swift */,
 				0200000000000033 /* ProfilePictureCache.swift */,
 				0200000000000038 /* PushNotificationService.swift */,
+				020000000000003D /* RefreshCoordinator.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -549,6 +552,7 @@
 				010000000000003A /* ImageLibraryPicker.swift in Sources */,
 				010000000000003B /* ImageCropView.swift in Sources */,
 				010000000000003C /* AboutView.swift in Sources */,
+				010000000000003D /* RefreshCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
