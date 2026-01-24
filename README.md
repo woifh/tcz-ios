@@ -8,6 +8,12 @@ iOS app for the TCZ tennis court reservation system, built with SwiftUI.
 - iOS 16.0+
 - Swift 5.0
 
+## Dependencies
+
+Managed via Swift Package Manager:
+
+- [TOCropViewController](https://github.com/TimOliver/TOCropViewController) — Profile picture cropping
+
 ## Setup
 
 1. Clone the repository
