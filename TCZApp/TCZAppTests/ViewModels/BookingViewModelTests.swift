@@ -31,6 +31,11 @@ final class BookingViewModelTests: XCTestCase {
         XCTAssertTrue(sut.searchResults.isEmpty)
         XCTAssertFalse(sut.isSearching)
         XCTAssertFalse(sut.showSearch)
+        // Conflict resolution state
+        XCTAssertFalse(sut.showConflictResolution)
+        XCTAssertTrue(sut.activeSessions.isEmpty)
+        XCTAssertNil(sut.cancellingSessionId)
+        XCTAssertNil(sut.conflictError)
     }
 
     // MARK: - Setup Tests
@@ -233,5 +238,144 @@ final class BookingViewModelTests: XCTestCase {
         XCTAssertFalse(sut.showSearch)
         XCTAssertEqual(sut.searchQuery, "")
         XCTAssertTrue(sut.searchResults.isEmpty)
+    }
+
+    // MARK: - Conflict Resolution Tests
+
+    func testCreateBooking_BookingLimitExceeded_ShowsConflictResolution() async {
+        sut.selectedMemberId = "test-user-id"
+        sut.courtId = 1
+        sut.date = Date()
+        sut.time = "10:00"
+        mockAPIClient.mockError = APIError.bookingLimitExceeded(
+            "Du hast bereits 2 aktive Buchungen",
+            TestData.testActiveSessions
+        )
+
+        let result = await sut.createBooking()
+
+        XCTAssertFalse(result)
+        XCTAssertTrue(sut.showConflictResolution)
+        XCTAssertEqual(sut.activeSessions.count, 2)
+        XCTAssertNil(sut.error) // Should not set regular error
+        XCTAssertFalse(sut.isLoading)
+    }
+
+    func testCancelSession_Success_AutoRetriesBooking() async {
+        // Set up initial conflict state
+        sut.selectedMemberId = "test-user-id"
+        sut.courtId = 1
+        sut.date = Date()
+        sut.time = "10:00"
+        sut.showConflictResolution = true
+        sut.activeSessions = TestData.testActiveSessions
+
+        // Mock cancel response - auto-retry will fail due to mock limitation
+        // (MockAPIClient returns same response for all calls)
+        let cancelResponse: CancelResponse = try! TestData.decodeJSON("""
+        {"message": "Buchung storniert"}
+        """)
+        mockAPIClient.mockResponse = cancelResponse
+
+        let result = await sut.cancelSession(123)
+
+        // Verify cancel API was called
+        XCTAssertTrue(mockAPIClient.requestCalled)
+        XCTAssertNil(sut.cancellingSessionId) // Loading should be finished
+        // Session should be removed from list after successful cancel
+        XCTAssertEqual(sut.activeSessions.count, 1)
+        XCTAssertNil(sut.activeSessions.first { $0.reservationId == 123 })
+    }
+
+    func testCancelSession_CancelFailure_ShowsError() async {
+        sut.selectedMemberId = "test-user-id"
+        sut.showConflictResolution = true
+        sut.activeSessions = TestData.testActiveSessions
+        mockAPIClient.mockError = APIError.forbidden("Keine Berechtigung")
+
+        let result = await sut.cancelSession(123)
+
+        XCTAssertFalse(result)
+        XCTAssertNotNil(sut.conflictError)
+        XCTAssertNil(sut.cancellingSessionId)
+        XCTAssertTrue(sut.showConflictResolution) // Should stay on conflict screen
+    }
+
+    func testCancelSession_GenericError_ShowsGenericErrorMessage() async {
+        sut.selectedMemberId = "test-user-id"
+        sut.showConflictResolution = true
+        sut.activeSessions = TestData.testActiveSessions
+        mockAPIClient.mockError = NSError(domain: "Test", code: 1)
+
+        let result = await sut.cancelSession(123)
+
+        XCTAssertFalse(result)
+        XCTAssertEqual(sut.conflictError, "Fehler beim Stornieren")
+        XCTAssertNil(sut.cancellingSessionId)
+    }
+
+    func testDismissConflictResolution_ResetsState() {
+        // Set up conflict state
+        sut.showConflictResolution = true
+        sut.activeSessions = TestData.testActiveSessions
+        sut.conflictError = "Some error"
+
+        sut.dismissConflictResolution()
+
+        XCTAssertFalse(sut.showConflictResolution)
+        XCTAssertTrue(sut.activeSessions.isEmpty)
+        XCTAssertNil(sut.conflictError)
+    }
+
+    func testActiveSession_FormattedProperties() {
+        let session = TestData.testActiveSession
+
+        XCTAssertEqual(session.reservationId, 123)
+        XCTAssertEqual(session.formattedDate, "25.01.2026")
+        XCTAssertEqual(session.timeRange, "10:00-11:00")
+        XCTAssertEqual(session.courtName, "Platz 1")
+    }
+
+    func testActiveSession_WithBooker_ShowsBookerName() {
+        let session = TestData.testActiveSessionWithBooker
+
+        XCTAssertEqual(session.bookedByName, "Other Person")
+        XCTAssertEqual(session.bookedById, "booker-id")
+    }
+
+    // MARK: - Short-Notice Conflict Tests
+
+    func testCreateBooking_ShortNoticeLimitExceeded_ShowsConflictResolution() async {
+        sut.selectedMemberId = "test-user-id"
+        sut.courtId = 1
+        sut.date = Date()
+        sut.time = "15:00"
+        mockAPIClient.mockError = APIError.bookingLimitExceeded(
+            "Du hast bereits eine aktive kurzfristige Buchung",
+            TestData.testShortNoticeSessions
+        )
+
+        let result = await sut.createBooking()
+
+        XCTAssertFalse(result)
+        XCTAssertTrue(sut.showConflictResolution)
+        XCTAssertEqual(sut.activeSessions.count, 1)
+        XCTAssertTrue(sut.activeSessions.first?.isShortNotice == true)
+        XCTAssertNil(sut.error) // Should not set regular error
+    }
+
+    func testActiveSession_ShortNotice_HasCorrectFlag() {
+        let session = TestData.testShortNoticeSession
+
+        XCTAssertEqual(session.reservationId, 789)
+        XCTAssertTrue(session.isShortNotice == true)
+        XCTAssertEqual(session.formattedDate, "24.01.2026")
+        XCTAssertEqual(session.timeRange, "15:00-16:00")
+    }
+
+    func testActiveSession_Regular_HasCorrectFlag() {
+        let session = TestData.testActiveSession
+
+        XCTAssertTrue(session.isShortNotice == false)
     }
 }

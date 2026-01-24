@@ -177,6 +177,10 @@ final class APIClient: APIClientProtocol {
             throw APIError.notFound(parseErrorMessage(from: data))
         case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
+                // Check for booking limit error with active sessions
+                if let sessions = errorResponse.activeSessions, !sessions.isEmpty {
+                    throw APIError.bookingLimitExceeded(errorResponse.error, sessions)
+                }
                 throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
             throw APIError.badRequest("Ungültige Anfrage")
@@ -225,6 +229,10 @@ final class APIClient: APIClientProtocol {
             throw APIError.notFound(parseErrorMessage(from: data))
         case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
+                // Check for booking limit error with active sessions
+                if let sessions = errorResponse.activeSessions, !sessions.isEmpty {
+                    throw APIError.bookingLimitExceeded(errorResponse.error, sessions)
+                }
                 throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
             throw APIError.badRequest("Ungueltige Anfrage")

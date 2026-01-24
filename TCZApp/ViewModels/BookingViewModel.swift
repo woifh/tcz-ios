@@ -15,6 +15,12 @@ final class BookingViewModel: ObservableObject {
     @Published var isSearching = false
     @Published var showSearch = false
 
+    // Conflict resolution properties
+    @Published var showConflictResolution = false
+    @Published var activeSessions: [ActiveSession] = []
+    @Published var cancellingSessionId: Int?
+    @Published var conflictError: String?
+
     private let apiClient: APIClientProtocol
 
     var courtId: Int = 0
@@ -87,8 +93,16 @@ final class BookingViewModel: ObservableObject {
 
             return true
         } catch let apiError as APIError {
-            error = apiError.localizedDescription
             isLoading = false
+
+            // Check for booking limit error with active sessions
+            if case .bookingLimitExceeded(_, let sessions) = apiError {
+                activeSessions = sessions
+                showConflictResolution = true
+                return false
+            }
+
+            error = apiError.localizedDescription
             return false
         } catch {
             self.error = "Fehler beim Erstellen der Buchung"
@@ -151,5 +165,84 @@ final class BookingViewModel: ObservableObject {
         if !showSearch {
             resetSearch()
         }
+    }
+
+    // MARK: - Conflict Resolution
+
+    /// Cancel an active session to make room for new booking, then auto-retry
+    func cancelSession(_ sessionId: Int) async -> Bool {
+        cancellingSessionId = sessionId
+        conflictError = nil
+
+        do {
+            let _: CancelResponse = try await apiClient.request(
+                .cancelReservation(id: sessionId), body: nil
+            )
+
+            // Remove from local list
+            activeSessions.removeAll { $0.reservationId == sessionId }
+            cancellingSessionId = nil
+
+            // Auto-retry the booking
+            return await retryBooking()
+        } catch let apiError as APIError {
+            conflictError = apiError.localizedDescription
+            cancellingSessionId = nil
+            return false
+        } catch {
+            conflictError = "Fehler beim Stornieren"
+            cancellingSessionId = nil
+            return false
+        }
+    }
+
+    /// Retry the original booking after cancellation
+    private func retryBooking() async -> Bool {
+        isLoading = true
+        conflictError = nil
+
+        guard let bookedForId = selectedMemberId else {
+            conflictError = "Bitte wähle ein Mitglied aus"
+            isLoading = false
+            return false
+        }
+
+        let request = CreateBookingRequest(
+            courtId: courtId,
+            date: DateFormatterService.apiDate.string(from: date),
+            startTime: time,
+            bookedForId: bookedForId
+        )
+
+        do {
+            let _: BookingCreatedResponse = try await apiClient.request(
+                .createReservation, body: request
+            )
+            isSuccess = true
+            showConflictResolution = false
+            isLoading = false
+            return true
+        } catch let apiError as APIError {
+            // Check if this is another booking limit error (edge case)
+            if case .bookingLimitExceeded(_, let sessions) = apiError {
+                activeSessions = sessions
+                isLoading = false
+                return false
+            }
+            conflictError = apiError.localizedDescription
+            isLoading = false
+            return false
+        } catch {
+            conflictError = "Fehler beim Erstellen der Buchung"
+            isLoading = false
+            return false
+        }
+    }
+
+    /// Return to normal booking view without changes
+    func dismissConflictResolution() {
+        showConflictResolution = false
+        activeSessions = []
+        conflictError = nil
     }
 }

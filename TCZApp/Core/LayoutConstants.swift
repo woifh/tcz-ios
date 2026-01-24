@@ -70,7 +70,7 @@ enum DateRangeConstants {
     /// Number of days in the past to show
     static let pastDays = 30
     /// Number of days in the future to show
-    static let futureDays = 90
+    static let futureDays = 365
     /// Total days in the date range
     static var totalDays: Int { pastDays + futureDays + 1 }
 }

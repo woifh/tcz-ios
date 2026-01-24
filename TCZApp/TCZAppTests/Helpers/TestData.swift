@@ -188,6 +188,42 @@ enum TestData {
     }
     """
 
+    static let testActiveSessionJSON = """
+    {
+        "reservation_id": 123,
+        "date": "2026-01-25",
+        "start_time": "10:00",
+        "court_number": 1,
+        "booked_by_id": null,
+        "booked_by_name": null,
+        "is_short_notice": false
+    }
+    """
+
+    static let testActiveSessionWithBookerJSON = """
+    {
+        "reservation_id": 456,
+        "date": "2026-01-26",
+        "start_time": "14:00",
+        "court_number": 2,
+        "booked_by_id": "booker-id",
+        "booked_by_name": "Other Person",
+        "is_short_notice": false
+    }
+    """
+
+    static let testShortNoticeSessionJSON = """
+    {
+        "reservation_id": 789,
+        "date": "2026-01-24",
+        "start_time": "15:00",
+        "court_number": 1,
+        "booked_by_id": null,
+        "booked_by_name": null,
+        "is_short_notice": true
+    }
+    """
+
     // MARK: - Decoded Test Objects
 
     static var testMember: Member {
@@ -204,6 +240,26 @@ enum TestData {
 
     static var testFavoritesResponse: FavoritesResponse {
         try! decodeJSON(testFavoritesResponseJSON)
+    }
+
+    static var testActiveSession: ActiveSession {
+        try! decodeJSON(testActiveSessionJSON)
+    }
+
+    static var testActiveSessionWithBooker: ActiveSession {
+        try! decodeJSON(testActiveSessionWithBookerJSON)
+    }
+
+    static var testShortNoticeSession: ActiveSession {
+        try! decodeJSON(testShortNoticeSessionJSON)
+    }
+
+    static var testActiveSessions: [ActiveSession] {
+        [testActiveSession, testActiveSessionWithBooker]
+    }
+
+    static var testShortNoticeSessions: [ActiveSession] {
+        [testShortNoticeSession]
     }
 
     // MARK: - Helper Functions

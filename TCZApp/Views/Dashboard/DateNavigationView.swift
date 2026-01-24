@@ -132,12 +132,12 @@ struct DateStripView: View {
     let scrollToTodayTrigger: Bool
     let onDateSelected: () -> Void
 
-    // Generate dates: 30 days before and 90 days after today (121 total, reduced from 731)
+    // Generate dates using DateRangeConstants (pastDays before and futureDays after today)
     private static func generateDateRange() -> [Date] {
         let calendar = Calendar.current
         let today = Date()
         var dates: [Date] = []
-        for offset in -30...90 {
+        for offset in -DateRangeConstants.pastDays...DateRangeConstants.futureDays {
             if let date = calendar.date(byAdding: .day, value: offset, to: today) {
                 dates.append(date)
             }
@@ -167,7 +167,7 @@ struct DateStripView: View {
 
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
+                LazyHStack(spacing: 8) {
                     ForEach(dateRange, id: \.self) { date in
                         let dateString = dateId(date)
                         DayCell(

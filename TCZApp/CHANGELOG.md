@@ -6,8 +6,10 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 ### Added
 - Court grid auto-scrolls to current hour when viewing today
 - Info badge on TCZ logo to indicate it opens the About screen
+- Booking conflict resolution: when hitting the 2-booking limit, view and cancel existing bookings directly
 
 ### Changed
+- Calendar date range extended from 90 days to 1 year into the future
 - Member search selection in booking is now instant (no loading state)
 
 ### Fixed

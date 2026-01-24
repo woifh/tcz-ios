@@ -17,47 +17,23 @@ struct BookingSheet: View {
 
     var body: some View {
         NavigationView {
-            ScrollViewReader { scrollProxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        // 1. Booking details as horizontal chips
-                        bookingDetailsChips
-
-                        // 2. Member picker section
-                        memberPickerSection
-
-                        // 3. Search section
-                        searchSection
-
-                        // 4. Error display
-                        if let error = viewModel.error {
-                            Text(error)
-                                .foregroundColor(.red)
-                                .font(.subheadline)
+            Group {
+                if viewModel.showConflictResolution {
+                    BookingConflictView(
+                        viewModel: viewModel,
+                        onDismiss: {
+                            viewModel.dismissConflictResolution()
+                        },
+                        onComplete: {
+                            onComplete()
                         }
-                    }
-                    .padding()
-                }
-                .safeAreaInset(edge: .bottom) {
-                    confirmButton
-                }
-                .onChange(of: viewModel.searchResults) { results in
-                    if !results.isEmpty {
-                        withAnimation {
-                            scrollProxy.scrollTo("searchResults", anchor: .top)
-                        }
-                    }
-                }
-                .onChange(of: viewModel.isSearching) { isSearching in
-                    if !isSearching && viewModel.searchResults.isEmpty && !viewModel.searchQuery.isEmpty {
-                        withAnimation {
-                            scrollProxy.scrollTo("noResults", anchor: .top)
-                        }
-                    }
+                    )
+                } else {
+                    bookingContent
                 }
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Platz buchen")
+            .navigationTitle(viewModel.showConflictResolution ? "Platz buchen" : "Platz buchen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -93,6 +69,50 @@ struct BookingSheet: View {
             }
         }
         .interactiveDismissDisabled(viewModel.isLoading)
+    }
+
+    // MARK: - Booking Content
+
+    private var bookingContent: some View {
+        ScrollViewReader { scrollProxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    // 1. Booking details as horizontal chips
+                    bookingDetailsChips
+
+                    // 2. Member picker section
+                    memberPickerSection
+
+                    // 3. Search section
+                    searchSection
+
+                    // 4. Error display
+                    if let error = viewModel.error {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .font(.subheadline)
+                    }
+                }
+                .padding()
+            }
+            .safeAreaInset(edge: .bottom) {
+                confirmButton
+            }
+            .onChange(of: viewModel.searchResults) { results in
+                if !results.isEmpty {
+                    withAnimation {
+                        scrollProxy.scrollTo("searchResults", anchor: .top)
+                    }
+                }
+            }
+            .onChange(of: viewModel.isSearching) { isSearching in
+                if !isSearching && viewModel.searchResults.isEmpty && !viewModel.searchQuery.isEmpty {
+                    withAnimation {
+                        scrollProxy.scrollTo("noResults", anchor: .top)
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Booking Details Chips

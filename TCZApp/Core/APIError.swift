@@ -7,6 +7,7 @@ enum APIError: Error, LocalizedError {
     case forbidden(String)
     case notFound(String?)
     case badRequest(String)
+    case bookingLimitExceeded(String, [ActiveSession])
     case rateLimited(String?)
     case serverError(Int, String?)
     case networkError(Error)
@@ -25,6 +26,8 @@ enum APIError: Error, LocalizedError {
         case .notFound(let message):
             return message ?? "Die angeforderte Ressource wurde nicht gefunden"
         case .badRequest(let message):
+            return message
+        case .bookingLimitExceeded(let message, _):
             return message
         case .rateLimited(let message):
             return message ?? "Zu viele Anfragen. Bitte warte einen Moment."
@@ -58,15 +61,25 @@ struct ErrorResponse: Decodable {
     }
 }
 
-struct ActiveSession: Decodable {
+struct ActiveSession: Decodable, Identifiable {
+    let reservationId: Int
     let date: String
     let startTime: String
     let courtNumber: Int?
+    let bookedById: String?
+    let bookedByName: String?
+    let isShortNotice: Bool?
+
+    var id: Int { reservationId }
 
     enum CodingKeys: String, CodingKey {
+        case reservationId = "reservation_id"
         case date
         case startTime = "start_time"
         case courtNumber = "court_number"
+        case bookedById = "booked_by_id"
+        case bookedByName = "booked_by_name"
+        case isShortNotice = "is_short_notice"
     }
 
     var formattedDescription: String {
@@ -78,5 +91,23 @@ struct ActiveSession: Decodable {
         let courtStr = courtNumber.map { "Platz \($0)" } ?? ""
 
         return "\(dateStr) \(startTime)-\(endTime) \(courtStr)"
+    }
+
+    /// Formatted date for display (e.g., "25.01.2026")
+    var formattedDate: String {
+        let dateParts = date.split(separator: "-")
+        return dateParts.count == 3 ? "\(dateParts[2]).\(dateParts[1]).\(dateParts[0])" : date
+    }
+
+    /// Time range string (e.g., "10:00-11:00")
+    var timeRange: String {
+        let startHour = Int(startTime.prefix(2)) ?? 0
+        let endTime = String(format: "%02d:00", startHour + 1)
+        return "\(startTime)-\(endTime)"
+    }
+
+    /// Court display name (e.g., "Platz 2")
+    var courtName: String {
+        courtNumber.map { "Platz \($0)" } ?? "Platz"
     }
 }
