@@ -81,7 +81,18 @@ struct DashboardView: View {
                         Button {
                             showingProfile = true
                         } label: {
-                            ProfilePictureView(member: user, size: 56)
+                            ZStack(alignment: .bottomTrailing) {
+                                ProfilePictureView(member: user, size: 56)
+
+                                // Settings gear badge
+                                Image(systemName: "gearshape.fill")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(4)
+                                    .background(Color.gray.opacity(0.8))
+                                    .clipShape(Circle())
+                                    .offset(x: 2, y: 2)
+                            }
                         }
                         .buttonStyle(.plain)
                     }
