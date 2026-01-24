@@ -81,7 +81,7 @@ final class DashboardViewModelTests: XCTestCase {
     }
 
     func testLoadAvailability_Failure_SetsError() async {
-        mockAPIClient.mockError = APIError.serverError(500)
+        mockAPIClient.mockError = APIError.serverError(500, nil)
 
         await sut.loadAvailability()
 

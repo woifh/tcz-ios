@@ -140,7 +140,7 @@ final class FavoritesViewModelTests: XCTestCase {
 
     func testSearchMembers_Failure_ClearsResults() async {
         sut.searchResults = [TestData.testMemberSummary]
-        mockAPIClient.mockError = APIError.serverError(500)
+        mockAPIClient.mockError = APIError.serverError(500, nil)
 
         await sut.searchMembers(query: "Test")
 
@@ -235,7 +235,7 @@ final class FavoritesViewModelTests: XCTestCase {
     func testRemoveFavorite_APIError_ReturnsFalseWithError() async {
         sut.setCurrentUserId("user-123")
         sut.favorites = [TestData.testMemberSummary]
-        mockAPIClient.mockError = APIError.notFound
+        mockAPIClient.mockError = APIError.notFound(nil)
 
         let result = await sut.removeFavorite("partner-id")
 

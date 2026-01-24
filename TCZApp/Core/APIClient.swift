@@ -107,6 +107,11 @@ final class APIClient: APIClientProtocol {
         self.onUnauthorized = handler
     }
 
+    /// Parses server error message from response data
+    private func parseErrorMessage(from data: Data) -> String? {
+        try? decoder.decode(ErrorResponse.self, from: data).error
+    }
+
     private func buildRequest(for endpoint: APIEndpoint, body: Encodable?) throws -> URLRequest {
         // Use string concatenation to preserve query parameters (appendingPathComponent encodes ? and &)
         guard let url = URL(string: baseURL.absoluteString + endpoint.path) else {
@@ -169,14 +174,14 @@ final class APIClient: APIClientProtocol {
             }
             throw APIError.forbidden("Du hast keine Berechtigung für diese Aktion")
         case 404:
-            throw APIError.notFound
+            throw APIError.notFound(parseErrorMessage(from: data))
         case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
                 throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
             throw APIError.badRequest("Ungültige Anfrage")
         case 429:
-            throw APIError.rateLimited
+            throw APIError.rateLimited(parseErrorMessage(from: data))
         default:
             // Retry once on transient server errors (500, 502, 503, 504) for GET requests
             let isRetryableError = [500, 502, 503, 504].contains(httpResponse.statusCode)
@@ -187,7 +192,7 @@ final class APIClient: APIClientProtocol {
                 try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
                 return try await performRequest(endpoint, body: body, attempt: attempt + 1)
             }
-            throw APIError.serverError(httpResponse.statusCode)
+            throw APIError.serverError(httpResponse.statusCode, parseErrorMessage(from: data))
         }
     }
 
@@ -217,16 +222,16 @@ final class APIClient: APIClientProtocol {
             }
             throw APIError.forbidden("Du hast keine Berechtigung für diese Aktion")
         case 404:
-            throw APIError.notFound
+            throw APIError.notFound(parseErrorMessage(from: data))
         case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
                 throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
             throw APIError.badRequest("Ungueltige Anfrage")
         case 429:
-            throw APIError.rateLimited
+            throw APIError.rateLimited(parseErrorMessage(from: data))
         default:
-            throw APIError.serverError(httpResponse.statusCode)
+            throw APIError.serverError(httpResponse.statusCode, parseErrorMessage(from: data))
         }
     }
 
@@ -291,13 +296,15 @@ final class APIClient: APIClientProtocol {
             let handler = self.onUnauthorized
             DispatchQueue.main.async { handler?() }
             throw APIError.unauthorized
+        case 403:
+            throw APIError.forbidden(parseErrorMessage(from: data) ?? "Du hast keine Berechtigung für diese Aktion")
         case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
                 throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
             throw APIError.badRequest("Ungültige Anfrage")
         default:
-            throw APIError.serverError(httpResponse.statusCode)
+            throw APIError.serverError(httpResponse.statusCode, parseErrorMessage(from: data))
         }
     }
 
@@ -326,10 +333,12 @@ final class APIClient: APIClientProtocol {
             let handler = self.onUnauthorized
             DispatchQueue.main.async { handler?() }
             throw APIError.unauthorized
+        case 403:
+            throw APIError.forbidden(parseErrorMessage(from: data) ?? "Du hast keine Berechtigung für diese Aktion")
         case 404:
-            throw APIError.notFound
+            throw APIError.notFound(parseErrorMessage(from: data))
         default:
-            throw APIError.serverError(httpResponse.statusCode)
+            throw APIError.serverError(httpResponse.statusCode, parseErrorMessage(from: data))
         }
     }
 
@@ -358,13 +367,17 @@ final class APIClient: APIClientProtocol {
             let handler = self.onUnauthorized
             DispatchQueue.main.async { handler?() }
             throw APIError.unauthorized
-        case 400, 404:
+        case 403:
+            throw APIError.forbidden(parseErrorMessage(from: data) ?? "Du hast keine Berechtigung für diese Aktion")
+        case 400:
             if let errorResponse = try? decoder.decode(ErrorResponse.self, from: data) {
                 throw APIError.badRequest(errorResponse.fullErrorMessage)
             }
             throw APIError.badRequest("Fehler beim Löschen")
+        case 404:
+            throw APIError.notFound(parseErrorMessage(from: data))
         default:
-            throw APIError.serverError(httpResponse.statusCode)
+            throw APIError.serverError(httpResponse.statusCode, parseErrorMessage(from: data))
         }
     }
 }

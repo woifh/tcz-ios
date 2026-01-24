@@ -353,7 +353,7 @@ final class ProfileViewModelTests: XCTestCase {
         await sut.loadProfile(memberId: "test-user-id")
 
         mockAPIClient.reset()
-        mockAPIClient.mockError = APIError.notFound
+        mockAPIClient.mockError = APIError.notFound(nil)
 
         let result = await sut.deleteProfilePicture()
 

@@ -12,6 +12,7 @@ All notable changes to the TCZ Tennis App will be documented in this file.
 
 ### Fixed
 - Dashboard and Reservations screens now auto-refresh when changes are made on the other screen
+- API errors now display server-provided messages instead of generic text
 
 ## [8.3] - 2026-01-24
 ### Added

@@ -75,7 +75,7 @@ final class BookingViewModelTests: XCTestCase {
 
     func testLoadFavorites_Failure_DoesNotCrash() async {
         sut.currentUserId = "test-user-id"
-        mockAPIClient.mockError = APIError.serverError(500)
+        mockAPIClient.mockError = APIError.serverError(500, nil)
 
         await sut.loadFavorites()
 
@@ -189,7 +189,7 @@ final class BookingViewModelTests: XCTestCase {
     }
 
     func testSearchMembers_Failure_ClearsResults() async {
-        mockAPIClient.mockError = APIError.serverError(500)
+        mockAPIClient.mockError = APIError.serverError(500, nil)
 
         await sut.searchMembers(query: "test")
 

@@ -5,10 +5,10 @@ enum APIError: Error, LocalizedError {
     case invalidData
     case unauthorized
     case forbidden(String)
-    case notFound
+    case notFound(String?)
     case badRequest(String)
-    case rateLimited
-    case serverError(Int)
+    case rateLimited(String?)
+    case serverError(Int, String?)
     case networkError(Error)
     case decodingError(Error)
 
@@ -22,14 +22,14 @@ enum APIError: Error, LocalizedError {
             return "Bitte melde dich erneut an"
         case .forbidden(let message):
             return message
-        case .notFound:
-            return "Die angeforderte Ressource wurde nicht gefunden"
+        case .notFound(let message):
+            return message ?? "Die angeforderte Ressource wurde nicht gefunden"
         case .badRequest(let message):
             return message
-        case .rateLimited:
-            return "Zu viele Anfragen. Bitte warte einen Moment."
-        case .serverError(let code):
-            return "Serverfehler (\(code)). Bitte versuche es später erneut."
+        case .rateLimited(let message):
+            return message ?? "Zu viele Anfragen. Bitte warte einen Moment."
+        case .serverError(let code, let message):
+            return message ?? "Serverfehler (\(code)). Bitte versuche es später erneut."
         case .networkError:
             return "Netzwerkfehler. Bitte überprüfe deine Verbindung."
         case .decodingError:
