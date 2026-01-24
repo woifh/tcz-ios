@@ -239,9 +239,7 @@ struct BookingSheet: View {
                     ForEach(Array(viewModel.searchResults.prefix(5).enumerated()), id: \.element.id) { index, member in
                         Button {
                             isSearchFocused = false
-                            Task {
-                                await viewModel.selectSearchedMember(member)
-                            }
+                            viewModel.selectSearchedMember(member)
                         } label: {
                             HStack {
                                 ProfilePictureView(member: member, size: 40)
@@ -257,19 +255,14 @@ struct BookingSheet: View {
 
                                 Spacer()
 
-                                if viewModel.isAddingToFavorites {
-                                    ProgressView()
-                                } else {
-                                    Image(systemName: "checkmark.circle")
-                                        .foregroundColor(.green)
-                                        .font(.system(size: 20))
-                                }
+                                Image(systemName: "checkmark.circle")
+                                    .foregroundColor(.green)
+                                    .font(.system(size: 20))
                             }
                             .padding()
                             .background(Color(.systemBackground))
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .disabled(viewModel.isAddingToFavorites)
 
                         if index < min(viewModel.searchResults.count, 5) - 1 {
                             Divider()

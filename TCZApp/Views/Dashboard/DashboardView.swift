@@ -64,11 +64,21 @@ struct DashboardView: View {
                         Button {
                             showingAbout = true
                         } label: {
-                            Image("tcz_icon")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 56, height: 56)
-                                .clipShape(Circle())
+                            ZStack(alignment: .bottomTrailing) {
+                                Image("tcz_icon")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 56, height: 56)
+                                    .clipShape(Circle())
+
+                                Image(systemName: "info.circle.fill")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(4)
+                                    .background(Color.gray.opacity(0.8))
+                                    .clipShape(Circle())
+                                    .offset(x: 2, y: 2)
+                            }
                         }
                         .buttonStyle(.plain)
                         Text("Platz-Reservierung")

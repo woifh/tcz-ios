@@ -14,7 +14,6 @@ final class BookingViewModel: ObservableObject {
     @Published var searchResults: [MemberSummary] = []
     @Published var isSearching = false
     @Published var showSearch = false
-    @Published var isAddingToFavorites = false
 
     private let apiClient: APIClientProtocol
 
@@ -82,6 +81,10 @@ final class BookingViewModel: ObservableObject {
             )
             isSuccess = true
             isLoading = false
+
+            // Refresh favorites (server may have added new favorite)
+            await loadFavorites()
+
             return true
         } catch let apiError as APIError {
             error = apiError.localizedDescription
@@ -129,27 +132,12 @@ final class BookingViewModel: ObservableObject {
         isSearching = false
     }
 
-    func selectSearchedMember(_ member: MemberSummary) async {
-        guard let userId = currentUserId else { return }
-
-        isAddingToFavorites = true
-
-        let request = AddFavoriteRequest(favouriteId: member.id)
-
-        do {
-            let response: AddFavoriteResponse = try await apiClient.request(
-                .addFavorite(memberId: userId), body: request
-            )
-            favorites.append(response.favourite)
-            selectedMemberId = member.id
-            resetSearch()
-        } catch {
-            // Even if adding to favorites fails, still select the member for booking
-            selectedMemberId = member.id
-            resetSearch()
-        }
-
-        isAddingToFavorites = false
+    func selectSearchedMember(_ member: MemberSummary) {
+        // Add to local favorites for immediate UI display
+        // Server will persist the favourite when booking is created
+        favorites.append(member)
+        selectedMemberId = member.id
+        resetSearch()
     }
 
     func resetSearch() {

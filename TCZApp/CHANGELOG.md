@@ -3,6 +3,13 @@
 All notable changes to the TCZ Tennis App will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Court grid auto-scrolls to current hour when viewing today
+- Info badge on TCZ logo to indicate it opens the About screen
+
+### Changed
+- Member search selection in booking is now instant (no loading state)
+
 ### Fixed
 - Dashboard and Reservations screens now auto-refresh when changes are made on the other screen
 

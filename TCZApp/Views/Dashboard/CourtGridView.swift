@@ -43,27 +43,63 @@ struct CourtGridView: View {
             )
             .padding(.bottom, LayoutConstants.courtGridCellSpacing)
 
-            // SCROLLABLE: Time slot rows only
-            ScrollView {
-                TabView(selection: $selectedPage) {
-                    ForEach(0..<viewModel.totalPages, id: \.self) { pageIndex in
-                        TimeSlotRowsView(
-                            viewModel: viewModel,
-                            pageIndex: pageIndex,
-                            onSlotTap: onSlotTap,
-                            rowHeight: rowHeight
-                        )
-                        .tag(pageIndex)
+            // SCROLLABLE: Time slot rows only (each page has its own ScrollView)
+            TabView(selection: $selectedPage) {
+                ForEach(0..<viewModel.totalPages, id: \.self) { pageIndex in
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            TimeSlotRowsView(
+                                viewModel: viewModel,
+                                pageIndex: pageIndex,
+                                onSlotTap: onSlotTap,
+                                rowHeight: rowHeight
+                            )
+                            .frame(height: timeSlotsHeight)
+                        }
+                        .onAppear {
+                            scrollToCurrentHourIfNeeded(proxy: proxy, pageIndex: pageIndex)
+                        }
                     }
+                    .tag(pageIndex)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(height: timeSlotsHeight)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .sheet(isPresented: $showLegend) {
             LegendSheet()
                 .presentationDetents([.height(260)])
                 .preferredColorScheme(appTheme.colorScheme)
+        }
+    }
+
+    private func scrollToCurrentHourIfNeeded(proxy: ScrollViewProxy, pageIndex: Int) {
+        // Only auto-scroll for today
+        guard viewModel.isToday else {
+            return
+        }
+
+        // Calculate current hour from device time (Berlin timezone)
+        guard let berlinTimeZone = TimeZone(identifier: "Europe/Berlin") else {
+            return
+        }
+        var berlinCalendar = Calendar.current
+        berlinCalendar.timeZone = berlinTimeZone
+        let currentHour = berlinCalendar.component(.hour, from: Date())
+
+        // If before or after operating hours (8-21), don't scroll
+        guard currentHour >= 8 && currentHour < 22 else {
+            return
+        }
+
+        // Scroll to current hour
+        let targetTime = String(format: "%02d:00", currentHour)
+
+        // Use unique ID for this page (IDs are "pageIndex-time")
+        let targetId = "\(pageIndex)-\(targetTime)"
+
+        // Delay to ensure layout is complete
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            proxy.scrollTo(targetId, anchor: .top)
         }
     }
 }
@@ -206,6 +242,7 @@ struct TimeSlotRowsView: View {
                         .buttonStyle(.plain)
                     }
                 }
+                .id("\(pageIndex)-\(time)")  // Unique ID per page for ScrollViewReader
             }
         }
         .contentShape(Rectangle())
