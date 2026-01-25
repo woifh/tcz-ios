@@ -13,7 +13,8 @@ This app **consumes the API** defined by the web backend.
 
 | Project | Path | Relationship |
 |---------|------|--------------|
-| Web Backend | `/Users/woifh/tcz/tcz-web` | Defines API we consume |
+| Web Backend | `/Users/woifh/tcz/tcz-server` | Defines API we consume |
+| React Web | `/Users/woifh/tcz/tcz-web` | Sibling app, same API (different auth method) |
 | Android App | `/Users/woifh/tcz/tcz-android` | Sibling app, same API |
 
 ### Cross-Project Search
@@ -22,10 +23,10 @@ See "Cross-Project Search" in the parent CLAUDE.md (`/Users/woifh/tcz/CLAUDE.md`
 
 ### API Debugging Tips
 
-- **Getting unexpected data?** → Check endpoint in `tcz-web/app/routes/api/`
-- **401 errors?** → Check auth flow in `tcz-web/app/routes/api/auth.py`
+- **Getting unexpected data?** → Check endpoint in `tcz-server/app/routes/api/`
+- **401 errors?** → Check auth flow in `tcz-server/app/routes/api/auth.py`
 - **Different behavior than Android?** → Compare implementations
-- **New endpoint needed?** → Ask to create it in tcz-web first
+- **New endpoint needed?** → Ask to create it in tcz-server first
 
 ---
 
@@ -213,7 +214,7 @@ Use existing file entries as templates. Without these entries, Xcode reports "Ca
 - New files must be added to `project.pbxproj` manually
 - `@MainActor` required on all ViewModels
 - Keychain access can fail silently in simulator — test on device for auth issues
-- Don't assume API response format — check tcz-web implementation
+- Don't assume API response format — check tcz-server implementation
 - Don't forget to handle token expiration (401 responses)
 
 ---
